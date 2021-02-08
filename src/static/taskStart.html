@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+	<meta charset="utf-8">
+	<title>执行任务</title>
+
+	<link href="bootstrap/bootstrap.css" rel="stylesheet" />
+	<link href="bootstrap/taskstyle-light.css" rel="stylesheet" />
+	<script src="jquery-1.10.2.js"></script>
+	<script src="bootstrap/bootstrap.min.js"></script>
+	<script src="taskStart.js"></script>
+	<style>
+		ul {
+			margin: 0;
+			padding: 0;
+		}
+
+		li {
+			margin: 0;
+			padding: 0;
+		}
+
+		#myTab li {
+			width: 25%;
+			float: left;
+			height: 40px;
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		#myTab li img {
+			float: left;
+			height: 40px;
+		}
+
+		#myTab li a {
+			color: white;
+			text-align: center;
+			position: relative;
+			display: block;
+			padding: 10px 15px;
+		}
+
+		.blue {
+			background: #0f9af2;
+		}
+
+		.gray {
+			background: #dfdfdf;
+		}
+
+		.tabPaneUl {
+			width: 700px;
+			margin: 0 auto;
+			list-style: none;
+		}
+
+		.tabPaneUl li {
+			height: 40px;
+			line-height: 40px;
+		}
+
+		.tab-pane {
+			margin-top: 50px;
+		}
+	</style>
+
+	<script>
+
+		// 步骤导航条 点击事件
+		var eventFun = {
+			setStep: function (index) {
+				for (var i = 2; i <= index; i++) {
+					$("#step" + i + "Li").addClass("blue").removeClass("gray");
+					$("#step" + i + "Img").attr("src", "images/blue_blue.png");
+				}
+				for (var i = index + 1; i <= 4; i++) {
+					$("#step" + i + "Li").addClass("gray").removeClass("blue");
+					$("#step" + i + "Img").attr("src", "images/gray_gray.png");
+				}
+				$("#step" + (index + 1) + "Img").attr("src", "images/blue_gray.png");
+			}
+		};
+	</script>
+</head>
+
+<body>
+	<div id="page-inner">
+		<!-- <div class="row" style="padding:10px;background: #bebebe">
+			<div class="col-md-12">
+				<div class="input-group" style="width: 60%; float: left;font-size: 20px;font-weight: bolder;">
+					执行任务
+				</div>
+			</div>
+		</div> -->
+		<div class="row" style="margin-top:30px">
+			<ul id="myTab" role="tablist">
+				<li id="step1Li" class="active blue">
+					<a href="#step1" onclick="eventFun.setStep(1)" role="tab" data-toggle="tab">
+						1. 脉冲编码转换
+					</a>
+				</li>
+				<li id="step2Li" class="gray">
+					<img src="images/blue_gray.png" id="step2Img" />
+					<a href="#step2" onclick="eventFun.setStep(2)" role="tab" data-toggle="tab">
+						2. 输入脉冲转换
+					</a>
+				</li>
+				<li id="step3Li" class="gray">
+					<img src="images/gray_gray.png" id="step3Img" />
+					<a href="#step3" onclick="eventFun.setStep(3)" role="tab" data-toggle="tab">
+						3. 运行任务
+					</a>
+				</li>
+				<li id="step4Li" class="gray">
+					<img src="images/gray_gray.png" id="step4Img" />
+					<a href="#step4" onclick="eventFun.setStep(4)" role="tab" data-toggle="tab">
+						4. 查看任务详情
+					</a>
+				</li>
+			</ul>
+			<div id="myTabContent" class="tab-content">
+
+				<div id="step1" class="tab-pane fade active in">
+					<div class="step-detail">
+						<div class="clearfix thewrap">
+							<p>功能介绍：将输入图片转换为脉冲编码后的`*.txt`文本文件。</p>
+							</br>
+							<div class="step-order">
+								<span>1. 选择输入数据所在的文件夹: </span>
+								<button id="select-png-dir" onclick="selectImgDir()">选择目录</button>
+								<span id="select-png-dir-ret" class="select-ret"></span>
+							</div>
+							</br>
+							<!-- <div class="step-order">
+								<span>2.导入配置文件 br2.pkl: </span>
+								<button id="select-br2-pkl-file" onclick="selectBr2pkl()">选择配置文件</button>
+								<span id="select-br2-pkl-ret" class="select-ret"></span>
+							</div>
+							</br>
+							<div class="step-order">
+								<span>3. 指定转换结果存放路径: </span>
+								<button id="select-save-dir" onclick="selectRetSavePath()">指定存储路径</button>
+								<span id="select-save-dir-ret" class="select-ret"></span>
+							</div> -->
+							</br>
+							<span>2. 单击按钮执行数据编码转换: </span>
+							<button id="doImgConvert" onclick="doImgConvert()">图像编码</button>
+							</br>
+							</br>
+							<span>命令下发结果: </span>
+							<span id="start-img-convert" class="select-ret"></span>
+							</br>
+							</br>
+							<span>图像数据编码转换结果: </span>
+							<span id="convert-ret" class="select-ret"></span>
+							</br>
+							</br>
+							<span>图像数据编码转换结果存储路径: </span>
+							<span id="convert-ret-path" class="select-ret"></span>
+						</div>
+					</div>
+				</div>
+
+
+				<div id="step2" class="tab-pane fade">
+					<div class="step-detail">
+						<div class="clearfix thewrap">
+							<p>功能介绍：将脉冲输入文件转为二进制。</p>
+							<!-- <div class="step-order">
+								<span>1. 选择脉冲数据所在的文件夹: </span>
+								<button id="select-pickle-dir" onclick="selectPickleDir()">选择目录</button>
+								<span id="select-pickle-dir-ret" class="select-ret"></span>
+							</div> -->
+							</br>
+							</br>
+							<span>单击按钮执行数据编码转换: </span>
+							<button id="doPickleConvert" onclick="doPickleConvert()">二进制转换</button>
+							</br>
+							</br>
+							<span>命令下发结果: </span>
+							<span id="start-pickle-convert" class="select-ret"></span>
+							</br>
+							</br>
+							<span>二进制编码转换结果: </span>
+							<span id="convert-pickle-ret" class="select-ret"></span>
+							</br>
+							</br>
+							<span>二进制编码转换结果存储路径: </span>
+							<span id="convert-pickle-ret-path" class="select-ret"></span>
+						</div>
+					</div>
+				</div>
+
+
+				<div id="step3" class="tab-pane fade">
+					<div class="step-detail">
+						<div class="clearfix thewrap">
+							<p>功能介绍：将数据发给芯片执行任务。</p>
+							</br>
+							</br>
+							<span>单击按钮运行任务: </span>
+							<button id="doStartTask" onclick="doStartTask()">运行任务</button>
+							</br>
+							</br>
+							<span>任务启动结果: </span>
+							<span id="start-task-ret" class="select-ret"></span>
+							</br>
+							</br>
+							<span>任务运行输出: </span>
+							<span id="run-task-ret" class="select-ret"></span>
+							</br>
+							</br>
+							<span>任务执行结果: </span>
+							<span id="finish-task-ret" class="select-ret"></span>
+						</div>
+					</div>
+				</div>
+
+
+				<div id="step4" class="tab-pane fade">
+					<div class="step-detail">
+						<div class="clearfix thewrap">
+							<p>功能介绍：任务启动成功，可以查看任务执行详情。</p>
+							</br>
+							</br>
+							<span>单击按钮查看任务详情: </span>
+							<button id="getTaskDetail" onclick="getTaskDetail()">查看任务</button>
+							</br>
+							</br>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+	</div>
+
+	<!-- 弹出框
+	<div>
+		<div id="convertResultShow" class="alert-box">
+			<p align="center" id="convertResult"></p>
+			
+			<a href="javascript:void(0)" @click="closeResult()"  style="float: right">关闭</a>
+		</div>
+	</div> -->
+
+</body>
+
+</html>

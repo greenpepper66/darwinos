@@ -1,0 +1,210 @@
+{
+	"name": "darwinos",
+	"displayName": "darwinos",
+	"description": "",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.52.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:darwinos.helloWorld",
+		"onView:model_view",
+		"onView:resource_view",
+		"onView:task_view",
+		"*"	
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "darwinos.helloWorld",
+				"title": "Hello World"
+			},
+			{
+				"command": "resource_view.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "media/light/refresh.svg",
+					"dark": "media/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "resource_view.resOverview",
+				"title": "Overview"
+			},
+			{
+				"command": "model_view.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "media/light/refresh.svg",
+					"dark": "media/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "model_view.modelOverview",
+				"title": "Overview"
+			},
+			{
+				"command": "model_view.deployTask",
+				"title": "Deploy"
+			},
+			{
+				"command": "model_view.deleteTask",
+				"title": "Delete"
+			},
+			{
+				"command": "model_view.uploadModel",
+				"title": "Upload Model",
+				"icon": {
+					"light": "media/light/plus.svg",
+					"dark": "media/dark/plus.svg"
+				}
+			},
+			{
+				"command": "task_view.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "media/light/refresh.svg",
+					"dark": "media/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "task_view.taskOverview",
+				"title": "Overview"
+			},
+			{
+				"command": "task_view.startTask",
+				"title": "Start"
+			},
+			{
+				"command": "task_view.stopTask",
+				"title": "Stop"
+			},
+			{
+				"command": "task_view.resetTask",
+				"title": "Reset"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "operating_system",
+					"title": "类脑计算机",
+					"icon": "media/monitoring.svg"
+				}
+			]
+		},
+		"views": {
+			"operating_system": [
+				{
+					"id": "resource_view",
+					"name": "资源视图",
+					"contextualTitle": "resource view"
+				},
+				{
+					"id": "model_view",
+					"name": "模型视图",
+					"contextualTitle": "model view"
+				},
+				{
+					"id": "task_view",
+					"name": "任务视图",
+					"contextualTitle": "task view"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "resource_view.refreshEntry",
+					"when": "view == resource_view",
+					"group": "navigation"
+				},
+				{
+					"command": "resource_view.resOverview",
+					"when": "view == resource_view"
+				},
+				{
+					"command": "model_view.refreshEntry",
+					"when": "view == model_view",
+					"group": "navigation"
+				},
+				{
+					"command": "model_view.modelOverview",
+					"when": "view == model_view"
+				},
+				{
+					"command": "model_view.uploadModel",
+					"when": "view == model_view",
+					"group": "navigation"
+				},
+				{
+					"command": "task_view.refreshEntry",
+					"when": "view == task_view",
+					"group": "navigation"
+				},
+				{
+					"command": "task_view.taskOverview",
+					"when": "view == task_view"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "model_view.deployTask",
+					"when": "view == model_view && viewItem == Model"
+				},
+				{
+					"command": "model_view.deleteTask",
+					"when": "view == model_view && viewItem == Model"
+				},
+				{
+					"command": "task_view.startTask",
+					"when": "view == task_view && viewItem == Task"
+				},
+				{
+					"command": "task_view.stopTask",
+					"when": "view == task_view && viewItem == Task"
+				},
+				{
+					"command": "task_view.resetTask",
+					"when": "view == task_view && viewItem == Task"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"dependencies": {
+		"axios": "^0.19.2",
+		"byte-length": "1.0.2",
+		"child_process": "^1.0.2",
+		"jquery": "^3.5.1",
+		"jsdom": "^16.4.0",
+		"serve": "^11.3.2",
+		"tsc": "^1.20150623.0"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.52.0",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.4",
+		"@types/node": "^12.11.7",
+		"@typescript-eslint/eslint-plugin": "^3.0.2",
+		"@typescript-eslint/parser": "^3.0.2",
+		"eslint": "^7.1.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.1.3",
+		"typescript": "^4.1.2",
+		"vscode-test": "^1.4.1",
+		"serve-handler": "^6.1.3",
+		"@types/jquery": "^3.5.1"
+	}
+}
