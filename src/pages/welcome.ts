@@ -65,7 +65,7 @@ module.exports = function(context) {
             }
         );
         let global = { panel};
-        panel.webview.html = getWebViewContent(context, 'src/static/custom-welcome.html');
+        panel.webview.html = getWebViewContent(context, 'src/static/views/custom-welcome.html');
         panel.webview.onDidReceiveMessage(message => {
             if (messageHandler[message.cmd]) {
                 messageHandler[message.cmd](global, message);

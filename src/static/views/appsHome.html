@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title>执行任务</title>
+    <link href="../css/taskstyle-dark.css" rel="stylesheet" />
+    <style>
+        /*将页面分为4个部分*/
+        .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix {
+            *zoom: 1;
+        }
+
+        .thewrap {
+            margin-top: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+
+        .quarter-div {
+            width: 50%;
+            box-sizing: border-box;
+            float: left;
+            overflow: auto;
+            margin-bottom: 10px;
+            border-color: red;
+        }
+
+        .imgApp {
+            min-height: 360px;
+            text-align: right;
+            padding-top: 100px;
+            padding-right: 30px;
+        }
+
+        .voiceApp {
+            min-height: 360px;
+            padding-top: 100px;
+        }
+
+        .brainApp {
+            min-height: 300px;
+            text-align: right;
+            padding-right: 30px;
+        }
+
+        .otherApp {
+            min-height: 300px;
+        }
+
+        hr {
+            width: 90%;
+        }
+    </style>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+
+        function gotoAppPage(num) {
+            vscode.postMessage({
+                command: 'gotoAppPage',
+                text: num,
+            })
+        }
+    </script>
+
+</head>
+
+<body>
+    <div class="appMain">
+        <div class="clearfix thewrap">
+            <div class="quarter-div imgApp">
+                <img src="../images/1.jpg" id="app1" onclick="gotoAppPage(1)" />
+            </div>
+
+            <div class="quarter-div voiceApp">
+                <img src="../images/2.jpg" id="app2" onclick="gotoAppPage(2)" />
+            </div>
+        </div>
+        <div class="clearfix thewrap">
+            <div class="quarter-div brainApp">
+                <img src="../images/3.jpg" id="app3" onclick="gotoAppPage(3)" />
+            </div>
+
+            <div class="quarter-div otherApp">
+                <img src="../images/4.jpg" id="app4" onclick="gotoAppPage(4)" />
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

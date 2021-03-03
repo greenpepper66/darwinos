@@ -8,10 +8,11 @@ import * as path from 'path';
 import { Model, ModelProvider } from "./DataProvider/ModelProvider";
 import { Task, TaskProvider } from "./DataProvider/TaskProvider";
 import { Node, Chip, ResProvider } from "./DataProvider/ResProvider";
+import { AppsProvider } from "./DataProvider/AppsProvider"
 import { PageProvideByPort, PageProvideByPath, changeIndexHtmlCss } from "./PageProvider";
 import { task_start, task_stop, task_reset, task_deploy, task_delete } from "./os/task_operations"
-import {startHttpServer} from './os/server';
-import { getTaskInputHtml } from "./DataProvider/TaskStart"
+import { startHttpServer } from './os/server';
+import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome"
 
 const PORT = 5001;
 
@@ -58,8 +59,29 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('task_view', TaskDataProvider);
 
 
+
+
+
+	// 应用视图
+	const AppsDataProvider = new AppsProvider(vscode.workspace.rootPath);
+	vscode.window.registerTreeDataProvider('apps_view', AppsDataProvider);
+	vscode.commands.registerCommand('apps_view.refreshEntry', () => AppsDataProvider.refresh());
+	vscode.commands.registerCommand('apps_view.appsOverview', () => {
+		AppsHomePageProvide(context);  // overview按钮打开应用视图首页
+	});
+	// 应用视图导航栏子选项单击命令
+	vscode.commands.registerCommand('extension.gotoAppPage', (name, num) => {
+		console.log("etadfdgfd", name, num);
+		openCertainAppHomePage(context, num);
+	});
+
+
+
+
+
+
 	//启动httpserver，接收来自web页面的数据
-	startHttpServer(ResDataProvider,ModelDataProvider,TaskDataProvider);
+	startHttpServer(ResDataProvider, ModelDataProvider, TaskDataProvider);
 
 	//resource view
 	vscode.commands.registerCommand('resource_view.refreshEntry', () => ResDataProvider.refresh());
@@ -109,7 +131,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// 	vscode.window.showInformationMessage(`Successfully called start task.`);
 	// });
 
-	require('./DataProvider/TaskStart')(context); // 
+	require('./pages/TaskStart')(context); // 
 	// require('./DataProvider/welcome')(context); // 欢迎提示
 
 
@@ -127,6 +149,8 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('extension.openPage', (name, port, route) => {
 		PageProvideByPort(name, port, route)
 	});
+
+
 
 }
 

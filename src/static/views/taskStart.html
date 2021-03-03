@@ -5,11 +5,11 @@
 	<meta charset="utf-8">
 	<title>执行任务</title>
 
-	<link href="bootstrap/bootstrap.css" rel="stylesheet" />
-	<link href="bootstrap/taskstyle-light.css" rel="stylesheet" />
-	<script src="jquery-1.10.2.js"></script>
-	<script src="bootstrap/bootstrap.min.js"></script>
-	<script src="taskStart.js"></script>
+	<link href="../bootstrap/bootstrap.css" rel="stylesheet" />
+	<link href="../css/taskstyle-light.css" rel="stylesheet" />
+	<script src="../lib/jquery-1.10.2.js"></script>
+	<script src="../bootstrap/bootstrap.min.js"></script>
+	<script src="../js/taskStart.js"></script>
 	<style>
 		ul {
 			margin: 0;
@@ -74,13 +74,13 @@
 			setStep: function (index) {
 				for (var i = 2; i <= index; i++) {
 					$("#step" + i + "Li").addClass("blue").removeClass("gray");
-					$("#step" + i + "Img").attr("src", "images/blue_blue.png");
+					$("#step" + i + "Img").attr("src", "../images/blue_blue.png");
 				}
 				for (var i = index + 1; i <= 4; i++) {
 					$("#step" + i + "Li").addClass("gray").removeClass("blue");
-					$("#step" + i + "Img").attr("src", "images/gray_gray.png");
+					$("#step" + i + "Img").attr("src", "../images/gray_gray.png");
 				}
-				$("#step" + (index + 1) + "Img").attr("src", "images/blue_gray.png");
+				$("#step" + (index + 1) + "Img").attr("src", "../images/blue_gray.png");
 			}
 		};
 	</script>
@@ -103,19 +103,19 @@
 					</a>
 				</li>
 				<li id="step2Li" class="gray">
-					<img src="images/blue_gray.png" id="step2Img" />
+					<img src="../images/blue_gray.png" id="step2Img" />
 					<a href="#step2" onclick="eventFun.setStep(2)" role="tab" data-toggle="tab">
 						2. 输入脉冲转换
 					</a>
 				</li>
 				<li id="step3Li" class="gray">
-					<img src="images/gray_gray.png" id="step3Img" />
+					<img src="../images/gray_gray.png" id="step3Img" />
 					<a href="#step3" onclick="eventFun.setStep(3)" role="tab" data-toggle="tab">
 						3. 运行任务
 					</a>
 				</li>
 				<li id="step4Li" class="gray">
-					<img src="images/gray_gray.png" id="step4Img" />
+					<img src="../images/gray_gray.png" id="step4Img" />
 					<a href="#step4" onclick="eventFun.setStep(4)" role="tab" data-toggle="tab">
 						4. 查看任务详情
 					</a>

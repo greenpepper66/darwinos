@@ -4,6 +4,7 @@ import * as path from 'path';
 import { exec } from "child_process";
 import { PageProvideByPort } from "../PageProvider";
 
+const taskHtmlFilePath = 'src/static/views/taskStart.html';
 
 const paramSet = {
     oriImgDir: "",  // 李畅目录， 只选一次
@@ -31,6 +32,15 @@ export function getTaskInputHtml(context, templatePath) {
         return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
     });
 
+    
+	// 任务输入执行页面样式
+    let vscodeColorTheme = vscode.window.activeColorTheme.kind;
+	if (vscodeColorTheme == 2) {
+		html = html.replace(/taskstyle-light.css/, "taskstyle-dark.css");
+	} else if(vscodeColorTheme == 1) {
+		html = html.replace(/taskstyle-dark.css/, "taskstyle-light.css");
+	}
+
     return html;
 }
 
@@ -48,7 +58,7 @@ module.exports = function (context) {
             }
         );
         let global = { panel, context };
-        panel.webview.html = getTaskInputHtml(context, 'src/static/taskStart.html');
+        panel.webview.html = getTaskInputHtml(context, taskHtmlFilePath);
         panel.webview.onDidReceiveMessage(message => {
             if (messageHandler[message.command]) {
                 messageHandler[message.command](global, message);

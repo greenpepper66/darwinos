@@ -39,17 +39,6 @@ export function changeIndexHtmlCss(context, vscodeColorTheme) {
 		dstHtml = oriHtml.replace(/dark.css/, "light.css");
 	}
 	fs.writeFileSync(indexPath, dstHtml);
-
-	// 任务输入执行页面样式
-	let taskHtmlPath =  path.join(context.extensionPath, 'src/static/taskStart.html');
-	let oriTaskHtml = fs.readFileSync(taskHtmlPath, 'utf-8');
-	let dstTaskHtml = "";
-	if (vscodeColorTheme == 2) {
-		dstTaskHtml = oriTaskHtml.replace(/taskstyle-light.css/, "taskstyle-dark.css");
-	} else if(vscodeColorTheme == 1) {
-		dstTaskHtml = oriTaskHtml.replace(/taskstyle-dark.css/, "taskstyle-light.css");
-	}
-	fs.writeFileSync(taskHtmlPath, dstTaskHtml);
 }
 
 
@@ -74,7 +63,7 @@ export function PageProvideByPort(name,port,route){
 					</style>
 				</head>
 				<body>
-					<iframe src="http://localhost:${PORT}/#/${ROUTE}"></iframe>
+					<iframe src="http://localhost:${PORT}/#/${ROUTE}" sandbox ="allow-scripts allow-popups allow-same-origin"></iframe>
 				</body>
 				</html>`
 		
