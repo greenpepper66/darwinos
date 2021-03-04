@@ -48,15 +48,39 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 			{
 				command: 'extension.gotoAppPage',
 				title: '',
-				arguments: ["testName", 1]
+				arguments: ["imgApp", 1]
 			}
 		);
 		this.appKinds.push(imgApp);
-		var voiceApp = new AppKind("语音识别", vscode.TreeItemCollapsibleState.None);
+		var voiceApp = new AppKind(
+			"语音识别",
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: 'extension.gotoAppPage',
+				title: '',
+				arguments: ["voiceApp", 2]
+			}
+		);
 		this.appKinds.push(voiceApp);
-		var brainApp = new AppKind("脑电模拟", vscode.TreeItemCollapsibleState.None);
+		var brainApp = new AppKind(
+			"脑电模拟",
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: 'extension.gotoAppPage',
+				title: '',
+				arguments: ["brainApp", 3]
+			}
+		);
 		this.appKinds.push(brainApp);
-		var otherApp = new AppKind("其他应用", vscode.TreeItemCollapsibleState.None);
+		var otherApp = new AppKind(
+			"其他应用",
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: 'extension.gotoAppPage',
+				title: '',
+				arguments: ["otherApp", 4]
+			}
+		);
 		this.appKinds.push(otherApp);
 
 		return Promise.resolve(this.appKinds);

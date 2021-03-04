@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title>新建应用</title>
+
+
+    <style>
+        .img-local-dir {
+            display: inline;
+            width: 82%;
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+
+    <script type="text/javascript">
+    </script>
+
+</head>
+
+<body>
+
+    <!-- 按钮触发模态框 -->
+    <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+        创建新的项目
+    </button>
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" id="myModalContent">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        新建数字图像识别应用
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form" id="project_info_form">
+                        <div class="form-group">
+                            <label for="project_name">应用名称</label>
+                            <input type="text" class="form-control" id="project_name">
+                        </div>
+                        <!-- <div class="form-group">
+                            <label for="select_type">选择数字图像输入源</label>
+                            <select class="form-control" id="select_type" οnchange="showImg()">
+                                <option volue="none" style="display: none;"></option>
+                                <option value="localImg">本地文件</option>
+                                <option value="remoteImg">远程文件</option>
+                            </select>
+                        </div> -->
+                        <div class="form-group" id="select_local_path">
+                            <label for="img_local_path">选择图像所在的文件夹</label>
+                            <div>
+                                <button type="button" class="btn btn-primary" id="select-dir"
+                                    onclick="selectImgDir()">选择文件夹</button>
+                                <input type="text" class="img-local-dir" id="img-local-dir" />
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="model_file_type">绑定模型文件</label>
+                            <el-select v-model="selected_dropdown_value" placeholder="请选择">
+                                <el-option v-for="item in modelFileList" :key="item.id" :label="item.name"
+                                    :value="item.name">
+                                </el-option>
+                            </el-select>
+                            
+                        </div>
+                        <div class="form-group">
+                            <label for="ann_lib_type">选择编码方法</label>
+                            <select class="form-control" id="ann_lib_type">
+                                <option>默认方法（李畅+刘铮）</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="dismiss">关闭
+                    </button>
+                    <button type="button" class="btn btn-default" id="saveConfig">保存应用
+                    </button>
+                    <button type="button" class="btn btn-primary" id="create">创建应用
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+
+
+</body>
+
+<link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="../lib/jquery/jquery.min.js"></script>
+<script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+<!-- 自定义样式放在后面加载 -->
+<link href="../css/dark.css" rel="stylesheet" />
+<script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/imgAppHome.js"></script>
+<script>Vue.config.ProductionTip = false</script>
+
+</html>

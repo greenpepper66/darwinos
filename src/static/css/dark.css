@@ -45,3 +45,11 @@ hr {
   overflow: auto;
   background-color: rgb(80, 80, 80);
 }
+
+/**  新建应用页面内模态框样式 **/
+#myModalContent {
+  background-color: #333;;
+  color: white;
+}
+
+
