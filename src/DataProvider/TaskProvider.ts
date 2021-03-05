@@ -21,22 +21,6 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 	  }
 	
 	  getChildren(element?: Task): Thenable<Task[]> {
-		this.tasks=[];
-		var task=new Task(
-			"name",
-			vscode.TreeItemCollapsibleState.None,
-			1,
-			1,
-			"nodeIP",
-			{
-				command: 'extension.openPage',
-				title: '',
-				arguments: ["任务"+"name"+"详情",
-				5001,
-				"taskDetail?nodeID="+1+"&modelID="+1]
-			}
-		);
-		this.tasks.push(task);
 		return Promise.resolve(this.tasks);
 	  }
 	

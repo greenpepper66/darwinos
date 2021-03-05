@@ -29,6 +29,9 @@ export function startHttpServer(ResDataProvider: ResProvider,
 			var models = JSONdata.models;
 			var tasks = JSONdata.tasks;
 
+			// 保存在全局变量中
+			allData.modelFileList = models;
+
 			ResDataProvider.updateNodes(nodes);
 			ModelDataProvider.updateModels(models);
 			TaskDataProvider.updateTasks(tasks);
