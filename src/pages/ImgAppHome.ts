@@ -3,12 +3,18 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { allData } from '../os/server';
+import { glob } from 'glob';
 
 const imgAppHomeHtmlFilePath = "src/static/views/imgAppHome.html";
 const newImgAppHtmlFilePath = "src/static/views/newImgApp.html";
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
 
 
+/**
+ * ******************************************************************************************************
+ * 消息通信
+ * ******************************************************************************************************
+ */
 
 // 2. 与数字图像识别应用首页交互
 const imgAppMessageHandler = {
@@ -16,7 +22,20 @@ const imgAppMessageHandler = {
     gotoNewAppPage(global, message) {
         console.log(message);
         openNewImgAppPage(global.context);
+    },
 
+    // 2.2 查询所有应用列表
+    getAppsConfigList(global, message) {
+        console.log(message);
+        let allApps = searchAllJson(global.context);
+        global.panel.webview.postMessage({ appsConfigListRet: allApps });
+    },
+
+    // 2.3 删除应用
+    deleteAppConfig(global, message) {
+        console.log(message);
+        deleteJson(global.context, message.text);
+        global.panel.webview.postMessage({ deleteAppConfigRet: "success" });
     },
 };
 
@@ -46,26 +65,39 @@ const newImgAppMessageHandler = {
     // 3.3 保存应用配置
     saveImgAppConfig(global, message) {
         console.log(message);
-        if (message.text.length != 4) {
-            global.panel.webview.postMessage({ saveImgAppConfigRet: "error" });
+        if (message.text.length != 5 || message.text[0] == "" || message.text[1] == "" || message.text[2] == "" || message.text[3] == "" || message.text[4] == "") {
+            global.panel.webview.postMessage({ saveImgAppConfigRet: "error: save failed, please check your input!" });
         } else {
             // 随机生成id， 利用js中的Date对象
-            var num = Math.random();
-			var date = new Date();
-			var id = date.getTime();//得到时间的13位毫秒数
-            console.log("id:", id)
-            let imgAppConfig = new ImgAppConfigData(id, message.text[0], message.text[1], message.text[2], message.text[3]);
+            // var num = Math.random();
+            let date = new Date();
+            let id = date.getTime();//得到时间的13位毫秒数
+
+            let name = message.text[0];
+            let imgAppConfig = new ImgAppConfigData(id, name);
+
+            let createTime = dateFormat("YYYY-mm-dd HH:MM", date);
+            console.log("id:", id, "time: ", createTime);
+            imgAppConfig.createTime = createTime;
+            imgAppConfig.imgSrcKind = message.text[1];
+            imgAppConfig.imgSrcDir = message.text[2];
+            imgAppConfig.modeFileID = message.text[3];
+            imgAppConfig.encodeMethodID = message.text[4];
+
             writeJson(global.context, imgAppConfig); //写入json文件
+
             global.panel.webview.postMessage({ saveImgAppConfigRet: "success" });
         }
-
-
     },
-
-
 
 };
 
+
+/**
+ * ******************************************************************************************************
+ * 新建webview页面
+ * ******************************************************************************************************
+ */
 
 // html页面处理
 export function getAppsHomeHtml(context, templatePath) {
@@ -102,6 +134,7 @@ export function openImgAppHomePage(context) {
             retainContextWhenHidden: true,
         }
     );
+
     let global = { panel, context };
     panel.webview.html = getAppsHomeHtml(context, imgAppHomeHtmlFilePath);
     panel.webview.onDidReceiveMessage(message => {
@@ -111,6 +144,7 @@ export function openImgAppHomePage(context) {
             vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
         }
     }, undefined, context.subscriptions);
+
 }
 
 
@@ -147,11 +181,15 @@ export function openNewImgAppPage(context) {
 
 
 
+
 /**
+ * ******************************************************************************************************
  * JSON文件处理
  * 本地保存新建应用配置信息
  * 参考 https://blog.csdn.net/zhaoxiang66/article/details/79894209
+ * ******************************************************************************************************
  */
+
 // Json文件类
 class ImgAppJsonData {
     public data: any[];
@@ -160,18 +198,17 @@ class ImgAppJsonData {
 
 // 应用的配置信息类
 class ImgAppConfigData {
-    public id: number;
-    public name: string;
-    public imgStrDir: string;
-    public modeFileID: number;
-    public encodeMethodID: number;
+    public id: number;              // 应用ID
+    public name: string;            // 应用名称
+    public imgSrcKind: string;      // 图像源类型：本地图像或远程图像
+    public imgSrcDir: string;       // 图像源
+    public modeFileID: number;      // 模型文件ID
+    public encodeMethodID: number;  // 编码方法ID
+    public createTime: string;      // 应用创建时间
 
-    constructor(id: number, name: string, imgStrDir: string, modeFileID: number, encodeMethodID: number) {  // 构造函数 实例化类的时候触发的方法
+    constructor(id: number, name: string) {  // 构造函数 实例化类的时候触发的方法
         this.id = id;
         this.name = name;
-        this.imgStrDir = imgStrDir;
-        this.modeFileID = modeFileID;
-        this.encodeMethodID = encodeMethodID;
     }
 }
 
@@ -185,17 +222,24 @@ class ImgAppConfigData {
 //  }
 
 
-//写入json文件选项
+//1. 增：写入json文件选项， 最多保存20条, 异步处理，不会等待执行结束
 function writeJson(context, imgAppConfig) {
-    console.log("json dealing...");
+    console.log("json writing...");
     let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     //现将json文件读出来
     fs.readFile(resourcePath, function (err, data) {
         if (err) {
+            console.error(err);
             return console.error(err);
         }
         var stringContent = data.toString();//将二进制的数据转换为字符串
         var jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
+
+        // 最多保存20条
+        if (jsonContent.total == 20) {
+            jsonContent.data.splice(0, 1);
+        }
+
         jsonContent.data.push(imgAppConfig);//将传来的对象push进数组对象中
         jsonContent.total = jsonContent.data.length;//定义一下总条数，为以后的分页打基础
         console.log(jsonContent);
@@ -203,9 +247,98 @@ function writeJson(context, imgAppConfig) {
         fs.writeFile(resourcePath, str, function (err) {
             if (err) {
                 console.error(err);
+                return console.error(err);
             }
             console.log('----------新增成功-------------');
+            return console.log("save app config success");
         })
     })
 }
 
+// 2. 删：根据id删除json文件中的选项
+function deleteJson(context, id) {
+    console.log("json deleting...");
+    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+
+    fs.readFile(resourcePath, function (err, data) {
+        if (err) {
+            return console.error(err);
+        }
+        var stringContent = data.toString();//将二进制的数据转换为字符串
+        var jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
+        //把数据读出来删除
+        for (var i = 0; i < jsonContent.data.length; i++) {
+            if (id == jsonContent.data[i].id) {
+                //console.log(person.data[i])
+                jsonContent.data.splice(i, 1);  // splice删除位置i上的1个元素
+            }
+        }
+        console.log(jsonContent.data);
+        jsonContent.total = jsonContent.data.length;
+        var str = JSON.stringify(jsonContent);
+        //然后再把数据写进去
+        fs.writeFile(resourcePath, str, function (err) {
+            if (err) {
+                console.error(err);
+                return console.error(err);
+            }
+            console.log("----------删除成功------------");
+            return console.log("delete app config success");
+        })
+    })
+}
+
+// 3. 查：同步处理
+function searchAllJson(context) {
+    console.log("json searching...");
+    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+
+    let data = fs.readFileSync(resourcePath, 'utf-8');
+
+    let stringContent = data.toString();//将二进制的数据转换为字符串
+    let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
+    //把数据读出来
+
+    let length = jsonContent.data.length;
+    let allApps = jsonContent.data;
+    console.log('------------------------查询成功allApps');
+    console.log(allApps);
+    return allApps;
+
+}
+
+
+
+
+
+
+
+/**
+ * ******************************************************************************************************
+ * 工具函数
+ * ******************************************************************************************************
+ */
+
+// 格式化应用创建时间
+function dateFormat(fmt, date) {
+    let ret;
+    const opt = {
+        "Y+": date.getFullYear().toString(),        // 年
+        "m+": (date.getMonth() + 1).toString(),     // 月
+        "d+": date.getDate().toString(),            // 日
+        "H+": date.getHours().toString(),           // 时
+        "M+": date.getMinutes().toString(),         // 分
+        "S+": date.getSeconds().toString()          // 秒
+        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+    };
+    for (let k in opt) {
+        ret = new RegExp("(" + k + ")").exec(fmt);
+        if (ret) {
+            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+        };
+    };
+    return fmt;
+}
+// let date = new Date()
+// dateFormat("YYYY-mm-dd HH:MM", date)
+// >>> `2019-06-06 19:45`

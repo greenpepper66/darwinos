@@ -22,6 +22,8 @@
     </style>
 
     <script type="text/javascript">
+
+
     </script>
 
 </head>
@@ -29,20 +31,20 @@
 <body>
     <div id="newImgApp">
         <!-- 按钮触发模态框 -->
-        <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" style="display: none;">
+        <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
             创建新的项目
         </button>
 
 
         <!-- 模态框（Modal） -->
         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+            aria-hidden="true" data-backdrop="static" data-keyboard="false">
             <div class="modal-dialog">
-                <div class="modal-content" id="myModalContent">
+                <div class="modal-content, myModalContent">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                             &times;
-                        </button>
+                        </button> -->
                         <h4 class="modal-title" id="myModalLabel">
                             新建数字图像识别应用
                         </h4>
@@ -53,26 +55,33 @@
                                 <label for="project_name">应用名称</label>
                                 <input type="text" class="form-control" id="project_name">
                             </div>
-                            <!-- <div class="form-group">
-                            <label for="select_type">选择数字图像输入源</label>
-                            <select class="form-control" id="select_type" οnchange="showImg()">
-                                <option volue="none" style="display: none;"></option>
-                                <option value="localImg">本地文件</option>
-                                <option value="remoteImg">远程文件</option>
-                            </select>
-                        </div> -->
-                            <div class="form-group" id="select_local_path">
+                            <div class="form-group">
+                                <label for="select_type">选择数字图像输入源</label>
+                                <select class="form-control" id="select_imgSrc_type" onchange="selectImgSrcKind()">
+                                    <option volue="none" style="display: none;"></option>
+                                    <option value="localImg">本地文件</option>
+                                    <option value="remoteImg">远程文件</option>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group" id="select_local_path" style="display: none;">
                                 <label for="img_local_path">选择图像所在的文件夹</label>
                                 <div>
                                     <button type="button" class="btn btn-primary" id="select-dir"
                                         onclick="selectImgDir()">选择文件夹</button>
                                     <input type="text" class="img-local-dir" id="img-local-dir" />
                                 </div>
-
                             </div>
+                            <div class="form-group" id="get_remoteIP_addr" style="display: none;">
+                                <label for="remoteIP_addr">请输入远程IP地址</label>
+                                <input type="text" class="form-control" id="remoteIP_addr">
+                            </div>
+
+
                             <div class="form-group">
                                 <label for="model_file_type">绑定模型文件</label>
-                                <select class="form-control" id="select_model" >
+                                <select class="form-control" id="select_model">
                                     <option volue="none" style="display: none;"></option>
                                 </select>
 
@@ -100,7 +109,70 @@
 
 
 
+        <!-- 确认信息-失败-->
+        <!-- 按钮触发模态框 -->
+        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#errInfoModal" style="display: none;"
+            id="btn_errInfoModal">
+            开始演示模态框
+        </button>
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="errInfoModal" tabindex="-1" role="dialog" aria-labelledby="errInfoModalLabel"
+            aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content, myModalContent">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="errInfoModalLabel">
+                            应用保存结果
+                        </h4>
+                    </div>
+                    <br>
+                    <span class="modal-body" id="errInfoModalContent"> </span>
+                    <div class="modal-body">
+                        保存失败，请重新尝试！
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     </div>
+
+
+
+    <!-- 确认信息-成功-->
+    <!-- 按钮触发模态框 -->
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#successInfoModal" style="display: none;"
+        id="btn_successInfoModal">
+        开始演示模态框
+    </button>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="successInfoModal" tabindex="-1" role="dialog" aria-labelledby="successInfoModalLabel"
+        aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content, myModalContent">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title" id="successInfoModalLabel">
+                        应用保存结果
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    保存成功！
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    </div>
+
 </body>
 
 <link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet">

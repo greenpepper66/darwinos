@@ -149,26 +149,43 @@
             最近使用的应用
             <hr />
             <div class="row">
-                <table class="table">
+                <table class="table" id="appsTable">
                     <thead>
                         <tr>
-                            <th>应用编号</th>
+                            <th>应用ID</th>
                             <th>应用名称</th>
                             <th>应用类别</th>
                             <th>模型ID</th>
-                            <th>模型名称</th>
+                            <th>编码方法</th>
                             <th>创建时间</th>
                             <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <template v-if="show == true">
+                        <!-- 数据加载不出来，改为js动态添加 -->
+                        <!-- <template v-if="appsConfigList.length == 0">
                             <tr>
                                 <template v-for="j in 7">
                                     <td width="10%" :key="j">-</td>
                                 </template>
                             </tr>
                         </template>
+                        <tr v-for="(item, index) in appsConfigList" :key="index">
+                            <td width="10%">{{ item.id }}</td>
+                            <td width="10%">{{ item.name }}</td>
+                            <td width="10%">数字图像识别</td>
+                            <td width="10%">{{ item.modeFileID }}</td>
+                            <td width="10%">{{ item.encodeMethodID }}</td>
+                            <td width="10%">{{ item.createTime }}</td>
+                            <td width="20%">
+                                <button>详情</button>
+                                <button>启动</button>
+                                <button>移除</button>
+                            </td>
+                        </tr> -->
+
+
+
                     </tbody>
                 </table>
             </div>
@@ -179,6 +196,7 @@
 
 
     <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
+    <script src="../lib/jquery/jquery.min.js"></script>
     <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
     <script src="../js/imgAppHome.js"></script>
     <script>Vue.config.ProductionTip = false</script>

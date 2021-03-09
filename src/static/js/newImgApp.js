@@ -1,7 +1,11 @@
 
 const vscode = acquireVsCodeApi();
 
-
+/**
+ * ******************************************************************************************************
+ * 给插件发送消息
+ * ******************************************************************************************************
+ */
 // 新建图像识别应用页面
 function selectImgDir() {
     vscode.postMessage({
@@ -17,6 +21,7 @@ function getModelFileList() {
     });
 }
 
+
 // 保存应用配置信息
 function saveImgAppConfig() {
     console.log("saveImgAppConfig js function ");
@@ -24,25 +29,36 @@ function saveImgAppConfig() {
     // 判断各个选项是否为空
 
     // 获取各个输入项
-    var appName = document.getElementById("project_name").value;
-    var imgDir = document.getElementById("img-local-dir").value;
-    var modelFileID = document.getElementById("select_model").value;
-    var encodeMethodID = document.getElementById("encode_method_type").value;
+    let appName = document.getElementById("project_name").value;  // 应用名称
+    let imgSrcKind = document.getElementById("select_imgSrc_type").value; // 数据源
+    if (imgSrcKind == "localImg") {
+        var imgDir = document.getElementById("img-local-dir").value;
+    } else if (imgSrcKind == "remoteImg") {
+        var imgDir = document.getElementById("remoteIP_addr").value;
+    }
 
-    console.log("获取各个输入项", appName, imgDir, modelFileID, encodeMethodID);
+    let modelFileID = document.getElementById("select_model").value;
+    let encodeMethodID = document.getElementById("encode_method_type").value;
+
+    console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID);
 
     vscode.postMessage({
         command: 'saveImgAppConfig',
-        text: [appName, imgDir, modelFileID, encodeMethodID],
+        text: [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID],
     });
 }
 
 
+
+/**
+ * ******************************************************************************************************
+ * 接收插件的消息
+ * ******************************************************************************************************
+ */
 // vscode返回的消息处理
 window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
-
 
     // 点击隐藏的按钮，弹出模态框
     if (message.createImgApplictaion != undefined) {
@@ -59,28 +75,49 @@ window.addEventListener('message', event => {
 
     // 获取模型文件列表
     if (message.modelFileListRet != undefined) {
-        modelFileListRet = message.modelFileListRet;
+        let modelFileListRet = message.modelFileListRet;
         console.log('---------------------------message：get model list', modelFileListRet[0].id);
         this.modelFileList = modelFileListRet;
         console.log(this.modelFileList[0].name);
-        for (var i = 0; i < modelFileListRet.length; i++) {
+        for (let i = 0; i < modelFileListRet.length; i++) {
             // new Option("Option text","Option value");
             $("#select_model").append((new Option(modelFileListRet[i].id + " - " + modelFileListRet[i].name + " - " + modelFileListRet[i].nodeIP, modelFileListRet[i].id)));
         }
     }
 
-    // 获取应用配置保存结果
+    // 获取应用配置保存结果，并弹出提示框
     if (message.saveImgAppConfigRet != undefined) {
         console.log('---------------------------message：get config save result', message.saveImgAppConfigRet);
-        if(message.saveImgAppConfigRet == "success") {
-
-        } else if(message.saveImgAppConfigRet == "error") {
-            
+        if (message.saveImgAppConfigRet == "success") {
+            document.getElementById("btn_successInfoModal").click();
+        } else if (message.saveImgAppConfigRet.indexOf("error") != -1) {
+            document.getElementById("errInfoModalContent").innerText = message.saveImgAppConfigRet;
+            document.getElementById("btn_errInfoModal").click();
         }
     }
 
 });
 
+
+
+/**
+ * ******************************************************************************************************
+ * 工具函数
+ * ******************************************************************************************************
+ */
+// 用户选择数据源：本地图像还是远程ip
+function selectImgSrcKind() {
+    console.log(document.getElementById("select_imgSrc_type").value);
+    let imgSrcKind = document.getElementById("select_imgSrc_type").value
+    if (imgSrcKind == "localImg") {
+        document.getElementById("select_local_path").style.display = "";//显示
+        document.getElementById("get_remoteIP_addr").style.display = "none";//隐藏
+    } else if (imgSrcKind == "remoteImg") {
+        document.getElementById("select_local_path").style.display = "none";//隐藏
+        document.getElementById("get_remoteIP_addr").style.display = "";//显示
+    }
+
+}
 
 new Vue({
     el: '#newImgApp',
@@ -93,6 +130,7 @@ new Vue({
     mounted() {
 
         getModelFileList();
+
     },
     watch: {
 

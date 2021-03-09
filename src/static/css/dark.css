@@ -8,14 +8,14 @@ button {
   color: white;
 }
 button:hover {
-  background-color: #497fdf; 
+  background-color: #497fdf;
 }
 input {
   background: white;
   color: black;
-} 
+}
 hr {
-  color:  rgb(80, 80, 80);
+  color: rgb(80, 80, 80);
 }
 
 /** dark 弹出框样式 **/
@@ -29,7 +29,7 @@ hr {
   background-color: black;
   z-index: 1001;
   -moz-opacity: 0.8;
-  opacity: .80;
+  opacity: 0.8;
   filter: alpha(opacity=88);
 }
 .alert-box {
@@ -47,9 +47,7 @@ hr {
 }
 
 /**  新建应用页面内模态框样式 **/
-#myModalContent {
-  background-color: #333;;
+.myModalContent {
+  background-color: #333;
   color: white;
 }
-
-

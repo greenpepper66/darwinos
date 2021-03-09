@@ -71,7 +71,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	// 应用视图导航栏子选项单击命令
 	vscode.commands.registerCommand('extension.gotoAppPage', (name, num) => {
-		console.log("etadfdgfd", name, num);
 		openCertainAppHomePage(context, num);
 	});
 
