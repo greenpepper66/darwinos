@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title>数字图像识别</title>
+    <link href="../css/dark.css" rel="stylesheet" />
+    <!-- CSS goes in the document HEAD or added to your external stylesheet -->
+    <style type="text/css">
+        table.hovertable {
+            font-family: verdana, arial, sans-serif;
+            border-width: 1px;
+            border-collapse: collapse;
+            margin: 0 auto;
+            margin-top: 30px;
+        }
+
+        table.hovertable th {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: #ADADAD;
+        }
+
+        table.hovertable tr {
+            background-color: #7B7B7B;
+        }
+
+        table.hovertable td {
+            border-width: 1px;
+            padding: 8px;
+            border-style: solid;
+            border-color: #ADADAD;
+            
+        }
+
+        table.hovertable tr td:nth-child(1) {
+            text-align: right;
+            padding-right: 20px;
+            width: 300px;
+        }
+        table.hovertable tr td:nth-child(2) {
+            text-align: left;
+            padding-left: 20px;
+            width: 500px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 150px;
+        }
+    </style>
+
+    <script>
+        function test(tr) {
+            tr.style.backgroundColor = '#7B7B7B';
+        }
+        function test2(tr) {
+            tr.style.backgroundColor = '#9D9D9D';
+        }
+    </script>
+</head>
+
+<body>
+    <div id="imgAppInfo">
+        <h2>{{ appName }}应用详情</h2>
+        <!-- Table goes in the document BODY -->
+        <table class="hovertable">
+           
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>应用ID</td>
+                <td>1615340189648</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>应用名称</td>
+                <td>testa</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>应用类型</td>
+                <td>数字图像识别</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>应用创建时间</td>
+                <td>2021-03-10 09:36</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>模型ID</td>
+                <td>11</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>模型名称</td>
+                <td>config.b</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>模型所在节点名称</td>
+                <td>节点2</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>模型所在节点IP</td>
+                <td>192.12.2.2</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>数据源类型</td>
+                <td>本地数据</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>数据源所在文件夹</td>
+                <td>D:/workspace/lab-work/github/darwinos/src/static/images</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>图像总数量</td>
+                <td>50</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>图像编码方法</td>
+                <td>默认方法（李畅+刘铮）</td>
+            </tr>
+            <tr onmouseover="test2(this)" onmouseout="test(this)">
+                <td>图像编码所需配置文件所在文件夹</td>
+                <td>D:/workspace/lab-work/github/darwinos/src/static/images</td>
+            </tr>
+        </table>
+    </div>
+
+
+    <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script>Vue.config.ProductionTip = false</script>
+</body>
+
+</html>

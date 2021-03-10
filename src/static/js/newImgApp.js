@@ -20,6 +20,13 @@ function getModelFileList() {
         text: '从插件获取所有模型文件'
     });
 }
+function selectEncodeConfDir() {
+    console.log("selectEncodeConfDir js function ");
+    vscode.postMessage({
+        command: 'selectEncodeConfDir',
+        text: '选择编码所需配置文件所在的文件夹'
+    });
+}
 
 
 // 保存应用配置信息
@@ -39,12 +46,13 @@ function saveImgAppConfig() {
 
     let modelFileID = document.getElementById("select_model").value;
     let encodeMethodID = document.getElementById("encode_method_type").value;
+    let encodeConfDir = document.getElementById("encode_config_dir").value;
 
-    console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID);
+    console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir);
 
     vscode.postMessage({
         command: 'saveImgAppConfig',
-        text: [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID],
+        text: [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir],
     });
 }
 
@@ -68,7 +76,7 @@ window.addEventListener('message', event => {
 
     // 用户选择的源图像数据目录
     if (message.selectedImgDir != undefined) {
-        imgOriginPath = message.selectedImgDir;
+        let imgOriginPath = message.selectedImgDir;
         console.log('---------------------------message：get img dir', imgOriginPath);
         document.getElementById("img-local-dir").value = message.selectedImgDir;
     }
@@ -94,6 +102,13 @@ window.addEventListener('message', event => {
             document.getElementById("errInfoModalContent").innerText = message.saveImgAppConfigRet;
             document.getElementById("btn_errInfoModal").click();
         }
+    }
+
+    // 用户选择的配置文件目录
+    if (message.selectedEncodeConfDir != undefined) {
+        let dir = message.selectedEncodeConfDir;
+        console.log('---------------------------message：get encode config dir', dir);
+        document.getElementById("encode_config_dir").value = message.selectedEncodeConfDir;
     }
 
 });

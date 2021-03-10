@@ -7,7 +7,7 @@
 
 
     <style>
-        .img-local-dir {
+        .local-dir-text {
             display: inline;
             width: 82%;
             height: 34px;
@@ -31,7 +31,7 @@
 <body>
     <div id="newImgApp">
         <!-- 按钮触发模态框 -->
-        <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+        <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" style="display: none;">
             创建新的项目
         </button>
 
@@ -56,7 +56,7 @@
                                 <input type="text" class="form-control" id="project_name">
                             </div>
                             <div class="form-group">
-                                <label for="select_type">选择数字图像输入源</label>
+                                <label for="select_imgSrc_type">选择数字图像输入源</label>
                                 <select class="form-control" id="select_imgSrc_type" onchange="selectImgSrcKind()">
                                     <option volue="none" style="display: none;"></option>
                                     <option value="localImg">本地文件</option>
@@ -66,11 +66,11 @@
 
 
                             <div class="form-group" id="select_local_path" style="display: none;">
-                                <label for="img_local_path">选择图像所在的文件夹</label>
+                                <label for="img-local-dir">选择图像所在的文件夹</label>
                                 <div>
-                                    <button type="button" class="btn btn-primary" id="select-dir"
+                                    <button type="button" class="btn btn-primary"
                                         onclick="selectImgDir()">选择文件夹</button>
-                                    <input type="text" class="img-local-dir" id="img-local-dir" />
+                                    <input type="text" class="local-dir-text" id="img-local-dir" />
                                 </div>
                             </div>
                             <div class="form-group" id="get_remoteIP_addr" style="display: none;">
@@ -80,7 +80,7 @@
 
 
                             <div class="form-group">
-                                <label for="model_file_type">绑定模型文件</label>
+                                <label for="select_model">绑定模型文件</label>
                                 <select class="form-control" id="select_model">
                                     <option volue="none" style="display: none;"></option>
                                 </select>
@@ -92,6 +92,14 @@
                                     <option volue="none" style="display: none;"></option>
                                     <option value="0">默认方法（李畅+刘铮）</option>
                                 </select>
+                            </div>
+                            <div class="form-group" id="select_config_path">
+                                <label for="encode_config_dir">选择配置文件所在的文件夹</label>
+                                <div>
+                                    <button type="button" class="btn btn-primary"
+                                        onclick="selectEncodeConfDir()">选择文件夹</button>
+                                    <input type="text" class="local-dir-text" id="encode_config_dir" />
+                                </div>
                             </div>
                         </form>
                     </div>

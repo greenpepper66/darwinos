@@ -8,6 +8,7 @@ import { glob } from 'glob';
 const imgAppHomeHtmlFilePath = "src/static/views/imgAppHome.html";
 const newImgAppHtmlFilePath = "src/static/views/newImgApp.html";
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
+const  imgAppInfoHtmlFilePath = "src/static/views/imgAppInfo.html";
 
 
 /**
@@ -37,6 +38,14 @@ const imgAppMessageHandler = {
         deleteJson(global.context, message.text);
         global.panel.webview.postMessage({ deleteAppConfigRet: "success" });
     },
+
+    // 2.4 查询应用  显示详情页
+    godoImgAppInfoPage(global, message) {
+        console.log(message);
+        openImgAppInfoPage(global.context);
+    },
+
+
 };
 
 // 3. 与新建数字识别应用页面交互
@@ -65,7 +74,7 @@ const newImgAppMessageHandler = {
     // 3.3 保存应用配置
     saveImgAppConfig(global, message) {
         console.log(message);
-        if (message.text.length != 5 || message.text[0] == "" || message.text[1] == "" || message.text[2] == "" || message.text[3] == "" || message.text[4] == "") {
+        if (message.text.length != 6 || message.text[0] == "" || message.text[1] == "" || message.text[2] == "" || message.text[3] == "" || message.text[4] == "" || message.text[5] == "") {
             global.panel.webview.postMessage({ saveImgAppConfigRet: "error: save failed, please check your input!" });
         } else {
             // 随机生成id， 利用js中的Date对象
@@ -83,6 +92,7 @@ const newImgAppMessageHandler = {
             imgAppConfig.imgSrcDir = message.text[2];
             imgAppConfig.modeFileID = message.text[3];
             imgAppConfig.encodeMethodID = message.text[4];
+            imgAppConfig.encodeConfigDir = message.text[5];
 
             writeJson(global.context, imgAppConfig); //写入json文件
 
@@ -90,7 +100,26 @@ const newImgAppMessageHandler = {
         }
     },
 
+    // 3.4 选择启动任务所需的各个配置文件所在目录
+    selectEncodeConfDir(global, message) {
+        console.log(message);
+        const options: vscode.OpenDialogOptions = {
+            openLabel: "选择目录",
+            canSelectFolders: true,
+        };
+        vscode.window.showOpenDialog(options).then(fileUri => {
+            console.log("选择目录为", fileUri);
+            // 将选择的目录返回给webview
+            global.panel.webview.postMessage({ selectedEncodeConfDir: fileUri[0].path });
+        });
+    },
+
 };
+
+// 4. 与应用详情页面的交互
+const imgAppInfoMessageHandler = {
+
+}
 
 
 /**
@@ -175,6 +204,29 @@ export function openNewImgAppPage(context) {
 }
 
 
+// 3. 打开应用详情页面
+export function openImgAppInfoPage(context) {
+    const panel = vscode.window.createWebviewPanel(
+        'ImgAppInfo',
+        "应用详情",
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        }
+    );
+
+    let global = { panel, context };
+    panel.webview.html = getAppsHomeHtml(context, imgAppInfoHtmlFilePath);
+
+    panel.webview.onDidReceiveMessage(message => {
+        if (imgAppInfoMessageHandler[message.command]) {
+            imgAppInfoMessageHandler[message.command](global, message);
+        } else {
+            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+        }
+    }, undefined, context.subscriptions);
+}
 
 
 
@@ -205,6 +257,7 @@ class ImgAppConfigData {
     public modeFileID: number;      // 模型文件ID
     public encodeMethodID: number;  // 编码方法ID
     public createTime: string;      // 应用创建时间
+    public encodeConfigDir: string; // 编码和运行任务所需的配置文件所在目录
 
     constructor(id: number, name: string) {  // 构造函数 实例化类的时候触发的方法
         this.id = id;
