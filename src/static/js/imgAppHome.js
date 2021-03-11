@@ -27,6 +27,7 @@ function deleteAppConfig(row, appID) {
     var i = row.parentNode.parentNode.rowIndex;
     document.getElementById('appsTable').deleteRow(i);
     console.log("delete app: ", appID);
+    
     // 给插件发送消息 删除一条应用
     vscode.postMessage({
         command: 'deleteAppConfig',
@@ -34,11 +35,20 @@ function deleteAppConfig(row, appID) {
     });
 }
 
-function godoImgAppInfoPage(imgAppID) {
+function gotoImgAppInfoPage(imgAppID) {
     console.log("search app: ", imgAppID);
     // 给插件发送消息 跳转到详情页
     vscode.postMessage({
-        command: 'godoImgAppInfoPage',
+        command: 'gotoImgAppInfoPage',
+        text: imgAppID,
+    });
+}
+
+function gotoImgAppRunTaskPage(imgAppID){
+    console.log("run app: ", imgAppID);
+    // 给插件发送消息 跳转到详情页
+    vscode.postMessage({
+        command: 'gotoImgAppRunTaskPage',
         text: imgAppID,
     });
 }
@@ -65,8 +75,8 @@ window.addEventListener('message', event => {
                 "</td><td width='10%'>" + this.appsConfigList[i].encodeMethodID +
                 "</td><td width='10%'>" + this.appsConfigList[i].createTime +
                 "</td><td width='20%'>" + 
-                " <button onclick='godoImgAppInfoPage( " + this.appsConfigList[i].id + ")'>详情</button>" + 
-                " <button>启动</button>" +
+                " <button onclick='gotoImgAppInfoPage( " + this.appsConfigList[i].id + ")'>详情</button>" + 
+                " <button onclick='gotoImgAppRunTaskPage( " + this.appsConfigList[i].id + " )'>启动</button>" +
                 " <button onclick='deleteAppConfig(this, " + this.appsConfigList[i].id + ")'>移除</button>" +
                 "</td></tr>");
             $("#appsTable").append(tr);

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { exec } from "child_process";
 
 import { allData } from '../os/server';
 import { glob } from 'glob';
@@ -8,8 +9,8 @@ import { glob } from 'glob';
 const imgAppHomeHtmlFilePath = "src/static/views/imgAppHome.html";
 const newImgAppHtmlFilePath = "src/static/views/newImgApp.html";
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
-const  imgAppInfoHtmlFilePath = "src/static/views/imgAppInfo.html";
-
+const imgAppInfoHtmlFilePath = "src/static/views/imgAppInfo.html";
+const imgAppRunTaskHtmlFilePath = "src/static/views/imgAppRunTask.html";
 
 /**
  * ******************************************************************************************************
@@ -40,11 +41,16 @@ const imgAppMessageHandler = {
     },
 
     // 2.4 查询应用  显示详情页
-    godoImgAppInfoPage(global, message) {
+    gotoImgAppInfoPage(global, message) {
         console.log(message);
-        openImgAppInfoPage(global.context);
+        openImgAppInfoPage(global.context, message.text);
     },
 
+    // 2.5 运行应用
+    gotoImgAppRunTaskPage(global, message) {
+        console.log(message);
+        openImgAppRunTaskPage(global.context, message.text);
+    },
 
 };
 
@@ -59,8 +65,8 @@ const newImgAppMessageHandler = {
         };
         vscode.window.showOpenDialog(options).then(fileUri => {
             console.log("选择目录为", fileUri);
-            // 将选择的目录返回给webview
-            global.panel.webview.postMessage({ selectedImgDir: fileUri[0].path });
+            // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
+            global.panel.webview.postMessage({ selectedImgDir: fileUri[0].path.substr(1) });
         });
     },
 
@@ -74,25 +80,41 @@ const newImgAppMessageHandler = {
     // 3.3 保存应用配置
     saveImgAppConfig(global, message) {
         console.log(message);
-        if (message.text.length != 6 || message.text[0] == "" || message.text[1] == "" || message.text[2] == "" || message.text[3] == "" || message.text[4] == "" || message.text[5] == "") {
+        if (message.text.length != 7 || message.text[0] == "" || message.text[1] == "" || message.text[2] == ""
+            || message.text[3] == "" || message.text[4] == "" || message.text[5] == "" || message.text[6] == "") {
             global.panel.webview.postMessage({ saveImgAppConfigRet: "error: save failed, please check your input!" });
         } else {
             // 随机生成id， 利用js中的Date对象
             // var num = Math.random();
             let date = new Date();
             let id = date.getTime();//得到时间的13位毫秒数
-
             let name = message.text[0];
             let imgAppConfig = new ImgAppConfigData(id, name);
 
             let createTime = dateFormat("YYYY-mm-dd HH:MM", date);
-            console.log("id:", id, "time: ", createTime);
             imgAppConfig.createTime = createTime;
+            console.log("id:", id, "time: ", createTime);
+
             imgAppConfig.imgSrcKind = message.text[1];
-            imgAppConfig.imgSrcDir = message.text[2];
-            imgAppConfig.modeFileID = message.text[3];
+            if (imgAppConfig.imgSrcKind == "localImg") {
+                imgAppConfig.imgSrcDir = message.text[2];
+                imgAppConfig.imgNum = getImgFileNum(imgAppConfig.imgSrcDir);
+            }
+
+            // 分割模型信息
+            let modelInfo = message.text[3].split(" - ");
+            if (modelInfo.length == 4) {
+                imgAppConfig.modeFileID = modelInfo[0];
+                imgAppConfig.modelFileName = modelInfo[1];
+                imgAppConfig.modelFileNodeID = modelInfo[2];
+                imgAppConfig.modelFileNodeIP = modelInfo[3];
+            } else {
+                global.panel.webview.postMessage({ saveImgAppConfigRet: "error: inner error!" });
+            }
+
             imgAppConfig.encodeMethodID = message.text[4];
             imgAppConfig.encodeConfigDir = message.text[5];
+            imgAppConfig.outputDir = message.text[6];
 
             writeJson(global.context, imgAppConfig); //写入json文件
 
@@ -110,16 +132,53 @@ const newImgAppMessageHandler = {
         vscode.window.showOpenDialog(options).then(fileUri => {
             console.log("选择目录为", fileUri);
             // 将选择的目录返回给webview
-            global.panel.webview.postMessage({ selectedEncodeConfDir: fileUri[0].path });
+            global.panel.webview.postMessage({ selectedEncodeConfDir: fileUri[0].path.substr(1) });
         });
     },
 
+    //3.5 选择编码过程中输出文件所在的文件夹
+    selectOutputDir(global, message) {
+        console.log(message);
+        const options: vscode.OpenDialogOptions = {
+            openLabel: "选择目录",
+            canSelectFolders: true,
+        };
+        vscode.window.showOpenDialog(options).then(fileUri => {
+            console.log("选择目录为", fileUri);
+            // 将选择的目录返回给webview
+            global.panel.webview.postMessage({ selectedOutputDir: fileUri[0].path.substr(1) });
+        });
+    },
 };
 
 // 4. 与应用详情页面的交互
 const imgAppInfoMessageHandler = {
+    getImgAppInfos(global, message) {
+        console.log(message);
+        let infos = searchImgAppByID(global.context, global.appID);
+        global.panel.webview.postMessage({ cmd: 'getImgAppInfosRet', cbid: message.cbid, data: infos });
+    },
+};
 
-}
+
+// 5. 应用运行页面交互
+const imgAppRunTaskMessageHandler = {
+    // 发送应用基本信息
+    getImgAppInfos(global, message) {
+        console.log(message);
+        let infos = searchImgAppByID(global.context, global.appID);
+        global.panel.webview.postMessage({ cmd: 'getImgAppInfosRet', cbid: message.cbid, data: infos });
+    },
+
+    // 开始运行应用
+    doStartRunTask(global, message) {
+        console.log(message);
+
+        imgAppRunTaskAllProcess(global);
+
+
+    },
+};
 
 
 /**
@@ -205,7 +264,7 @@ export function openNewImgAppPage(context) {
 
 
 // 3. 打开应用详情页面
-export function openImgAppInfoPage(context) {
+export function openImgAppInfoPage(context, appID) {
     const panel = vscode.window.createWebviewPanel(
         'ImgAppInfo',
         "应用详情",
@@ -216,7 +275,8 @@ export function openImgAppInfoPage(context) {
         }
     );
 
-    let global = { panel, context };
+    // 保存应用ID
+    let global = { panel, context, appID };
     panel.webview.html = getAppsHomeHtml(context, imgAppInfoHtmlFilePath);
 
     panel.webview.onDidReceiveMessage(message => {
@@ -229,7 +289,30 @@ export function openImgAppInfoPage(context) {
 }
 
 
+// 4. 打开运行应用页面
+export function openImgAppRunTaskPage(context, appID) {
+    const panel = vscode.window.createWebviewPanel(
+        'ImgAppInfo',
+        "应用详情",
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        }
+    );
 
+    // 保存应用ID
+    let global = { panel, context, appID };
+    panel.webview.html = getAppsHomeHtml(context, imgAppRunTaskHtmlFilePath);
+
+    panel.webview.onDidReceiveMessage(message => {
+        if (imgAppRunTaskMessageHandler[message.command]) {
+            imgAppRunTaskMessageHandler[message.command](global, message);
+        } else {
+            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+        }
+    }, undefined, context.subscriptions);
+}
 
 
 
@@ -251,13 +334,20 @@ class ImgAppJsonData {
 // 应用的配置信息类
 class ImgAppConfigData {
     public id: number;              // 应用ID
+
     public name: string;            // 应用名称
-    public imgSrcKind: string;      // 图像源类型：本地图像或远程图像
-    public imgSrcDir: string;       // 图像源
+    public imgSrcKind: string;      // 图像源类型：本地图像或远程图像（取值：localImg 或 remoteImg）
+    public imgSrcDir: string;       // 图像源-本地地址
+    public imgSrcRemoteIP: string;  // 图像源-远程ip（暂时不用）
+    public imgNum: number;          // 图像数量
     public modeFileID: number;      // 模型文件ID
-    public encodeMethodID: number;  // 编码方法ID
+    public modelFileName: string;   // 模型文件名称
+    public modelFileNodeID: number; // 模型所在节点ID
+    public modelFileNodeIP: string; // 模型所在节点IP
+    public encodeMethodID: number;  // 编码方法ID（0： 默认方法，当前就一个）
     public createTime: string;      // 应用创建时间
     public encodeConfigDir: string; // 编码和运行任务所需的配置文件所在目录
+    public outputDir: string;       // 编码过程中间输出文件所在目录
 
     constructor(id: number, name: string) {  // 构造函数 实例化类的时候触发的方法
         this.id = id;
@@ -341,9 +431,9 @@ function deleteJson(context, id) {
     })
 }
 
-// 3. 查：同步处理
+// 3. 查所有：同步处理
 function searchAllJson(context) {
-    console.log("json searching...");
+    console.log("json searching all...");
     let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
 
     let data = fs.readFileSync(resourcePath, 'utf-8');
@@ -357,10 +447,83 @@ function searchAllJson(context) {
     console.log('------------------------查询成功allApps');
     console.log(allApps);
     return allApps;
+}
 
+// 4. 查一个：
+function searchImgAppByID(context, id) {
+    console.log("json searching ...", id);
+    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+
+    let data = fs.readFileSync(resourcePath, 'utf-8');
+
+    let stringContent = data.toString();//将二进制的数据转换为字符串
+    let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
+
+    for (var i = 0; i < jsonContent.data.length; i++) {
+        if (id == jsonContent.data[i].id) {
+            return jsonContent.data[i];
+        }
+    }
+    return "error";
 }
 
 
+
+
+
+/**
+ * ******************************************************************************************************
+ * 运行任务相关函数，执行python脚本
+ * ******************************************************************************************************
+ */
+function imgAppRunTaskAllProcess(global) {
+    console.log("start run a task for app: ", global.appID);
+
+    // 0. 查询应用基本信息
+    let infos = searchImgAppByID(global.context, global.appID);
+    console.log("get app info: ", infos);
+
+    // 1. 李畅的脉冲编码
+    runImgConvertScript(global, infos);
+    // console.log("img convert into pickle finished...");  // exec是异步的，这里打印没意义
+
+    // 2. 柳铮的打包编译
+
+    // 3. 运行任务，识别图像
+
+
+}
+
+// 运行李畅脚本
+function runImgConvertScript(global, appInfo) {
+    // 脚本位置
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "encode_input.py");
+
+    // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
+    let imgSrcDir = appInfo.imgSrcDir.replace(/\//g, "\\");            // 图像源目录
+    let configDir = appInfo.encodeConfigDir.replace(/\//g, "\\");      // 配置文件目录，要保证有br2.pkl文件
+    let outputDir = appInfo.outputDir.replace(/\//g, "\\");            // 输出pickle保存目录
+
+    let command_str = "python " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
+    console.log("执行命令为", command_str);
+
+    let scriptProcess = exec(command_str, {});
+
+    scriptProcess.stdout?.on("data", function (data) {
+        console.log(data);
+        let formatted_data = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({img_convert_log: formatted_data });
+    });
+
+    scriptProcess.stderr?.on("data", function (data) {
+        console.log(data);
+    });
+    scriptProcess.on("exit", function () {
+        console.log("done!!");
+    });
+
+
+}
 
 
 
@@ -395,3 +558,12 @@ function dateFormat(fmt, date) {
 // let date = new Date()
 // dateFormat("YYYY-mm-dd HH:MM", date)
 // >>> `2019-06-06 19:45`
+
+// 获取文件夹下图像文件的数量
+function getImgFileNum(path: string) {
+    // 根据文件路径读取文件，返回一个文件列表
+    //读取文件夹下内容
+    let files = fs.readdirSync(path);
+    console.log("getFiles list =--------", files);
+    return files.length;
+}

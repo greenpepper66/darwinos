@@ -27,6 +27,13 @@ function selectEncodeConfDir() {
         text: '选择编码所需配置文件所在的文件夹'
     });
 }
+function selectOutputDir() {
+    console.log("selectOutputDir js function ");
+    vscode.postMessage({
+        command: 'selectOutputDir',
+        text: '选择编码过程中输出文件所在的文件夹'
+    });
+}
 
 
 // 保存应用配置信息
@@ -36,23 +43,24 @@ function saveImgAppConfig() {
     // 判断各个选项是否为空
 
     // 获取各个输入项
-    let appName = document.getElementById("project_name").value;  // 应用名称
-    let imgSrcKind = document.getElementById("select_imgSrc_type").value; // 数据源
+    let appName = document.getElementById("project_name").value;                // 应用名称
+    let imgSrcKind = document.getElementById("select_imgSrc_type").value;       // 数据源
     if (imgSrcKind == "localImg") {
-        var imgDir = document.getElementById("img-local-dir").value;
+        var imgDir = document.getElementById("img-local-dir").value;            // 本地图像文件夹
     } else if (imgSrcKind == "remoteImg") {
         var imgDir = document.getElementById("remoteIP_addr").value;
     }
 
-    let modelFileID = document.getElementById("select_model").value;
-    let encodeMethodID = document.getElementById("encode_method_type").value;
-    let encodeConfDir = document.getElementById("encode_config_dir").value;
+    let modelFileID = document.getElementById("select_model").value;            // 绑定模型
+    let encodeMethodID = document.getElementById("encode_method_type").value;   // 编码方法
+    let encodeConfDir = document.getElementById("encode_config_dir").value;     // 编码配置文件所在目录
+    let outputDir = document.getElementById("output_dir").value;                // 编码过程中间文件输出目录 
 
-    console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir);
+    console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir);
 
     vscode.postMessage({
         command: 'saveImgAppConfig',
-        text: [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir],
+        text: [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir],
     });
 }
 
@@ -89,7 +97,9 @@ window.addEventListener('message', event => {
         console.log(this.modelFileList[0].name);
         for (let i = 0; i < modelFileListRet.length; i++) {
             // new Option("Option text","Option value");
-            $("#select_model").append((new Option(modelFileListRet[i].id + " - " + modelFileListRet[i].name + " - " + modelFileListRet[i].nodeIP, modelFileListRet[i].id)));
+            let text = modelFileListRet[i].id + " - " + modelFileListRet[i].name + " - " + "节点" + modelFileListRet[i].nodeID +  " - " + modelFileListRet[i].nodeIP;
+            let value = modelFileListRet[i].id + " - " + modelFileListRet[i].name + " - " + modelFileListRet[i].nodeID +  " - " + modelFileListRet[i].nodeIP;
+            $("#select_model").append((new Option(text, value)));
         }
     }
 
@@ -109,6 +119,13 @@ window.addEventListener('message', event => {
         let dir = message.selectedEncodeConfDir;
         console.log('---------------------------message：get encode config dir', dir);
         document.getElementById("encode_config_dir").value = message.selectedEncodeConfDir;
+    }
+
+    // 用户选择的输出文件目录
+    if (message.selectedOutputDir != undefined) {
+        let dir = message.selectedOutputDir;
+        console.log('---------------------------message：get output dir', dir);
+        document.getElementById("output_dir").value = message.selectedOutputDir;
     }
 
 });
