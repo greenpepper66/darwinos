@@ -43,9 +43,29 @@ function doStartRunTask() {
     console.log("start run task button is clicked.");
     vscode.postMessage({
         command: 'doStartRunTask',
-        text: '开始运行应用'
+        text: '开始运行应用,先执行脉冲编码脚本'
     });
 }
+
+function startPickleConvertProcess() {
+    console.log("start convert pickle files.");
+    vscode.postMessage({
+        command: 'startPickleConvertProcess',
+        text: '运行pickle文件转换脚本'
+    });
+}
+
+function startRecognitionProcess() {
+    console.log("start recognition process.");
+    vscode.postMessage({
+        command: 'startRecognitionProcess',
+        text: '开始执行手写体数字识别'
+    });
+}
+
+
+
+
 
 
 /**
@@ -58,16 +78,109 @@ window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
 
-    if (message.img_convert_log  != undefined) {
+    // 1. 李畅的脚本 - 图像编码 相关消息
+    // 日志输出
+    if (message.imgConvertProcessLog  != undefined) {
         let log_output_lists = new Array();
-        log_output_lists = log_output_lists.concat(message.img_convert_log.split("<br/>"));
-        console.log("data.logoutput=[" + message.img_convert_log + "]");
+        log_output_lists = log_output_lists.concat(message.imgConvertProcessLog.split("<br/>"));
+        console.log("data.logoutput=[" + message.imgConvertProcessLog + "]");
         console.log("data split list len=" + log_output_lists.length);
-        $("#log_output_div").html(log_output_lists.join("<br/>"));
+        $("#log_output_div").append(log_output_lists.join("<br/>"));
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+
+    // 一个图像转换完成后需要累加的进度
+    if(message.imgConvertOneDone != undefined) {
+        console.log("run script middle: ", message.imgConvertOneDone);
+        let addVal = parseInt(message.imgConvertOneDone[0] / message.imgConvertOneDone[1] * 100 ) + "%";
+        document.getElementById("png_convert_progress_div").style.width = addVal;
+    }
+
+    // 错误和告警输出
+    if(message.imgConvertProcessErrorLog != undefined) {
+        console.log("run script err: ", message.imgConvertProcessErrorLog);
+        $("#log_output_div").append(message.imgConvertProcessErrorLog + "<br/>");
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+
+    // 脉冲编码结束，进度条刷满格
+    if(message.imgConvertProcessFinish != undefined) {
+        console.log("run script over!", message.imgConvertProcessFinish);
+        document.getElementById("png_convert_progress_div").style.width = "100%";
+        $("#log_output_div").append(message.imgConvertProcessFinish + "<br/><br/><br/>");
         document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
 
-
+        // 发送消息执行柳铮的脚本
+        startPickleConvertProcess();
     }
+
+    // 2. 柳铮的脚本 - 打包编译 相关消息
+    if(message.pickleConvertProcessLog != undefined) {
+        let log_output_lists = new Array();
+        log_output_lists = log_output_lists.concat(message.imgConvertProcessLog.split("<br/>"));
+        console.log("data.logoutput=[" + message.imgConvertProcessLog + "]");
+        console.log("data split list len=" + log_output_lists.length);
+        $("#log_output_div").append(log_output_lists.join("<br/>"));
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+
+    if(message.pickleConvertOneDone != undefined) {
+        console.log("run script2 middle: ", message.pickleConvertOneDone);
+        let addVal = parseInt(message.pickleConvertOneDone[0] / message.pickleConvertOneDone[1] * 100 ) + "%";
+        document.getElementById("pickle_convert_progress_div").style.width = addVal;
+    }
+
+    if(message.pickleConvertProcessErrorLog != undefined) {
+        console.log("run script2 err: ", message.pickleConvertProcessErrorLog);
+        $("#log_output_div").append(message.pickleConvertProcessErrorLog + "<br/>");
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+
+    if(message.pickleConvertProcessFinish != undefined) {
+        console.log("run script2 over!", message.pickleConvertProcessFinish);
+        document.getElementById("pickle_convert_progress_div").style.width = "100%";
+        $("#log_output_div").append(message.pickleConvertProcessFinish + "<br/><br/><br/>");
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+
+        // 发送消息执行图像识别的脚本
+        startRecognitionProcess();
+    }
+
+    // 3. 图像识别 相关消息
+    if(message.recognitionProcessLog != undefined) {
+        let log_output_lists = new Array();
+        log_output_lists = log_output_lists.concat(message.recognitionProcessLog.split("<br/>"));
+        console.log("data.logoutput=[" + message.recognitionProcessLog + "]");
+        console.log("data split list len=" + log_output_lists.length);
+        $("#log_output_div").append(log_output_lists.join("<br/>"));
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+
+    if(message.recognitionOneDone != undefined) {
+        console.log("run mnist middle: ", message.recognitionOneDone);
+        let addVal = parseInt(message.recognitionOneDone[0] / message.recognitionOneDone[1] * 100 ) + "%";
+        document.getElementById("recognition_task_progress_div").style.width = addVal;
+    }
+
+    if(message.recognitionProcessErrorLog != undefined) {
+        console.log("run mnist err: ", message.recognitionProcessErrorLog);
+        $("#log_output_div").append(message.recognitionProcessErrorLog + "<br/>");
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+
+    if(message.recognitionProcessFinish != undefined) {
+        console.log("run mnist over!", message.recognitionProcessFinish);
+        document.getElementById("recognition_task_progress_div").style.width = "100%";
+        $("#log_output_div").append(message.recognitionProcessFinish + "<br/><br/><br/>");
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+
+    if(message.recognitionOneResult != undefined) {
+        console.log("run mnist result: ", message.recognitionOneResult);
+        $("#recognition_result_div").append(message.recognitionOneResult + "<br/>");
+        document.getElementById("recognition_result_div").scrollTop = document.getElementById("recognition_result_div").scrollHeight;
+    }
+
 
 });
 

@@ -6,6 +6,8 @@ import pickle
 from PIL import Image
 import json
 import sys
+import time
+import datetime
 
 ################################
 # param:
@@ -18,16 +20,24 @@ imgSrcDir = sys.argv[1]
 configDir = sys.argv[2]
 outputDir = sys.argv[3]
 
+
 #baseDirPath = os.path.dirname(os.path.abspath(__file__))
 #baseDirPath = sys.argv[1]
-print("imgSrc dir is: ", imgSrcDir)
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Start to run encode_input.py script. ", flush=True)
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] ImgSrc dir is: ", imgSrcDir, ". ", flush=True)
 
+ # 输出文件所在目录
+outputDir = os.path.join(outputDir, "pickleDir")
+isExists = os.path.exists(outputDir)
+if not isExists:
+    os.mkdir(outputDir)
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] MakeDir output dir is: ", outputDir, ". ", flush=True)
 
-print("Loading convert config file br2.pkl ...")
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Loading convert config file br2.pkl ...", flush=True)
 with open(os.path.join(configDir, "br2.pkl"), "rb") as f:
     info = pickle.load(f)
 
-print("Creating...")
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Creating...")
 br2_neurons = []
 br2_synapses = []
 model_eqs = """
@@ -49,7 +59,7 @@ br2_input_monitor = brian2.SpikeMonitor(br2_neurons[0])
 br2_net = brian2.Network(br2_neurons, br2_synapses, br2_input_monitor)
 br2_net.store()
 
-print("start convert img into pickle format file ...")
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Start convert img into pickle format file ...", flush=True)
 count = 1
 for file in os.listdir(imgSrcDir):
     img_path = os.path.join(imgSrcDir, file)
@@ -69,7 +79,7 @@ for file in os.listdir(imgSrcDir):
         # f.write(json.dumps(input_spike_arrs))
         pickle.dump(input_spike_arrs, f)
 
-    print("Converting img " + str(count) + ": " + file + " ok ")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Converting one image " + str(count) + ": " + file + " ok. ", flush=True)
     count = count + 1
     
-print("convert img into pickle format file finished ...")
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] CONVERT FINISHED!", flush=True)

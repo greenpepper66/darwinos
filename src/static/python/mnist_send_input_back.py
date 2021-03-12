@@ -9,9 +9,18 @@ from convert import Convert
 import threading
 import os
 import sys
+import datetime
 
 # 用户指定目录
-baseDirPath = sys.argv[1]
+oriOutputDir = sys.argv[1]                             # 用户选择的输出文件目录
+configDir = sys.argv[2]                                # 用户指定的配置文件所在目录
+inputDataDir = os.path.join(oriOutputDir, "textDir")  # 上一步转换pickle后生成的input数据所在目录
+
+
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Start to run mnist_send_input_back.py script. ", flush=True)
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Input data dir is: ", inputDataDir, ". ", flush=True)
+
+# baseDirPath = sys.argv[1]
 # print("base dir is: ", baseDirPath)
 
 
@@ -49,13 +58,12 @@ def get_slave_ip_port_fid(config_file_path):
         return ip,port
 
 # 配置文件目录
-configFile = os.path.join(baseDirPath, "runtask_config", "config.b")
+configFile = os.path.join(configDir, "config.b")
 ip, port = get_slave_ip_port_fid(configFile)
-# print(ip)
-# print(port)
+
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Config file ", configFile, " checked ok. ", flush=True)
 
 conn1 = ClientConnection(ip, port)
-
 conn1._socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, True)
 def set_tick_time(conn, tick_time):
     tick_times = [tick_time]
@@ -70,7 +78,7 @@ def set_tick_time(conn, tick_time):
     # print(result)
 
 set_tick_time(conn1, 5000000)
-
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Set tick time ok.", flush=True)
 
 def clear_start(conn, clear_enable):
     clear_enables = [clear_enable]
@@ -90,15 +98,18 @@ def clear_start(conn, clear_enable):
 # f.truncate(0)
 # f1 = open(os.path.join(baseDirPath, "result_str.txt"),"a+")
 # f1.truncate(0)
-path = os.path.join(baseDirPath, "pickle_encode_output")
-count = 0
-for file in os.listdir(path): #file 表示的是文件名
-        count = count+1
 
-for i in range(count):
+# path = os.path.join(baseDirPath, "pickle_encode_output")
+count = 0
+for file in os.listdir(inputDataDir): #file 表示的是文件名
+        count = count+1
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] There are all ", str(count), " files.", flush=True)
+
+for j in range(count):
+    i = j + 1
     # 首先发送给MASTER 模型
-    roxTxt = os.path.join(baseDirPath, "pickle_encode_output", str(i), "row.txt")
-    inputTxt = os.path.join(baseDirPath, "pickle_encode_output", str(i), "input.txt")
+    roxTxt = os.path.join(inputDataDir, str(i), "row.txt")
+    inputTxt = os.path.join(inputDataDir, str(i), "input.txt")
     
     with open(roxTxt, 'r') as row:
         row_list = row.readlines()
@@ -141,12 +152,16 @@ for i in range(count):
     max_index = spike.index(max(spike))    
     Number = str(max_index)
     print(Number + " ")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] The ", str(i), " image recognition results is ", str(Number), ". ", flush=True)
+    print("RECOGNITION RESULT: **", Number, "**", flush=True)
     # f.write(Number)
     # f.write('\r')
     # exit(0)
     clear_start(conn1, 1)
     time.sleep(1)
+    
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Recognize one image ok. ", flush=True)
 
 # f.close()
 # f1.close()
-
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Recognition FINISHED!", flush=True)
