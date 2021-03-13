@@ -14,7 +14,8 @@
 		"onView:model_view",
 		"onView:resource_view",
 		"onView:task_view",
-		"*"	
+		"onView:apps_view",
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -113,6 +114,11 @@
 					"id": "task_view",
 					"name": "任务视图",
 					"contextualTitle": "task view"
+				},
+				{
+					"id": "apps_view",
+					"name": "应用视图",
+					"contextualTitle": "apps view"
 				}
 			]
 		},
