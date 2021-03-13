@@ -13,9 +13,10 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
   readonly onDidChangeTreeData: vscode.Event<Node | undefined | void> = this._onDidChangeTreeData.event;
 
   
-  private nodes:Node[];
+  public nodes:Node[];
 
   constructor(private workspaceRoot: string) {
+    this.nodes = [];
   }
 
     refresh(): void {
@@ -37,7 +38,10 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
       }
     }
     
-
+  //暂时用于打开vscode时跳出导航栏  
+  getParent(element? : Node | undefined): import("vscode").ProviderResult<Node>{       
+      return undefined;    
+  }
   
     
   
