@@ -131,7 +131,8 @@
 				},
 				{
 					"command": "resource_view.resOverview",
-					"when": "view == resource_view"
+					"when": "view == resource_view",
+					"group": "navigation"
 				},
 				{
 					"command": "model_view.refreshEntry",
@@ -140,7 +141,8 @@
 				},
 				{
 					"command": "model_view.modelOverview",
-					"when": "view == model_view"
+					"when": "view == model_view",
+					"group": "navigation"
 				},
 				{
 					"command": "model_view.uploadModel",
@@ -154,7 +156,8 @@
 				},
 				{
 					"command": "task_view.taskOverview",
-					"when": "view == task_view"
+					"when": "view == task_view",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
