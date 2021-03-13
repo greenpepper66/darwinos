@@ -8,7 +8,8 @@ import * as path from 'path';
 import { Model, ModelProvider } from "./DataProvider/ModelProvider";
 import { Task, TaskProvider } from "./DataProvider/TaskProvider";
 import { Node, Chip, ResProvider } from "./DataProvider/ResProvider";
-import { AppsProvider } from "./DataProvider/AppsProvider"
+import { AppsProvider } from "./DataProvider/AppsProvider";
+import {EmptyData,EmptyDataProvider} from "./DataProvider/EmptyDataProvider";
 import { PageProvideByPort, PageProvideByPath, changeIndexHtmlCss } from "./PageProvider";
 import { task_start, task_stop, task_reset, task_deploy, task_delete } from "./os/task_operations"
 import { startHttpServer } from './os/server';
@@ -75,7 +76,16 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 
+	//上传模型
+	const uploadModelDataProvider = new EmptyDataProvider(vscode.workspace.rootPath);
+	vscode.window.registerTreeDataProvider('upload_model_view', uploadModelDataProvider);
+	let uploadModelTreeView=vscode.window.createTreeView('upload_model_view',{treeDataProvider:uploadModelDataProvider});
 
+	uploadModelTreeView.onDidChangeVisibility((evt)=>{
+		if(evt.visible){
+			vscode.commands.executeCommand('model_view.uploadModel');		
+		}
+	});
 
 
 
@@ -111,7 +121,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('model_view.uploadModel', () => {
-		PageProvideByPort("模型视图", 5001, "UploadModel");
+		PageProvideByPort("上传模型", 5001, "UploadModel");
 		vscode.window.showInformationMessage(`Successfully called upload model.`);
 	});
 

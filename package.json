@@ -95,6 +95,11 @@
 					"id": "operating_system",
 					"title": "类脑计算机",
 					"icon": "media/monitoring.svg"
+				},
+				{
+					"id": "upload_model",
+					"title": "上传模型",
+					"icon": "media/dark/plus.svg"
 				}
 			]
 		},
@@ -120,6 +125,14 @@
 					"name": "应用视图",
 					"contextualTitle": "apps view"
 				}
+			],
+			"upload_model":[
+				{
+					"id":"upload_model_view",
+					"name":"上传模型",
+					"contextualTitle": "upload model view"
+				}
+				
 			]
 		},
 		"menus": {
@@ -144,11 +157,7 @@
 					"when": "view == model_view",
 					"group": "navigation"
 				},
-				{
-					"command": "model_view.uploadModel",
-					"when": "view == model_view",
-					"group": "navigation"
-				},
+				
 				{
 					"command": "task_view.refreshEntry",
 					"when": "view == task_view",
@@ -182,7 +191,25 @@
 					"when": "view == task_view && viewItem == Task"
 				}
 			]
-		}
+		},
+		"viewsWelcome":[
+			{
+				"view": "resource_view",
+				"contents": "无数据，请检查网络或点击刷新按钮"
+			},
+			{
+				"view": "model_view",
+				"contents": "无数据，请检查网络或点击刷新按钮"
+			},
+			{
+				"view": "task_view",
+				"contents": "无数据，请检查网络或点击刷新按钮"
+			},
+			{
+				"view": "upload_model_view",
+				"contents": "（此处可以添加相关说明）"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
