@@ -164,6 +164,16 @@ export function activate(context: vscode.ExtensionContext) {
 	//自动弹出导航栏
 	let ResTreeView=vscode.window.createTreeView('resource_view',{treeDataProvider:ResDataProvider});
 	ResTreeView.reveal(ResDataProvider.nodes[0]);
+
+
+	
+	//定时自动刷新导航栏，显示信息
+	setTimeout(function refreshEntrys() {		
+		vscode.commands.executeCommand('resource_view.refreshEntry');
+		vscode.commands.executeCommand('model_view.refreshEntry');
+		vscode.commands.executeCommand('task_view.refreshEntry');
+	  }, 5000);
+
 }
 
 // this method is called when your extension is deactivated
