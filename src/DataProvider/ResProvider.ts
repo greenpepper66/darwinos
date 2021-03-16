@@ -13,9 +13,10 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
   readonly onDidChangeTreeData: vscode.Event<Node | undefined | void> = this._onDidChangeTreeData.event;
 
   
-  private nodes:Node[];
+  public nodes:Node[];
 
   constructor(private workspaceRoot: string) {
+    this.nodes = [];
   }
 
     refresh(): void {
@@ -37,7 +38,10 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
       }
     }
     
-
+  //暂时用于打开vscode时跳出导航栏  
+  getParent(element? : Node | undefined): import("vscode").ProviderResult<Node>{       
+      return undefined;    
+  }
   
     
   
@@ -50,6 +54,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
         vscode.TreeItemCollapsibleState.None,
         node.nodeID,
         i,
+        node.usedNeureNums[i],
         {
           command: 'extension.openPage',
           title: '',
@@ -70,6 +75,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
       var ip=nodes[i].ip;
       var role=nodes[i].role;
       var chips=nodes[i].chips;
+      var usedNeureNums=nodes[i].usedNeureNums;
 
       var node=new Node(
         "节点"+id,
@@ -78,6 +84,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
         id,
         ip,
         chips,
+        usedNeureNums,
         {
           command: 'extension.openPage',
           title: '',
@@ -105,6 +112,7 @@ export class Node extends vscode.TreeItem {
     public readonly nodeID?: number,
     public readonly nodeIP?: string,
     public readonly chips?: number[],
+    public readonly usedNeureNums?: number[],
     public readonly command?: vscode.Command
   ) {
     super(label, collapsibleState);
@@ -129,12 +137,13 @@ export class Chip extends vscode.TreeItem {
     
     public readonly nodeID: number,
     public readonly chipID: number,
+    public readonly usedNeureNum: number,
     public readonly command?: vscode.Command
   ) {
     super(label, collapsibleState);
 
     this.tooltip = `${this.label}`;
-    this.description = this.label;
+    this.description = (usedNeureNum / (24 * 24) * 100).toFixed(2)+"%";
   }
   iconPath = {
     light: path.join(__filename, '..', '..', '..','media', 'light', 'chip.svg'),

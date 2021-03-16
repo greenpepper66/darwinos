@@ -15,6 +15,7 @@
 		"onView:resource_view",
 		"onView:apps_view",
 		"onView:task_view",
+		"onView:apps_view",
 		"*"
 	],
 	"main": "./out/extension.js",
@@ -111,6 +112,11 @@
 					"id": "operating_system",
 					"title": "类脑计算机",
 					"icon": "media/monitoring.svg"
+				},
+				{
+					"id": "upload_model",
+					"title": "上传模型",
+					"icon": "media/dark/plus.svg"
 				}
 			]
 		},
@@ -135,7 +141,20 @@
 					"id": "task_view",
 					"name": "任务视图",
 					"contextualTitle": "task view"
+				},
+				{
+					"id": "apps_view",
+					"name": "应用视图",
+					"contextualTitle": "apps view"
 				}
+			],
+			"upload_model":[
+				{
+					"id":"upload_model_view",
+					"name":"上传模型",
+					"contextualTitle": "upload model view"
+				}
+				
 			]
 		},
 		"menus": {
@@ -147,7 +166,8 @@
 				},
 				{
 					"command": "resource_view.resOverview",
-					"when": "view == resource_view"
+					"when": "view == resource_view",
+					"group": "navigation"
 				},
 				{
 					"command": "model_view.refreshEntry",
@@ -156,13 +176,10 @@
 				},
 				{
 					"command": "model_view.modelOverview",
-					"when": "view == model_view"
-				},
-				{
-					"command": "model_view.uploadModel",
 					"when": "view == model_view",
 					"group": "navigation"
 				},
+				
 				{
 					"command": "apps_view.refreshEntry",
 					"when": "view == apps_view",
@@ -179,7 +196,8 @@
 				},
 				{
 					"command": "task_view.taskOverview",
-					"when": "view == task_view"
+					"when": "view == task_view",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
@@ -204,7 +222,25 @@
 					"when": "view == task_view && viewItem == Task"
 				}
 			]
-		}
+		},
+		"viewsWelcome":[
+			{
+				"view": "resource_view",
+				"contents": "无数据，请检查网络或点击刷新按钮"
+			},
+			{
+				"view": "model_view",
+				"contents": "无数据，请检查网络或点击刷新按钮"
+			},
+			{
+				"view": "task_view",
+				"contents": "无数据，请检查网络或点击刷新按钮"
+			},
+			{
+				"view": "upload_model_view",
+				"contents": "（此处可以添加相关说明）"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
