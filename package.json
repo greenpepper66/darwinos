@@ -141,11 +141,6 @@
 					"id": "task_view",
 					"name": "任务视图",
 					"contextualTitle": "task view"
-				},
-				{
-					"id": "apps_view",
-					"name": "应用视图",
-					"contextualTitle": "apps view"
 				}
 			],
 			"upload_model":[
@@ -187,7 +182,8 @@
 				},
 				{
 					"command": "apps_view.appsOverview",
-					"when": "view == apps_view"
+					"when": "view == apps_view",
+					"group": "navigation"
 				},
 				{
 					"command": "task_view.refreshEntry",

@@ -34,15 +34,12 @@
         }
 
         .middle {
-            min-height: 400px;
+            min-height: 210px;
             text-align: center;
             margin-top: 50px;
         }
 
-        .bottom {
-            min-height: 300px;
-            text-align: center;
-        }
+
 
         .taskDescBox {
             border: 1px solid #7B7B7B;
@@ -65,9 +62,22 @@
         .logOutputText,
         .taskResultTab {
             margin-left: 20px;
-            height: 340px;
+            height: 200px;
             overflow: auto;
             text-align: left;
+        }
+
+        .bottom {
+            min-height: 1000px;
+            text-align: center;
+        }
+        .taskIframeBox {
+            border: 1px solid #7B7B7B;
+        }
+
+        .taskIframeContent {
+            width: 100%;
+            height: 1000px;
         }
 
         .probarBox {
@@ -207,57 +217,61 @@
                     </div> -->
                 </div>
 
-                <div class="row">
-                    <button style="float: right;">查看芯片运行状态</button>
-                </div>
 
             </div>
+        </div>
 
+        <div class="clearfix thewrap middle">
+            <div class="row">
+                <h4>日志输出</h4>
+                <div class="logOutputBox">
 
-            <div class="clearfix thewrap middle">
-                <div class="row">
-                    <h4>日志输出</h4>
-                    <div class="logOutputBox">
-
-                        <div id="log_output_div" class="logOutputText">
-                        </div>
+                    <div id="log_output_div" class="logOutputText">
                     </div>
                 </div>
             </div>
 
-            <div class="clearfix thewrap bottom">
-                <div class="row">
-                    <h4>图像识别结果（表格）</h4>
-                    <div class="taskResultBox">
+            <div class="row">
+                <h4>图像识别结果</h4>
+                <div class="taskResultBox">
 
-                        <div id="recognition_result_div" class="taskResultTab">
-                            <table id="recognition_ret_tab" class="recRetTable">
-                                <tr style="height: 60px;">
-                                    <td>原始图像</td>
-                                </tr>
-                                <tr style="height: 60px;">
-                                    <td>识别结果</td>
-                                </tr>
+                    <div id="recognition_result_div" class="taskResultTab">
+                        <table id="recognition_ret_tab" class="recRetTable">
+                            <tr style="height: 60px;">
+                                <td>原始图像</td>
+                            </tr>
+                            <tr style="height: 60px;">
+                                <td>识别结果</td>
+                            </tr>
 
-                            </table>
+                        </table>
 
-                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-
+        
+        <div class="clearfix thewrap bottom">
+            <h4>芯片运行状态</h4>
+            <div id="taskIframe" class="taskIframeBox">
+                <iframe :src="iframeRoute" sandbox ="allow-scripts allow-popups allow-same-origin" frameborder="0" scrolling="no" class="taskIframeContent"></iframe>
+            </div>
         </div>
 
 
-        <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
-        <link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet" />
-        <link href="../css/dark.css" rel="stylesheet" />
-        <script src="../lib/jquery/jquery.min.js"></script>
-        <script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
-        <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
-        <script src="../js/imgAppRunTask.js"></script>
-        <script>Vue.config.ProductionTip = false</script>
+
+    </div>
+
+
+    <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
+    <link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../css/dark.css" rel="stylesheet" />
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+    <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/imgAppRunTask.js"></script>
+    <script>Vue.config.ProductionTip = false</script>
 </body>
 
 </html>

@@ -168,6 +168,7 @@ const imgAppRunTaskMessageHandler = {
         console.log(message);
         global.panel.webview.postMessage({ cmd: 'getImgAppInfosRet', cbid: message.cbid, data: global.appInfo });
     },
+    
 
     // 开始运行应用, 执行脉冲编码脚本
     doStartRunTask(global, message) {
