@@ -301,8 +301,8 @@ export function openImgAppInfoPage(context, appID) {
 // 4. 打开运行应用页面
 export function openImgAppRunTaskPage(context, appID) {
     const panel = vscode.window.createWebviewPanel(
-        'ImgAppInfo',
-        "应用详情",
+        'runImgApp',
+        "任务详情",
         vscode.ViewColumn.One,
         {
             enableScripts: true,
@@ -596,8 +596,9 @@ function runPickleConvertScript(global) {
 function runMnistSendInputScript(global) {
     console.log("start mnist image recognition: ", global.appInfo.name);
 
-    // 脚本位置
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "mnist_send_input_back.py");
+    // 脚本位置 mnist_send_input_back.py
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "test.py");
+    let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
     let configDir = global.appInfo.encodeConfigDir.replace(/\//g, "\\");      // 配置文件目录，要保证有 config.b 文件
@@ -619,11 +620,24 @@ function runMnistSendInputScript(global) {
         }
 
         // 解析识别结果的输出
-        if(data.indexOf("RECOGNITION RESULT") !== -1) {
+        if (data.indexOf("RECOGNITION RESULT") !== -1) {
             console.log("*************", data);
+            // 图像识别结果
             let ret = data.split("**")[1];
-            console.log("*************", ret);
-            global.panel.webview.postMessage({ recognitionOneResult: ret });
+            // 对应的原始图像数据
+            // todo
+            let datauri = "";
+            fs.readdirSync(imgSrcDir).forEach((file, index) => {
+                console.log("tesatatat", file, index);
+                if (index == imgNum) {
+                    let bData = fs.readFileSync(imgSrcDir + "/" + file);
+                    let base64Str = bData.toString('base64');
+                    datauri = 'data:image/png;base64,' + base64Str;
+                    console.log("dddddd", datauri);
+                    // global.panel.webview.postMessage({ recognitionOneSrcImg: datauri });
+                }
+            });
+            global.panel.webview.postMessage({ recognitionOneResult: [ret, datauri] });
         }
 
         let formatted_data = data.split("\r\n").join("<br/>");
@@ -641,6 +655,11 @@ function runMnistSendInputScript(global) {
         let str = "This image recognition task is all finished！";
         global.panel.webview.postMessage({ recognitionProcessFinish: str });
     });
+
+
+
+
+
 }
 
 

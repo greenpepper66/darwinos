@@ -176,12 +176,26 @@ window.addEventListener('message', event => {
     }
 
     if(message.recognitionOneResult != undefined) {
-        console.log("run mnist result: ", message.recognitionOneResult);
-        $("#recognition_result_div").append(message.recognitionOneResult + "<br/>");
-        document.getElementById("recognition_result_div").scrollTop = document.getElementById("recognition_result_div").scrollHeight;
+        console.log("run mnist result: ", message.recognitionOneResult[0], message.recognitionOneResult[1]);
+
+        // 动态添加列元素
+        let tab = document.getElementById("recognition_ret_tab");
+
+        let row1 = tab.rows[0];
+        let row2 = tab.rows[1];
+        let newCell1 = row1.insertCell();
+        let newCell2 = row2.insertCell();
+        newCell1.innerHTML = '<img src="' + message.recognitionOneResult[1] + '"></img>';
+        newCell2.innerHTML = message.recognitionOneResult[0];
+
+        // $("#recognition_result_div").append(message.recognitionOneResult + "<br/>");
+        // document.getElementById("recognition_result_div").scrollTop = document.getElementById("recognition_result_div").scrollHeight;
     }
 
-
+    if(message.recognitionOneSrcImg != undefined) {
+        console.log("run mnist src image: ", message.recognitionOneSrcImg);
+        document.getElementById('recognition_result_div').innerHTML += '<li><img src="' + message.recognitionOneSrcImg + '"></img></li>';
+    }
 });
 
 

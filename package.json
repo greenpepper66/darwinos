@@ -13,12 +13,17 @@
 		"onCommand:darwinos.helloWorld",
 		"onView:model_view",
 		"onView:resource_view",
+		"onView:apps_view",
 		"onView:task_view",
-		"*"	
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
+            {
+                "command": "darwinos.showHomePage",
+                "title": "显示home页面"
+            },
 			{
 				"command": "darwinos.helloWorld",
 				"title": "Hello World"
@@ -62,6 +67,18 @@
 					"light": "media/light/plus.svg",
 					"dark": "media/dark/plus.svg"
 				}
+			},
+			{
+				"command": "apps_view.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "media/light/refresh.svg",
+					"dark": "media/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "apps_view.appsOverview",
+				"title": "Overview"
 			},
 			{
 				"command": "task_view.refreshEntry",
@@ -110,6 +127,11 @@
 					"contextualTitle": "model view"
 				},
 				{
+					"id": "apps_view",
+					"name": "应用视图",
+					"contextualTitle": "application view"
+				},
+				{
 					"id": "task_view",
 					"name": "任务视图",
 					"contextualTitle": "task view"
@@ -140,6 +162,15 @@
 					"command": "model_view.uploadModel",
 					"when": "view == model_view",
 					"group": "navigation"
+				},
+				{
+					"command": "apps_view.refreshEntry",
+					"when": "view == apps_view",
+					"group": "navigation"
+				},
+				{
+					"command": "apps_view.appsOverview",
+					"when": "view == apps_view"
 				},
 				{
 					"command": "task_view.refreshEntry",

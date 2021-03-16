@@ -25,7 +25,7 @@ print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Input data 
 
 
 CLIENT_IP = '192.168.1.254'
-TCP_PORT = 10123
+TCP_PORT = 10123    
 MODEL_DEPLOY_MASTER = 0
 SPIKE_DEPLOY_MASTER = 0
 SET_TICK = 3
