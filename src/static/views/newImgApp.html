@@ -31,7 +31,8 @@
 <body>
     <div id="newImgApp">
         <!-- 按钮触发模态框 -->
-        <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" style="display: none;">
+        <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal"
+            style="display: none;">
             创建新的项目
         </button>
 
@@ -94,21 +95,39 @@
                                 </select>
                             </div>
                             <div class="form-group" id="select_config_path">
-                                <label for="encode_config_dir">选择配置文件所在的文件夹</label>
+                                <label for="encode_config_file">选择配置文件</label>
                                 <div>
                                     <button type="button" class="btn btn-primary"
-                                        onclick="selectEncodeConfDir()">选择文件夹</button>
-                                    <input type="text" class="local-dir-text" id="encode_config_dir" />
+                                        onclick="selectEncodeConfFile()">选择文件</button>
+                                    <input type="text" class="local-dir-text" id="encode_config_file" />
                                 </div>
                             </div>
                             <div class="form-group" id="select_output_path">
-                                <label for="output_dir">选择输出文件所在的文件夹</label>
+                                <label for="output_dir">选择中间输出结果保存路径</label>
                                 <div>
                                     <button type="button" class="btn btn-primary"
                                         onclick="selectOutputDir()">选择文件夹</button>
                                     <input type="text" class="local-dir-text" id="output_dir" />
                                 </div>
                             </div>
+
+
+                            <div class="form-group">
+                                <label for="select_retShow_way">选择识别结果输出方式</label>
+                                <select class="form-control" id="select_retShow_way" onchange="selectRetShowWay()">
+                                    <option volue="none" style="display: none;"></option>
+                                    <option value="localShow">本地展示</option>
+                                    <option value="remoteShow">远程输出</option>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group" id="get_remoteIP_addr_forRet" style="display: none;">
+                                <label for="remoteIP_addr_forRet">请输入远程IP地址</label>
+                                <input type="text" class="form-control" id="remoteIP_addr_forRet">
+                            </div>
+
+
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -125,60 +144,27 @@
 
 
 
-        <!-- 确认信息-失败-->
-        <!-- 按钮触发模态框 -->
-        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#errInfoModal" style="display: none;"
-            id="btn_errInfoModal">
-            开始演示模态框
-        </button>
-        <!-- 模态框（Modal） -->
-        <div class="modal fade" id="errInfoModal" tabindex="-1" role="dialog" aria-labelledby="errInfoModalLabel"
-            aria-hidden="true" data-backdrop="static" data-keyboard="false">
-            <div class="modal-dialog">
-                <div class="modal-content, myModalContent">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
-                        </button>
-                        <h4 class="modal-title" id="errInfoModalLabel">
-                            应用保存结果
-                        </h4>
-                    </div>
-                    <br>
-                    <span class="modal-body" id="errInfoModalContent"> </span>
-                    <div class="modal-body">
-                        保存失败，请重新尝试！
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                        </button>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
-    </div>
-
-
-
     <!-- 确认信息-成功-->
     <!-- 按钮触发模态框 -->
-    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#successInfoModal" style="display: none;"
-        id="btn_successInfoModal">
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#saveAppInfoModal" style="display: none;"
+        id="btn_saveAppInfoRetModal">
         开始演示模态框
     </button>
     <!-- 模态框（Modal） -->
-    <div class="modal fade" id="successInfoModal" tabindex="-1" role="dialog" aria-labelledby="successInfoModalLabel"
+    <div class="modal fade" id="saveAppInfoModal" tabindex="-1" role="dialog" aria-labelledby="saveAppInfoModalLabel"
         aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content, myModalContent">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
                     </button>
-                    <h4 class="modal-title" id="successInfoModalLabel">
+                    <h4 class="modal-title" id="saveAppInfoModalLabel">
                         应用保存结果
                     </h4>
                 </div>
+                
                 <div class="modal-body">
-                    保存成功！
+                    <span class="modal-body" id="saveAppInfoModalContent"> </span>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭

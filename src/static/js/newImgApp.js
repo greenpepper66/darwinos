@@ -20,11 +20,11 @@ function getModelFileList() {
         text: '从插件获取所有模型文件'
     });
 }
-function selectEncodeConfDir() {
-    console.log("selectEncodeConfDir js function ");
+function selectEncodeConfFile() {
+    console.log("selectEncodeConfFile js function ");
     vscode.postMessage({
-        command: 'selectEncodeConfDir',
-        text: '选择编码所需配置文件所在的文件夹'
+        command: 'selectEncodeConfFile',
+        text: '选择编码所需配置文件'
     });
 }
 function selectOutputDir() {
@@ -40,8 +40,6 @@ function selectOutputDir() {
 function saveImgAppConfig() {
     console.log("saveImgAppConfig js function ");
 
-    // 判断各个选项是否为空
-
     // 获取各个输入项
     let appName = document.getElementById("project_name").value;                // 应用名称
     let imgSrcKind = document.getElementById("select_imgSrc_type").value;       // 数据源
@@ -53,7 +51,7 @@ function saveImgAppConfig() {
 
     let modelFileID = document.getElementById("select_model").value;            // 绑定模型
     let encodeMethodID = document.getElementById("encode_method_type").value;   // 编码方法
-    let encodeConfDir = document.getElementById("encode_config_dir").value;     // 编码配置文件所在目录
+    let encodeConfDir = document.getElementById("encode_config_file").value;     // 编码配置文件所在目录
     let outputDir = document.getElementById("output_dir").value;                // 编码过程中间文件输出目录 
 
     console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir);
@@ -97,8 +95,8 @@ window.addEventListener('message', event => {
         console.log(this.modelFileList[0].name);
         for (let i = 0; i < modelFileListRet.length; i++) {
             // new Option("Option text","Option value");
-            let text = modelFileListRet[i].id + " - " + modelFileListRet[i].name + " - " + "节点" + modelFileListRet[i].nodeID +  " - " + modelFileListRet[i].nodeIP;
-            let value = modelFileListRet[i].id + " - " + modelFileListRet[i].name + " - " + modelFileListRet[i].nodeID +  " - " + modelFileListRet[i].nodeIP;
+            let text = modelFileListRet[i].id + " - " + modelFileListRet[i].name + " - " + "节点" + modelFileListRet[i].nodeID + " - " + modelFileListRet[i].nodeIP;
+            let value = modelFileListRet[i].id + " - " + modelFileListRet[i].name + " - " + modelFileListRet[i].nodeID + " - " + modelFileListRet[i].nodeIP;
             $("#select_model").append((new Option(text, value)));
         }
     }
@@ -107,18 +105,18 @@ window.addEventListener('message', event => {
     if (message.saveImgAppConfigRet != undefined) {
         console.log('---------------------------message：get config save result', message.saveImgAppConfigRet);
         if (message.saveImgAppConfigRet == "success") {
-            document.getElementById("btn_successInfoModal").click();
+            document.getElementById("saveAppInfoModalContent").innerText = "保存成功！";
         } else if (message.saveImgAppConfigRet.indexOf("error") != -1) {
-            document.getElementById("errInfoModalContent").innerText = message.saveImgAppConfigRet;
-            document.getElementById("btn_errInfoModal").click();
+            document.getElementById("saveAppInfoModalContent").innerText = "保存失败：" + message.saveImgAppConfigRet;
         }
+        document.getElementById("btn_saveAppInfoRetModal").click();
     }
 
     // 用户选择的配置文件目录
     if (message.selectedEncodeConfDir != undefined) {
         let dir = message.selectedEncodeConfDir;
         console.log('---------------------------message：get encode config dir', dir);
-        document.getElementById("encode_config_dir").value = message.selectedEncodeConfDir;
+        document.getElementById("encode_config_file").value = message.selectedEncodeConfDir;
     }
 
     // 用户选择的输出文件目录
@@ -148,7 +146,16 @@ function selectImgSrcKind() {
         document.getElementById("select_local_path").style.display = "none";//隐藏
         document.getElementById("get_remoteIP_addr").style.display = "";//显示
     }
-
+}
+// 用户选择输出方式：本地展示或输出给远程地址
+function selectRetShowWay() {
+    console.log(document.getElementById("select_retShow_way").value);
+    let retShowWay = document.getElementById("select_retShow_way").value;
+    if (retShowWay == "localShow") {
+        document.getElementById("get_remoteIP_addr_forRet").style.display = "none";//隐藏
+    } else if (retShowWay == "remoteShow") {
+        document.getElementById("get_remoteIP_addr_forRet").style.display = "";//显示
+    }
 }
 
 new Vue({
@@ -160,9 +167,7 @@ new Vue({
 
     },
     mounted() {
-
         getModelFileList();
-
     },
     watch: {
 

@@ -143,7 +143,7 @@ export class Chip extends vscode.TreeItem {
     super(label, collapsibleState);
 
     this.tooltip = `${this.label}`;
-    this.description = (usedNeureNum / (24 * 24) * 100).toFixed(2)+"%";
+    // this.description = (usedNeureNum / (24 * 24) * 100).toFixed(2)+"%";
   }
   iconPath = {
     light: path.join(__filename, '..', '..', '..','media', 'light', 'chip.svg'),

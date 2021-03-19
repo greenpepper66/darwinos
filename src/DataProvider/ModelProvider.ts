@@ -31,6 +31,7 @@ export class ModelProvider implements vscode.TreeDataProvider<Model> {
 	
 
 	public updateModels(models){
+		console.log("updateModels!!");
 		this.models=[];
 		for (var i = 0; i < models.length; i++){
 			var name=models[i].name;
@@ -67,7 +68,7 @@ export class Model extends vscode.TreeItem {
 		super(label, collapsibleState);
 
 		this.tooltip = `${this.label}`;
-		this.description = this.label;
+		// this.description = this.label;
 	}
 	
 	iconPath = {

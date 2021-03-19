@@ -46,6 +46,14 @@ function doStartRunTask() {
     });
 }
 
+function startImgConvertProcess() {
+    console.log("start convert png images.");
+    vscode.postMessage({
+        command: 'startImgConvertProcess',
+        text: '运行image图像转换脚本'
+    });
+}
+
 function startPickleConvertProcess() {
     console.log("start convert pickle files.");
     vscode.postMessage({
@@ -76,6 +84,31 @@ function startRecognitionProcess() {
 window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
+
+
+    // 0. 解包配置文件的脚本
+    // 日志输出
+    if (message.unpackConfigFileProcessLog != undefined) {
+        let log_output_lists = new Array();
+        log_output_lists = log_output_lists.concat(message.unpackConfigFileProcessLog.split("<br/>"));
+        console.log("data.logoutput=[" + message.unpackConfigFileProcessLog + "]");
+        console.log("data split list len=" + log_output_lists.length);
+        $("#log_output_div").append(log_output_lists.join("<br/>"));
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+    // 错误和告警输出
+    if (message.unpackConfigFileProcessErrorLog != undefined) {
+        console.log("run script err: ", message.unpackConfigFileProcessErrorLog);
+        $("#log_output_div").append(message.unpackConfigFileProcessErrorLog + "<br/>");
+        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+    }
+
+    // 解包结束，发送命令 编码
+    if (message.unpackConfigFileProcessFinish != undefined) {
+        console.log("run script over!", message.unpackConfigFileProcessFinish);
+        startImgConvertProcess();
+    }
+
 
     // 1. 李畅的脚本 - 图像编码 相关消息
     // 日志输出
@@ -212,7 +245,7 @@ new Vue({
     mounted() {
         callVscode('getImgAppInfos', imgAppInformation => {
             this.imgAppInformation = imgAppInformation;
-            this.iframeRoute = "http://localhost:5001/#/appDetail?nodeID=" + this.imgAppInformation.modelFileNodeID  + "&modelID=" + this.imgAppInformation.modeFileID;
+            this.iframeRoute = "http://localhost:5001/#/taskDetail?nodeID=" + this.imgAppInformation.modelFileNodeID  + "&modelID=" + this.imgAppInformation.modeFileID;
             console.log("TTT", iframeRoute);
         });
     },

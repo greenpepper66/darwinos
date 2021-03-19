@@ -9,11 +9,12 @@ import { Model, ModelProvider } from "./DataProvider/ModelProvider";
 import { Task, TaskProvider } from "./DataProvider/TaskProvider";
 import { Node, Chip, ResProvider } from "./DataProvider/ResProvider";
 import { AppsProvider } from "./DataProvider/AppsProvider";
-import {EmptyData,EmptyDataProvider} from "./DataProvider/EmptyDataProvider";
+import { EmptyData, EmptyDataProvider } from "./DataProvider/EmptyDataProvider";
 import { PageProvideByPort, PageProvideByPath, changeIndexHtmlCss } from "./PageProvider";
 import { task_start, task_stop, task_reset, task_deploy, task_delete } from "./os/task_operations"
 import { startHttpServer } from './os/server';
-import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome"
+import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
+import {openImgAppRunTaskPage} from "./pages/ImgAppHome";
 
 const PORT = 5001;
 
@@ -45,11 +46,6 @@ export function activate(context: vscode.ExtensionContext) {
 	PageProvideByPort("类脑计算机", 5001, "")
 
 
-	//PageProvideByPath(context,"asd","src/resources/dist/index.html");
-
-
-
-
 	const ResDataProvider = new ResProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('resource_view', ResDataProvider);
 
@@ -59,55 +55,88 @@ export function activate(context: vscode.ExtensionContext) {
 	const TaskDataProvider = new TaskProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('task_view', TaskDataProvider);
 
-
-
-
-
-	// 应用视图
 	const AppsDataProvider = new AppsProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('apps_view', AppsDataProvider);
-	vscode.commands.registerCommand('apps_view.refreshEntry', () => AppsDataProvider.refresh());
-	vscode.commands.registerCommand('apps_view.appsOverview', () => {
-		AppsHomePageProvide(context);  // overview按钮打开应用视图首页
-	});
-	// 应用视图导航栏子选项单击命令
-	vscode.commands.registerCommand('extension.gotoAppPage', (name, num) => {
-		openCertainAppHomePage(context, num);
-	});
+
 
 
 	//上传模型
+	vscode.commands.registerCommand('model_view.uploadModel', () => {
+		PageProvideByPort("上传模型", 5001, "UploadModel");
+		vscode.window.showInformationMessage(`Successfully called upload model.`);
+	});
+
 	const uploadModelDataProvider = new EmptyDataProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('upload_model_view', uploadModelDataProvider);
-	let uploadModelTreeView=vscode.window.createTreeView('upload_model_view',{treeDataProvider:uploadModelDataProvider});
-
-	uploadModelTreeView.onDidChangeVisibility((evt)=>{
-		if(evt.visible){
-			vscode.commands.executeCommand('model_view.uploadModel');		
+	let uploadModelTreeView = vscode.window.createTreeView('upload_model_view', { treeDataProvider: uploadModelDataProvider });
+	uploadModelTreeView.onDidChangeVisibility((evt) => {
+		if (evt.visible) {
+			vscode.commands.executeCommand('model_view.uploadModel');
 		}
 	});
 
 
+	// 刷新
+	vscode.commands.registerCommand('resource_view.refreshEntry', () => ResDataProvider.refresh());
+	vscode.commands.registerCommand('model_view.refreshEntry', () => ModelDataProvider.refresh());
+	vscode.commands.registerCommand('apps_view.refreshEntry', () => AppsDataProvider.refresh());
+	vscode.commands.registerCommand('task_view.refreshEntry', () => TaskDataProvider.refresh());
+
 
 	//启动httpserver，接收来自web页面的数据
-	startHttpServer(ResDataProvider, ModelDataProvider, TaskDataProvider);
+	startHttpServer(ResDataProvider, ModelDataProvider, TaskDataProvider, context);
 
-	//resource view
-	vscode.commands.registerCommand('resource_view.refreshEntry', () => ResDataProvider.refresh());
+	//自动弹出导航栏
+	let ResTreeView = vscode.window.createTreeView('resource_view', { treeDataProvider: ResDataProvider });
+	ResTreeView.reveal(ResDataProvider.nodes[0]);
 
+	// 立即显示导航栏
+	ResDataProvider.refresh();
+	ModelDataProvider.refresh();
+	TaskDataProvider.refresh();
+	
+
+
+	vscode.commands.registerCommand('extension.openPage', (name, port, route) => {
+		PageProvideByPort(name, port, route)
+	});
+
+
+	// OverView
 	vscode.commands.registerCommand('resource_view.resOverview', () => {
 		PageProvideByPort("资源视图", 5001, "")
 	});
-
-
-
-	//model view  
-	vscode.commands.registerCommand('model_view.refreshEntry', () => ModelDataProvider.refresh());
-
 	vscode.commands.registerCommand('model_view.modelOverview', () => {
 		PageProvideByPort("模型视图", 5001, "model")
 	});
+	vscode.commands.registerCommand('apps_view.appsOverview', () => {
+		AppsHomePageProvide(context);  // overview按钮打开应用视图首页
+	});
+	vscode.commands.registerCommand('task_view.taskOverview', () => {
+		PageProvideByPort("任务视图", 5001, "task")
+	});
 
+
+	// 应用视图
+	// 应用视图导航栏子选项单击命令
+	vscode.commands.registerCommand('extension.gotoAppPage', (name, num) => {
+		openCertainAppHomePage(context, num);
+	});
+	// 任务视图导航栏子选项单击命令
+	vscode.commands.registerCommand('extension.gotoImgAppTaskPage', (name, id, type) => {
+		openImgAppRunTaskPage(context, id)
+	});
+
+
+	//定时自动刷新导航栏，显示信息
+	setTimeout(function refreshEntrys() {
+		vscode.commands.executeCommand('resource_view.refreshEntry');
+		vscode.commands.executeCommand('model_view.refreshEntry');
+		vscode.commands.executeCommand('task_view.refreshEntry');
+	}, 500);
+
+
+	//model view  
 	vscode.commands.registerCommand('model_view.deployTask', (model: Model) => {
 		task_deploy(model.nodeIp, model.modelId);
 		vscode.window.showInformationMessage(`Successfully called deploy task.`);
@@ -120,20 +149,9 @@ export function activate(context: vscode.ExtensionContext) {
 		ModelDataProvider.refresh();
 	});
 
-	vscode.commands.registerCommand('model_view.uploadModel', () => {
-		PageProvideByPort("上传模型", 5001, "UploadModel");
-		vscode.window.showInformationMessage(`Successfully called upload model.`);
-	});
-
 
 
 	//task view
-	vscode.commands.registerCommand('task_view.refreshEntry', () => TaskDataProvider.refresh());
-
-	vscode.commands.registerCommand('task_view.taskOverview', () => {
-		PageProvideByPort("任务视图", 5001, "task")
-	});
-
 	// 启动任务
 	// vscode.commands.registerCommand('task_view.startTask', (task: Task) => {
 	// 	task_start(task.nodeIp,task.modelId);		
@@ -142,7 +160,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	require('./pages/TaskStart')(context); // 
 	// require('./DataProvider/welcome')(context); // 欢迎提示
-
 
 	vscode.commands.registerCommand('task_view.stopTask', (task: Task) => {
 		task_stop(task.nodeIp, task.modelId);
@@ -155,24 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 
-	vscode.commands.registerCommand('extension.openPage', (name, port, route) => {
-		PageProvideByPort(name, port, route)
-	});
 
-
-
-	//自动弹出导航栏
-	let ResTreeView=vscode.window.createTreeView('resource_view',{treeDataProvider:ResDataProvider});
-	ResTreeView.reveal(ResDataProvider.nodes[0]);
-
-
-	
-	//定时自动刷新导航栏，显示信息
-	setTimeout(function refreshEntrys() {		
-		vscode.commands.executeCommand('resource_view.refreshEntry');
-		vscode.commands.executeCommand('model_view.refreshEntry');
-		vscode.commands.executeCommand('task_view.refreshEntry');
-	  }, 5000);
 
 }
 

@@ -9,13 +9,15 @@ import { TaskProvider } from "../DataProvider/TaskProvider";
 // 定义全局变量，供外部文件调用
 export module allData {
 	export let modelFileList: any[];
+	export let deployedModelList: any[]; // 部署后的模型列表，可以用来运行任务
 }
 
 
 
 export function startHttpServer(ResDataProvider: ResProvider,
 	ModelDataProvider: ModelProvider,
-	TaskDataProvider: TaskProvider) {
+	TaskDataProvider: TaskProvider,
+	context) {
 	var routes = {
 		'/post': function (req, res) {
 			var obj = {};
@@ -31,17 +33,17 @@ export function startHttpServer(ResDataProvider: ResProvider,
 
 			// 保存在全局变量中
 			allData.modelFileList = models;
+			allData.deployedModelList = tasks;
 
 			ResDataProvider.updateNodes(nodes);
 			ModelDataProvider.updateModels(models);
-			TaskDataProvider.updateTasks(tasks);
+			// TaskDataProvider.updateTasks(tasks);
+			TaskDataProvider.getTaskList(context);
 		}
 	}
 
 	var server = http.createServer(function (req, res) {
-
 		var pathObj = url.parse(req.url, true);
-
 		//新添处理路由的代码
 		var handleFn = routes[pathObj.pathname];
 		if (handleFn) {
@@ -53,23 +55,21 @@ export function startHttpServer(ResDataProvider: ResProvider,
 				handleFn(req, res);
 			});
 		} else {
-
 			res.writeHead(404, "Not Found");
 			res.end('<h1>404 Not Found!</h1>');
-
 		}
 	});
 	server.listen(5002);
 
 
 	// test
-	let model = {
-		id: 11,
-		name:"model_name",
-		nodeID: 1,
-		nodeIP: "192.168.1.1"              
-	}
-	allData.modelFileList = [model];
+	// let model = {
+	// 	id: 11,
+	// 	name:"model_name",
+	// 	nodeID: 1,
+	// 	nodeIP: "192.168.1.1"              
+	// }
+	// allData.modelFileList = [model];
 }
 
 
