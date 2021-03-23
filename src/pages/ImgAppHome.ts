@@ -17,6 +17,9 @@ const imgAppRunTaskHtmlFilePath = "src/static/views/imgAppRunTask.html";
  * ******************************************************************************************************
  */
 
+const log_output_channel = vscode.window.createOutputChannel("darwinos output");
+log_output_channel.show();
+
 // 2. 与数字图像识别应用首页交互
 const imgAppMessageHandler = {
     // 2.1 单击“新建应用”按钮 跳转到新建应用页面
@@ -123,8 +126,7 @@ const newImgAppMessageHandler = {
 
                     // 发送给web保存结果
                     global.panel.webview.postMessage({ saveImgAppConfigRet: "success" });
-                    // 更新任务导航栏
-                    vscode.commands.executeCommand('task_view.refreshEntry');
+                    
                 }
             }
         }
@@ -377,7 +379,10 @@ function unpackConfigFiles(global) {
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
+
+
     scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
         console.log(data);
         // if (data.indexOf("UNPACKCONFIG FINISHED") !== -1) {
         //     global.panel.webview.postMessage({ unpackConfigFileProcessFinish: "unpack finish" });
@@ -387,6 +392,7 @@ function unpackConfigFiles(global) {
     });
 
     scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
         console.log(data);
         let formatted_err = data.split("\r\n").join("<br/>");
         global.panel.webview.postMessage({ unpackConfigFileProcessErrorLog: formatted_err });
@@ -420,6 +426,7 @@ function runImgConvertScript(global) {
     let scriptProcess = exec(command_str, {});
 
     scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
         console.log(data);
         // if (data.indexOf("CONVERT FINISHED") !== -1) {
         //     global.panel.webview.postMessage({imgConvertProcessFinish: "convert finish"});
@@ -435,6 +442,7 @@ function runImgConvertScript(global) {
     });
 
     scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
         console.log(data);
         let formatted_err = data.split("\r\n").join("<br/>");
         global.panel.webview.postMessage({ imgConvertProcessErrorLog: formatted_err });
@@ -466,6 +474,7 @@ function runPickleConvertScript(global) {
     let scriptProcess = exec(command_str, {});
 
     scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
         console.log(data);
         if (data.indexOf("Converting one image") !== -1) {
             // 传递 转换成功的图像个数
@@ -477,6 +486,7 @@ function runPickleConvertScript(global) {
     });
 
     scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
         console.log(data);
         let formatted_err = data.split("\r\n").join("<br/>");
         global.panel.webview.postMessage({ pickleConvertProcessErrorLog: formatted_err });
@@ -495,7 +505,7 @@ function runMnistSendInputScript(global) {
     console.log("start mnist image recognition: ", global.appInfo.name);
 
     // 脚本位置 mnist_send_input_back.py
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "mnist_send_input_back.py");
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "test.py");
     let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
@@ -511,6 +521,7 @@ function runMnistSendInputScript(global) {
     let scriptProcess = exec(command_str, {});
 
     scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
         console.log(data);
         if (data.indexOf("Recognize one image ok") !== -1) {
             // 传递 转换成功的图像个数
@@ -544,6 +555,7 @@ function runMnistSendInputScript(global) {
     });
 
     scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
         console.log(data);
         let formatted_err = data.split("\r\n").join("<br/>");
         global.panel.webview.postMessage({ recognitionProcessErrorLog: formatted_err });

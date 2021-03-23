@@ -81,6 +81,8 @@ export function writeJson(context, imgAppConfig) {
                 return console.error(err);
             }
             console.log('----------新增成功-------------');
+            // 更新任务导航栏
+            vscode.commands.executeCommand('task_view.refreshEntry');
             return console.log("save app config success");
         })
     })
@@ -114,6 +116,8 @@ export function deleteJson(context, id) {
                 return console.error(err);
             }
             console.log("----------删除成功------------");
+            // 更新任务导航栏
+            vscode.commands.executeCommand('task_view.refreshEntry');
             return console.log("delete app config success");
         })
     })

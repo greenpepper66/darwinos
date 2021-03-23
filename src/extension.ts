@@ -14,7 +14,9 @@ import { PageProvideByPort, PageProvideByPath, changeIndexHtmlCss } from "./Page
 import { task_start, task_stop, task_reset, task_deploy, task_delete } from "./os/task_operations"
 import { startHttpServer } from './os/server';
 import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
-import {openImgAppRunTaskPage} from "./pages/ImgAppHome";
+import { openImgAppRunTaskPage } from "./pages/ImgAppHome";
+
+import {SystemTreeViewProvider} from "./DataProvider/SystemProvider";
 
 const PORT = 5001;
 
@@ -45,6 +47,8 @@ export function activate(context: vscode.ExtensionContext) {
 	//打开home页
 	PageProvideByPort("类脑计算机", 5001, "")
 
+	// 导航栏重构尝试
+	// SystemTreeViewProvider.initTreeViewItem();
 
 	const ResDataProvider = new ResProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('resource_view', ResDataProvider);
@@ -58,6 +62,13 @@ export function activate(context: vscode.ExtensionContext) {
 	const AppsDataProvider = new AppsProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('apps_view', AppsDataProvider);
 
+
+	//启动httpserver，接收来自web页面的数据
+	startHttpServer(ResDataProvider, ModelDataProvider, TaskDataProvider, context);
+
+	//自动弹出导航栏
+	let ResTreeView = vscode.window.createTreeView('resource_view', { treeDataProvider: ResDataProvider});
+	ResTreeView.reveal(ResDataProvider.nodes[0]);
 
 
 	//上传模型
@@ -83,18 +94,8 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('task_view.refreshEntry', () => TaskDataProvider.refresh());
 
 
-	//启动httpserver，接收来自web页面的数据
-	startHttpServer(ResDataProvider, ModelDataProvider, TaskDataProvider, context);
 
-	//自动弹出导航栏
-	let ResTreeView = vscode.window.createTreeView('resource_view', { treeDataProvider: ResDataProvider });
-	ResTreeView.reveal(ResDataProvider.nodes[0]);
 
-	// 立即显示导航栏
-	ResDataProvider.refresh();
-	ModelDataProvider.refresh();
-	TaskDataProvider.refresh();
-	
 
 
 	vscode.commands.registerCommand('extension.openPage', (name, port, route) => {

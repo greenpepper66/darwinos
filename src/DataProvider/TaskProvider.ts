@@ -9,13 +9,15 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Task | undefined | void> = new vscode.EventEmitter<Task | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<Task | undefined | void> = this._onDidChangeTreeData.event;
 
-	private tasks: Task[];
+	public tasks: Task[];
 
 	constructor(private workspaceRoot: string) {
+		this.getTasksList();
 	}
 
 	refresh(): void {
 		console.log("fire!!!");
+		this.getTasksList();
 		this._onDidChangeTreeData.fire();
 	}
 
@@ -57,11 +59,10 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 		}
 	}
 
-
-	public getTaskList(context) {
+	public getTasksList() {
 		this.tasks = [];
-		console.log("task list searching ...");
-		let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+		console.log("task list searching ...", __filename);
+		let resourcePath = path.join(__filename, "..", "..", "..", imgAppsConfigFile);
 		let data = fs.readFileSync(resourcePath, 'utf-8');
 		let stringContent = data.toString();//将二进制的数据转换为字符串
 		let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
@@ -88,8 +89,8 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 			);
 			this.tasks.push(task);
 		}
-
 	}
+
 }
 
 
@@ -114,7 +115,7 @@ export class Task extends vscode.TreeItem {
 	}
 
 	iconPath = {
-		light: path.join(__filename, '..', '..', 'media', 'light', 'document.svg'),
+		light: path.join(__filename, '..', '..', '..', 'media', 'light', '文件.png'),
 		dark: path.join(__filename, '..', '..', 'media', 'dark', 'document.svg')
 	};
 

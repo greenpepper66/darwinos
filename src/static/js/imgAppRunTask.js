@@ -93,14 +93,14 @@ window.addEventListener('message', event => {
         log_output_lists = log_output_lists.concat(message.unpackConfigFileProcessLog.split("<br/>"));
         console.log("data.logoutput=[" + message.unpackConfigFileProcessLog + "]");
         console.log("data split list len=" + log_output_lists.length);
-        $("#log_output_div").append(log_output_lists.join("<br/>"));
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(log_output_lists.join("<br/>"));
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
     // 错误和告警输出
     if (message.unpackConfigFileProcessErrorLog != undefined) {
         console.log("run script err: ", message.unpackConfigFileProcessErrorLog);
-        $("#log_output_div").append(message.unpackConfigFileProcessErrorLog + "<br/>");
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(message.unpackConfigFileProcessErrorLog + "<br/>");
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
 
     // 解包结束，发送命令 编码
@@ -117,8 +117,8 @@ window.addEventListener('message', event => {
         log_output_lists = log_output_lists.concat(message.imgConvertProcessLog.split("<br/>"));
         console.log("data.logoutput=[" + message.imgConvertProcessLog + "]");
         console.log("data split list len=" + log_output_lists.length);
-        $("#log_output_div").append(log_output_lists.join("<br/>"));
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(log_output_lists.join("<br/>"));
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
 
     // 一个图像转换完成后需要累加的进度
@@ -131,16 +131,16 @@ window.addEventListener('message', event => {
     // 错误和告警输出
     if (message.imgConvertProcessErrorLog != undefined) {
         console.log("run script err: ", message.imgConvertProcessErrorLog);
-        $("#log_output_div").append(message.imgConvertProcessErrorLog + "<br/>");
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(message.imgConvertProcessErrorLog + "<br/>");
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
 
     // 脉冲编码结束，进度条刷满格
     if (message.imgConvertProcessFinish != undefined) {
         console.log("run script over!", message.imgConvertProcessFinish);
         document.getElementById("png_convert_progress_div").style.width = "100%";
-        $("#log_output_div").append(message.imgConvertProcessFinish + "<br/><br/><br/>");
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(message.imgConvertProcessFinish + "<br/><br/><br/>");
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
 
         // 发送消息执行柳铮的脚本
         startPickleConvertProcess();
@@ -152,8 +152,8 @@ window.addEventListener('message', event => {
         log_output_lists = log_output_lists.concat(message.imgConvertProcessLog.split("<br/>"));
         console.log("data.logoutput=[" + message.imgConvertProcessLog + "]");
         console.log("data split list len=" + log_output_lists.length);
-        $("#log_output_div").append(log_output_lists.join("<br/>"));
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(log_output_lists.join("<br/>"));
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
 
     if (message.pickleConvertOneDone != undefined) {
@@ -164,15 +164,15 @@ window.addEventListener('message', event => {
 
     if (message.pickleConvertProcessErrorLog != undefined) {
         console.log("run script2 err: ", message.pickleConvertProcessErrorLog);
-        $("#log_output_div").append(message.pickleConvertProcessErrorLog + "<br/>");
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(message.pickleConvertProcessErrorLog + "<br/>");
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
 
     if (message.pickleConvertProcessFinish != undefined) {
         console.log("run script2 over!", message.pickleConvertProcessFinish);
         document.getElementById("pickle_convert_progress_div").style.width = "100%";
-        $("#log_output_div").append(message.pickleConvertProcessFinish + "<br/><br/><br/>");
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(message.pickleConvertProcessFinish + "<br/><br/><br/>");
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
 
         // 发送消息执行图像识别的脚本
         startRecognitionProcess();
@@ -184,8 +184,8 @@ window.addEventListener('message', event => {
         log_output_lists = log_output_lists.concat(message.recognitionProcessLog.split("<br/>"));
         console.log("data.logoutput=[" + message.recognitionProcessLog + "]");
         console.log("data split list len=" + log_output_lists.length);
-        $("#log_output_div").append(log_output_lists.join("<br/>"));
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(log_output_lists.join("<br/>"));
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
 
     if (message.recognitionOneDone != undefined) {
@@ -196,15 +196,15 @@ window.addEventListener('message', event => {
 
     if (message.recognitionProcessErrorLog != undefined) {
         console.log("run mnist err: ", message.recognitionProcessErrorLog);
-        $("#log_output_div").append(message.recognitionProcessErrorLog + "<br/>");
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(message.recognitionProcessErrorLog + "<br/>");
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
 
     if (message.recognitionProcessFinish != undefined) {
         console.log("run mnist over!", message.recognitionProcessFinish);
         document.getElementById("recognition_task_progress_div").style.width = "100%";
-        $("#log_output_div").append(message.recognitionProcessFinish + "<br/><br/><br/>");
-        document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
+        // $("#log_output_div").append(message.recognitionProcessFinish + "<br/><br/><br/>");
+        // document.getElementById("log_output_div").scrollTop = document.getElementById("log_output_div").scrollHeight;
     }
 
     if (message.recognitionOneResult != undefined) {

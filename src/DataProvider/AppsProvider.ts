@@ -7,19 +7,15 @@ export class AppKind extends vscode.TreeItem {
 
 	constructor(
 		public readonly label: string,
+		public readonly iconPath: vscode.Uri,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
 	}
 
-	iconPath = {
-		light: path.join(__filename, '..', '..', 'media', 'light', 'document.svg'),
-		dark: path.join(__filename, '..', '..', 'media', 'dark', 'document.svg')
-	};
-
 	contextValue = 'Application Kind';
+
 }
 
 
@@ -27,9 +23,54 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 	private _onDidChangeTreeData: vscode.EventEmitter<AppKind | undefined | void> = new vscode.EventEmitter<AppKind | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<AppKind | undefined | void> = this._onDidChangeTreeData.event;
 
-	private appKinds: AppKind[];
+	public appKinds: AppKind[];
 
 	constructor(private workspaceRoot: string) {
+		this.appKinds = [];
+		var imgApp = new AppKind(
+			"数字图像识别",
+			AppsProvider.getIconUriForLabel("数字图像识别.png"),
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: 'extension.gotoAppPage',
+				title: '',
+				arguments: ["imgApp", 1]
+			}
+		);
+		this.appKinds.push(imgApp);
+		var voiceApp = new AppKind(
+			"语音识别",
+			AppsProvider.getIconUriForLabel("语音识别.png"),
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: 'extension.gotoAppPage',
+				title: '',
+				arguments: ["voiceApp", 2]
+			}
+		);
+		this.appKinds.push(voiceApp);
+		var brainApp = new AppKind(
+			"脑电模拟",
+			AppsProvider.getIconUriForLabel("脑电模拟.png"),
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: 'extension.gotoAppPage',
+				title: '',
+				arguments: ["brainApp", 3]
+			}
+		);
+		this.appKinds.push(brainApp);
+		var otherApp = new AppKind(
+			"其它应用",
+			AppsProvider.getIconUriForLabel("其它应用.png"),
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: 'extension.gotoAppPage',
+				title: '',
+				arguments: ["otherApp", 4]
+			}
+		);
+		this.appKinds.push(otherApp);
 	}
 
 	refresh(): void {
@@ -41,50 +82,17 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 	}
 
 	getChildren(element?: AppKind): Thenable<AppKind[]> {
-		this.appKinds = [];
-		var imgApp = new AppKind(
-			"数字图像识别",
-			vscode.TreeItemCollapsibleState.None,
-			{
-				command: 'extension.gotoAppPage',
-				title: '',
-				arguments: ["imgApp", 1]
-			}
-		);
-		this.appKinds.push(imgApp);
-		var voiceApp = new AppKind(
-			"语音识别",
-			vscode.TreeItemCollapsibleState.None,
-			{
-				command: 'extension.gotoAppPage',
-				title: '',
-				arguments: ["voiceApp", 2]
-			}
-		);
-		this.appKinds.push(voiceApp);
-		var brainApp = new AppKind(
-			"脑电模拟",
-			vscode.TreeItemCollapsibleState.None,
-			{
-				command: 'extension.gotoAppPage',
-				title: '',
-				arguments: ["brainApp", 3]
-			}
-		);
-		this.appKinds.push(brainApp);
-		var otherApp = new AppKind(
-			"其他应用",
-			vscode.TreeItemCollapsibleState.None,
-			{
-				command: 'extension.gotoAppPage',
-				title: '',
-				arguments: ["otherApp", 4]
-			}
-		);
-		this.appKinds.push(otherApp);
-
 		return Promise.resolve(this.appKinds);
 	}
+
+		// __filename：当前文件的路径
+	// 重点讲解 Uri.file(join(__filename,'..', '..') 算是一种固定写法
+	// Uri.file(join(__filename,'..','assert', ITEM_ICON_MAP.get(label)+''));   写成这样图标出不来
+	// 所以小伙伴们就以下面这种写法编写
+	static getIconUriForLabel(name: string): vscode.Uri {
+		return vscode.Uri.file(path.join(__filename, "..", "..", "..", "media", "light", name));
+	}
+
 }
 
 
