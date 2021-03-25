@@ -5,7 +5,6 @@ import numpy as np
 import pickle
 from PIL import Image
 import json
-
 import sys
 import time
 import datetime
@@ -34,19 +33,12 @@ if not isExists:
     os.mkdir(outputDir)
 print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] MakeDir output dir is: ", outputDir, ". ", flush=True)
 
-
-
-# baseDirPath = os.path.dirname(os.path.abspath(__file__))
-
 # 加载配置文件br2.pkl
 print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Loading convert config file br2.pkl ...", flush=True)
-
-
-print("Loading...")
 with open(os.path.join(configDir, "br2.pkl"), "rb") as f:
     info = pickle.load(f)
 
-print("Creating...")
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Creating...")
 br2_neurons = []
 br2_synapses = []
 model_eqs = """
@@ -60,7 +52,7 @@ for i in range(len(info["neurons"])):
 
 for k in range(len(info["synapses_i"])):
     br2_synapses.append(brian2.Synapses(
-        br2_neurons[k], br2_neurons[k+1], model="w:1", on_pre="v+=w", dt=1*brian2.ms))
+        br2_neurons[k], br2_neurons[k+1], model="w:1", on_pre="v+=w", dt=0.1*brian2.ms))
     br2_synapses[-1].connect(i=info["synapses_i"][k], j=info["synapses_j"][k])
     br2_synapses[-1].w = info["synapses_w"][k]
 
@@ -69,13 +61,11 @@ br2_net = brian2.Network(br2_neurons, br2_synapses, br2_input_monitor)
 br2_net.store()
 
 print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Start convert img into pickle format file ...", flush=True)
-print("Converting...")
 count = 1
-
 for file in os.listdir(imgSrcDir):
     img_path = os.path.join(imgSrcDir, file)
     img = Image.open(img_path)
-    img = np.array(img, dtype="float32")/255.0
+    img = np.array(img, dtype="int32")/255
     br2_net.restore()
     br2_neurons[0].bias = img.flatten()/brian2.ms
     br2_net.run(info["run_dura"]*brian2.ms,

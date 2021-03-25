@@ -63,6 +63,22 @@ function saveImgAppConfig() {
 }
 
 
+// 新建的应用启动运行
+function startRunTheNewApp() {
+    // 先保存
+    
+
+    
+    // // 跳转到任务界面
+    // let imgAppName = document.getElementById("project_name").value;
+    // vscode.postMessage({
+    //     command: 'gotoImgAppRunTaskPageByName',
+    //     text: imgAppName,
+    // });
+    // // 新增一条任务
+
+}
+
 
 /**
  * ******************************************************************************************************

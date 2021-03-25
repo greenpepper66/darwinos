@@ -32,14 +32,14 @@ const imgAppMessageHandler = {
     getAppsConfigList(global, message) {
         console.log(message);
         let allApps = searchAllJson(global.context);
-        global.panel.webview.postMessage({ appsConfigListRet: allApps });
+        global.panel.webview.postMessage({ cmd: 'appsConfigListRet', cbid: message.cbid, data: allApps });
     },
 
     // 2.3 删除应用
     deleteAppConfig(global, message) {
         console.log(message);
-        deleteJson(global.context, message.text);
-        global.panel.webview.postMessage({ deleteAppConfigRet: "success" });
+        deleteJson(global.context, message.text[1]);
+        global.panel.webview.postMessage({ deleteAppConfigRet: message.text[0] });
     },
 
     // 2.4 查询应用  显示详情页
@@ -49,9 +49,9 @@ const imgAppMessageHandler = {
     },
 
     // 2.5 运行应用
-    gotoImgAppRunTaskPage(global, message) {
+    gotoImgAppRunTaskPageByID(global, message) {
         console.log(message);
-        openImgAppRunTaskPage(global.context, message.text);
+        openImgAppRunTaskPage(global.context, "byID", message.text);
     },
 
 };
@@ -126,7 +126,7 @@ const newImgAppMessageHandler = {
 
                     // 发送给web保存结果
                     global.panel.webview.postMessage({ saveImgAppConfigRet: "success" });
-                    
+
                 }
             }
         }
@@ -159,6 +159,12 @@ const newImgAppMessageHandler = {
             global.panel.webview.postMessage({ selectedOutputDir: fileUri[0].path.substr(1) });
         });
     },
+
+    //3.6 跳转到应用运行界面
+    gotoImgAppRunTaskPageByName(global, message) {
+        console.log(message);
+        openImgAppRunTaskPage(global.context, "byName", message.text);
+    }
 };
 
 // 4. 与应用详情页面的交互
@@ -227,9 +233,9 @@ export function getAppsHomeHtml(context, templatePath) {
     // 任务输入执行页面样式
     let vscodeColorTheme = vscode.window.activeColorTheme.kind;
     if (vscodeColorTheme == 2) {
-        html = html.replace(/light.css/, "dark.css");
+        html = html.replace(/vs-light.css/, "vs-dark.css");
     } else if (vscodeColorTheme == 1) {
-        html = html.replace(/dark.css/, "light.css");
+        html = html.replace(/vs-dark.css/, "vs-light.css");
     }
 
     return html;
@@ -315,8 +321,8 @@ export function openImgAppInfoPage(context, appID) {
 }
 
 
-// 4. 打开运行应用页面
-export function openImgAppRunTaskPage(context, appID) {
+// 4. 打开运行应用页面 
+export function openImgAppRunTaskPage(context, kind, val) {
     const panel = vscode.window.createWebviewPanel(
         'runImgApp',
         "任务详情",
@@ -328,7 +334,12 @@ export function openImgAppRunTaskPage(context, appID) {
     );
 
     // 保存应用信息
-    let appInfo = searchImgAppByID(context, appID);
+    if (kind == "byID") {
+        var appInfo = searchImgAppByID(context, val);
+    } else if(kind == "byName") {
+        var appInfo = searchImgAppByName(context, val);
+    }
+    
     let global = { panel, context, appInfo };
     panel.webview.html = getAppsHomeHtml(context, imgAppRunTaskHtmlFilePath);
 

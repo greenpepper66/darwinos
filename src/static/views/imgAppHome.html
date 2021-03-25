@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>数字图像识别</title>
-    <link href="../css/dark.css" rel="stylesheet" />
+    <link href="../css/vs-light.css" rel="stylesheet" />
 
     <style>
         .clearfix:before,
@@ -28,128 +28,63 @@
             box-sizing: border-box;
             overflow: auto;
         }
-
-        .top {
-            height: 100px;
-            margin-top: 120px;
-        }
-
-        .middle {
-            min-height: 400px;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        .bottom {
-            height: 160px;
-        }
-
-        .table {
-            margin: 0 auto;
-        }
-
-        .newApp-box {
-            width: 20%;
-            height: 60%;
-            float: right;
-            margin: 0 auto;
-            display: inline;
-            margin-top: 20px;
-        }
-
-        .newApp-button {
-            width: 200px;
-            height: 40px;
-            display: block;
-            margin: 0 auto;
-            border-width: 0;
-        }
-
-        .totalModels {
-            height: 30px;
-            margin-left: 30px;
-            text-align: left;
-        }
-
-        /* 下面是搜索框样式 */
-        .search-box {
-            height: 60%;
-            width: 80%;
-            float: left;
-            margin: 0 auto;
-            margin-top: 20px;
-            overflow: auto;
-        }
-
-        .quarter-search {
-            height: 35px;
-            width: 18%;
-            box-sizing: border-box;
-            float: left;
-            overflow: auto;
-        }
-
-        .searchByName,
-        .searchByType {
-            margin-right: 20px;
-        }
-
-        .searchTitle {
-            margin-top: 7px;
-            text-align: right;
-        }
-
-        .inputBox {
-            height: 80%;
-            width: 80%;
-            float: left;
-        }
-
-        .searchBtn {
-            width: 100px;
-            height: 40px;
-            border: none;
-            float: center;
-        }
     </style>
 
-    <script>
-
-    </script>
-
+    <script></script>
 </head>
 
 <body>
-    <div id="imgAppHome">
-        <div class="clearfix thewrap top">
-            <div class="search-box">
-                <div class="searchTitle quarter-search">按应用搜索：</div>
-                <div class="searchByName quarter-search">
-                    <input type="text" id="searchByName" class="inputBox" placeholder="请输入应用名称" />
-                </div>
-                <div class="searchTitle quarter-search">按模型搜索：</div>
-                <div class="searchByType quarter-search">
-                    <input type="text" id="searchByType" class="inputBox" placeholder="请输入模型名称" />
-                </div>
-                <div>
-                    <button class="searchBtn quarter-search" onclick="searchImgApp()">
-                        搜索
-                    </button>
-                </div>
+    <div id="imgAppHome" class="imgAppHome_page">
+        <div class="clearfix thewrap imgAppHome_top">
+
+            <div class="row">
+                <table class="imgAppHome_page_table-search">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="imgAppHome_search_title">按应用搜索：</div>
+                            </td>
+                            <td>
+                                <div class="">
+                                    <input type="text" id="searchByName" class="imgAppHome_inputBox"
+                                        placeholder="请输入应用名称" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="imgAppHome_search_title">按模型搜索：</div>
+                            </td>
+                            <td>
+                                <div>
+                                    <input type="text" id="searchByType" class="imgAppHome_inputBox"
+                                        placeholder="请输入模型名称" />
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <button class="imgAppHome_search_btn" @click="searchImgApp()">
+                                        搜索
+                                    </button>
+                                </div>
+                            </td>
+                            <td colspan="2">
+                                <div>
+                                    <button type="button" @click="gotoNewAppPage()" class="imgAppHome_newApp_btn">
+                                        新建应用
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="newApp-box">
-                <button type="button" onclick="gotoNewAppPage()" class="newApp-button">
-                    新建应用
-                </button>
-            </div>
         </div>
 
-        <div class="clearfix thewrap middle">
-            最近使用的应用
-            <hr />
+        <div class="clearfix thewrap imgAppHome_middle">
+            <div class="imgAppHome_title">最近使用的应用</div>
+
             <div class="row">
-                <table class="table" id="appsTable">
+                <table class="imgAppHome_page_table-list" id="appsTable">
                     <thead>
                         <tr>
                             <th>应用ID</th>
@@ -162,29 +97,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- 数据加载不出来，改为js动态添加 -->
-                        <!-- <template v-if="appsConfigList.length == 0">
+                        <template v-if="appsConfigList.length == 0">
                             <tr>
                                 <template v-for="j in 7">
-                                    <td width="10%" :key="j">-</td>
+                                    <td :key="j">-</td>
                                 </template>
                             </tr>
                         </template>
-                        <tr v-for="(item, index) in appsConfigList" :key="index">
-                            <td width="10%">{{ item.id }}</td>
-                            <td width="10%">{{ item.name }}</td>
-                            <td width="10%">数字图像识别</td>
-                            <td width="10%">{{ item.modeFileID }}</td>
-                            <td width="10%">{{ item.encodeMethodID }}</td>
-                            <td width="10%">{{ item.createTime }}</td>
-                            <td width="20%">
-                                <button>详情</button>
-                                <button>启动</button>
-                                <button>移除</button>
+
+                        <tr v-for="(item, index) in appsConfigList" :key="item.id">
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.name }}</td>
+                            <td>数字图像识别</td>
+                            <td>{{ item.modeFileID }}</td>
+                            <td>{{ item.encodeMethodID }}</td>
+                            <td>{{ item.createTime }}</td>
+                            <td>
+                                <button type="button" class="imgAppHome_detail_btn"
+                                    @click="gotoImgAppInfoPage(item.id)">详情</button>
+                                <button type="button" class="imgAppHome_runApp_btn"
+                                    @click="gotoImgAppRunTaskPageByID(item.id)">启动</button>
+                                <button type="button" class="imgAppHome_delete_btn"
+                                    @click="deleteAppConfig(index, item.id)">移除</button>
                             </td>
-                        </tr> -->
-
-
+                        </tr>
 
                     </tbody>
                 </table>
@@ -196,8 +132,8 @@
 
 
     <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
-    <script src="../lib/jquery/jquery.min.js"></script>
     <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/jquery/jquery.min.js"></script>
     <script src="../js/imgAppHome.js"></script>
     <script>Vue.config.ProductionTip = false</script>
 </body>

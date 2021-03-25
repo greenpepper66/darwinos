@@ -1,0 +1,224 @@
+/**********************************************************************************************
+** UI设计后调整
+** 0. common style
+**********************************************************************************************/
+table,
+td {
+  border-collapse: collapse; /** 合并单元格边框 */
+}
+
+body {
+  background-color: white;
+  color: black;
+  font-size: 16px;
+}
+
+/****************************************************************************
+  **** 1. 图像识别首页-应用列表
+  ****************************************************************************/
+.imgAppHome_page {
+  margin: 25px;
+  text-align: center;
+}
+.imgAppHome_top {
+  margin-top: 25px;
+  height: 150px;
+  margin: 0 auto;
+  background: #f5f5f5;
+}
+
+table.imgAppHome_page_table-search {
+  margin-left: 20px;
+  margin-right: 20px;
+  font-size: 14px;
+  color: #666666;
+  font-family: PingFangSC-Regular;
+  width: 90%;
+  margin: auto;
+  margin-top: 35px;
+}
+table.imgAppHome_page_table-search tr {
+  padding: 8px;
+  height: 70px;
+}
+table.imgAppHome_page_table-search tr td:nth-child(1),
+table.imgAppHome_page_table-search tr td:nth-child(3) {
+  text-align: right;
+  padding-right: 20px;
+}
+table.imgAppHome_page_table-search tr td:nth-child(2),
+table.imgAppHome_page_table-search tr td:nth-child(4),
+table.imgAppHome_page_table-search tr td:nth-child(5) {
+  text-align: left;
+}
+.imgAppHome_search_title {
+  font-size: 16px;
+  color: #333333;
+  letter-spacing: 0.91px;
+  vertical-align: middle;
+}
+.imgAppHome_inputBox {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  height: 40px;
+  font-size: 16px;
+  color: #999999;
+  letter-spacing: 0;
+  line-height: 14px;
+  width: 80%;
+}
+.imgAppHome_search_btn {
+  background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
+  border-radius: 2px;
+  height: 45px;
+  width: 111px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+}
+.imgAppHome_newApp_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 2px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  height: 45px;
+  width: 220px;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+}
+
+.imgAppHome_middle {
+  background: #f5f5f5;
+  height: 80%;
+  min-height: 800px;
+}
+.imgAppHome_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.imgAppHome_detail_btn,
+.imgAppHome_runApp_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 2px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 12px;
+  color: #ffffff;
+  letter-spacing: 0.69px;
+  height: 29px;
+  width: 73px;
+  margin-right: 10px;
+}
+.imgAppHome_delete_btn {
+  background-image: linear-gradient(180deg, #ffc4b9 0%, #ff8777 100%);
+  border-radius: 2px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 12px;
+  color: #ffffff;
+  letter-spacing: 0.69px;
+  height: 29px;
+  width: 73px;
+  margin-right: 10px;
+}
+
+table.imgAppHome_page_table-list {
+  margin-left: 20px;
+  margin-right: 20px;
+  font-size: 14px;
+  color: #666666;
+  font-family: PingFangSC-Regular;
+  width: 90%;
+  margin: auto;
+  margin-bottom: 50px;
+}
+
+table.imgAppHome_page_table-list th {
+  background: rgba(238, 238, 238, 1);
+  height: 50px;
+}
+
+table.imgAppHome_page_table-list tr {
+  border-width: 2px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #d6d6d6;
+  height: 50px;
+}
+.imgAppHome_bottom {
+  background: #f5f5f5;
+  height: 40%;
+  min-height: 300px;
+}
+
+table.imgAppHome_page_table-total {
+  font-family: verdana, arial, sans-serif;
+  border-collapse: collapse;
+  margin: 0 auto;
+  width: 90%;
+}
+
+table.imgAppHome_page_table-total tr td:nth-child(1) {
+  text-align: right;
+  padding-right: 20px;
+  width: 40%;
+  background-color: #eeeeee;
+}
+
+table.imgAppHome_page_table-total tr td:nth-child(2) {
+  text-align: left;
+  padding-left: 20px;
+  width: 60%;
+}
+
+table.imgAppHome_page_table-total td {
+  border-width: 2px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #d6d6d6;
+  height: 30px;
+}
+
+/** 模型部署结果弹出框 **/
+.imgAppHome_deploy_alert-box {
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 30%;
+  width: 40%;
+  height: 30%;
+  padding: 10px;
+  z-index: 1002;
+  overflow: auto;
+}
+.imgAppHome_deploy_alert-txt {
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+  margin-top: 15%;
+}
+.imgAppHome_deploy_alert-btn {
+  background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
+  border-radius: 2px;
+  font-size: 20px;
+  color: #ffffff;
+  letter-spacing: 1.14px;
+  height: 47px;
+  width: 20%;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  margin-top: 10%;
+}

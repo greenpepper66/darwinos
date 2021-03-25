@@ -125,7 +125,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	// 任务视图导航栏子选项单击命令
 	vscode.commands.registerCommand('extension.gotoImgAppTaskPage', (name, id, type) => {
-		openImgAppRunTaskPage(context, id)
+		openImgAppRunTaskPage(context, "byID", id);
 	});
 
 
