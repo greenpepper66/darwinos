@@ -106,7 +106,7 @@ new Vue({
         },
         gotoImgAppRunTaskPageByID(imgAppID) {
             console.log("run app: ", imgAppID);
-            // 给插件发送消息 跳转到详情页
+            // 给插件发送消息 跳转到任务页面
             vscode.postMessage({
                 command: 'gotoImgAppRunTaskPageByID',
                 text: imgAppID,

@@ -4,7 +4,8 @@ import * as fs from 'fs';
 import { exec } from "child_process";
 
 import { allData } from '../os/server';
-import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, } from '../DataProvider/ImgAppJsonDataProvider';
+import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatus, checkImgAppExist } from '../DataProvider/ImgAppJsonDataProvider';
+import { glob } from 'glob';
 
 const imgAppHomeHtmlFilePath = "src/static/views/imgAppHome.html";
 const newImgAppHtmlFilePath = "src/static/views/newImgApp.html";
@@ -48,13 +49,69 @@ const imgAppMessageHandler = {
         openImgAppInfoPage(global.context, message.text);
     },
 
-    // 2.5 运行应用
+    // 2.5 运行应用， 应用列表页面的“启动”按钮 触发
     gotoImgAppRunTaskPageByID(global, message) {
         console.log(message);
         openImgAppRunTaskPage(global.context, "byID", message.text);
     },
 
 };
+
+// 保存应用配置到json文件中
+function writeImgAppInfoToJson(global, message) {
+    if (message.text.length != 7 || message.text[0] == "" || message.text[1] == "" || message.text[2] == ""
+        || message.text[3] == "" || message.text[4] == "" || message.text[5] == "" || message.text[6] == "") {
+        return "error: save failed, please check your input!";
+    } else {
+        // 检查名字是否重复
+        if (searchImgAppByName(global.context, message.text[0]) != "none") {
+            console.log("应用名字重复");
+            return "error: save failed, the app name is repeated!";
+        } else {
+            // 随机生成id， 利用js中的Date对象
+            // var num = Math.random();
+            let date = new Date();
+            let id = date.getTime();//得到时间的13位毫秒数
+            let name = message.text[0];
+            let imgAppConfig = new ImgAppConfigData(id, name);
+
+            let createTime = dateFormat("YYYY-mm-dd HH:MM", date);
+            imgAppConfig.createTime = createTime;
+            console.log("id:", id, "time: ", createTime);
+
+            imgAppConfig.imgSrcKind = message.text[1];
+            if (imgAppConfig.imgSrcKind == "localImg") {
+                imgAppConfig.imgSrcDir = message.text[2];
+                imgAppConfig.imgNum = getImgFileNum(imgAppConfig.imgSrcDir);
+            }
+
+            // 分割模型信息
+            let modelInfo = message.text[3].split(" - ");
+            if (modelInfo.length != 4) {
+                return "error: inner error!";
+            } else {
+                imgAppConfig.modeFileID = modelInfo[0];
+                imgAppConfig.modelFileName = modelInfo[1];
+                imgAppConfig.modelFileNodeID = modelInfo[2];
+                imgAppConfig.modelFileNodeIP = modelInfo[3];
+
+                imgAppConfig.encodeMethodID = message.text[4];
+                imgAppConfig.encodeConfigFile = message.text[5];
+                imgAppConfig.outputDir = message.text[6];
+
+                imgAppConfig.status = 0; // 状态默认为0
+
+                let writeRet = writeJson(global.context, imgAppConfig); //写入json文件
+                console.log("保存结果为： ", writeRet);  // success 或 error
+
+                if (writeRet == "success") {
+                    return "success";
+                }
+                return "error: write json error!";
+            }
+        }
+    }
+}
 
 // 3. 与新建数字识别应用页面交互
 const newImgAppMessageHandler = {
@@ -79,57 +136,12 @@ const newImgAppMessageHandler = {
         global.panel.webview.postMessage({ modelFileListRet: allData.deployedModelList });
     },
 
-    // 3.3 保存应用配置
+    // 3.3 保存应用配置 - 新建应用页面的“保存应用”按钮触发
     saveImgAppConfig(global, message) {
         console.log(message);
-        if (message.text.length != 7 || message.text[0] == "" || message.text[1] == "" || message.text[2] == ""
-            || message.text[3] == "" || message.text[4] == "" || message.text[5] == "" || message.text[6] == "") {
-            global.panel.webview.postMessage({ saveImgAppConfigRet: "error: save failed, please check your input!" });
-        } else {
-            // 检查名字是否重复
-            if (searchImgAppByName(global.context, message.text[0]) != "none") {
-                console.log("应用名字重复");
-                global.panel.webview.postMessage({ saveImgAppConfigRet: "error: save failed, the app name is repeated!" });
-            } else {
-                // 随机生成id， 利用js中的Date对象
-                // var num = Math.random();
-                let date = new Date();
-                let id = date.getTime();//得到时间的13位毫秒数
-                let name = message.text[0];
-                let imgAppConfig = new ImgAppConfigData(id, name);
-
-                let createTime = dateFormat("YYYY-mm-dd HH:MM", date);
-                imgAppConfig.createTime = createTime;
-                console.log("id:", id, "time: ", createTime);
-
-                imgAppConfig.imgSrcKind = message.text[1];
-                if (imgAppConfig.imgSrcKind == "localImg") {
-                    imgAppConfig.imgSrcDir = message.text[2];
-                    imgAppConfig.imgNum = getImgFileNum(imgAppConfig.imgSrcDir);
-                }
-
-                // 分割模型信息
-                let modelInfo = message.text[3].split(" - ");
-                if (modelInfo.length != 4) {
-                    global.panel.webview.postMessage({ saveImgAppConfigRet: "error: inner error!" });
-                } else {
-                    imgAppConfig.modeFileID = modelInfo[0];
-                    imgAppConfig.modelFileName = modelInfo[1];
-                    imgAppConfig.modelFileNodeID = modelInfo[2];
-                    imgAppConfig.modelFileNodeIP = modelInfo[3];
-
-                    imgAppConfig.encodeMethodID = message.text[4];
-                    imgAppConfig.encodeConfigFile = message.text[5];
-                    imgAppConfig.outputDir = message.text[6];
-
-                    writeJson(global.context, imgAppConfig); //写入json文件
-
-                    // 发送给web保存结果
-                    global.panel.webview.postMessage({ saveImgAppConfigRet: "success" });
-
-                }
-            }
-        }
+        let saveRet = writeImgAppInfoToJson(global, message);
+        console.log("saveImgAppConfig save result： ", saveRet);
+        global.panel.webview.postMessage({ saveImgAppConfigRet: saveRet });
     },
 
     // 3.4 选择启动任务所需的各个配置文件 - 打包成一个了
@@ -160,10 +172,19 @@ const newImgAppMessageHandler = {
         });
     },
 
-    //3.6 跳转到应用运行界面
+    //3.6 跳转到应用运行界面 - 新建应用页面的“启动应用”按钮触发
     gotoImgAppRunTaskPageByName(global, message) {
         console.log(message);
-        openImgAppRunTaskPage(global.context, "byName", message.text);
+        // 先检查应用是否已经保存，必须先保存再启动
+        let isExist = checkImgAppExist(global.context, message);
+        if (isExist.indexOf("error") != -1) {
+            // app不存在 报错
+            global.panel.webview.postMessage({ gotoImgAppRunTaskPageByNameRet: isExist });
+        } else {
+            console.log("gotoImgAppRunTaskPageByName: the app is saved and can go to the task page!")
+            // 保存成功 - 跳转到任务页面
+            openImgAppRunTaskPage(global.context, "byName", message.text[0]);
+        }
     }
 };
 
@@ -323,6 +344,19 @@ export function openImgAppInfoPage(context, appID) {
 
 // 4. 打开运行应用页面 
 export function openImgAppRunTaskPage(context, kind, val) {
+    // 查询应用信息
+    if (kind == "byID") {
+        var appInfo = searchImgAppByID(context, val);
+    } else if (kind == "byName") {
+        var appInfo = searchImgAppByName(context, val);
+    }
+    if (appInfo == "none") {
+        console.error("can not found the app: ", val);
+    }
+    // 应用成为一条任务
+    updateImgAppStatus(context, appInfo.id);
+    console.log("become one task: ", appInfo.id);
+
     const panel = vscode.window.createWebviewPanel(
         'runImgApp',
         "任务详情",
@@ -333,13 +367,6 @@ export function openImgAppRunTaskPage(context, kind, val) {
         }
     );
 
-    // 保存应用信息
-    if (kind == "byID") {
-        var appInfo = searchImgAppByID(context, val);
-    } else if(kind == "byName") {
-        var appInfo = searchImgAppByName(context, val);
-    }
-    
     let global = { panel, context, appInfo };
     panel.webview.html = getAppsHomeHtml(context, imgAppRunTaskHtmlFilePath);
 

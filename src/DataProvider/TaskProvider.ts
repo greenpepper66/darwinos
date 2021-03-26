@@ -68,29 +68,30 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 		let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
 
 		for (var i = 0; i < jsonContent.data.length; i++) {
-			var taskID = jsonContent.data[i].id;
-			var name = jsonContent.data[i].name;
-			var modelID = jsonContent.data[i].modeFileID;
-			var nodeID = jsonContent.data[i].modelFileNodeID;
-			var nodeIP = jsonContent.data[i].modelFileNodeIP;
+			if (jsonContent.data[i].status == 1) {  // 状态为1的表示一条任务
+				var taskID = jsonContent.data[i].id;
+				var name = jsonContent.data[i].name;
+				var modelID = jsonContent.data[i].modeFileID;
+				var nodeID = jsonContent.data[i].modelFileNodeID;
+				var nodeIP = jsonContent.data[i].modelFileNodeIP;
 
-			var task = new Task(
-				name,
-				vscode.TreeItemCollapsibleState.None,
-				taskID,
-				modelID,
-				nodeID,
-				nodeIP,
-				{
-					command: 'extension.gotoImgAppTaskPage',
-					title: '',
-					arguments: [name, taskID, "图像识别"]
-				}
-			);
-			this.tasks.push(task);
+				var task = new Task(
+					name,
+					vscode.TreeItemCollapsibleState.None,
+					taskID,
+					modelID,
+					nodeID,
+					nodeIP,
+					{
+						command: 'extension.gotoImgAppTaskPage',
+						title: '',
+						arguments: [name, taskID, "图像识别"]
+					}
+				);
+				this.tasks.push(task);
+			}
 		}
 	}
-
 }
 
 
