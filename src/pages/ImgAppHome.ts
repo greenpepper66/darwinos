@@ -4,13 +4,14 @@ import * as fs from 'fs';
 import { exec } from "child_process";
 
 import { allData } from '../os/server';
-import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatus, checkImgAppExist } from '../DataProvider/ImgAppJsonDataProvider';
+import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToTask, updateImgAppStatusToApp, checkImgAppExist, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
 import { glob } from 'glob';
 
 const imgAppHomeHtmlFilePath = "src/static/views/imgAppHome.html";
 const newImgAppHtmlFilePath = "src/static/views/newImgApp.html";
 const imgAppInfoHtmlFilePath = "src/static/views/imgAppInfo.html";
 const imgAppRunTaskHtmlFilePath = "src/static/views/imgAppRunTask.html";
+const imgAppTasksHtmlFilePath = "src/static/views/imgAppTasks.html";
 
 /**
  * ******************************************************************************************************
@@ -39,8 +40,9 @@ const imgAppMessageHandler = {
     // 2.3 删除应用
     deleteAppConfig(global, message) {
         console.log(message);
-        deleteJson(global.context, message.text[1]);
-        global.panel.webview.postMessage({ deleteAppConfigRet: message.text[0] });
+        let delRet = deleteJson(global.context, message.text);
+        console.log("deleteAppConfig ret: ", delRet);
+        global.panel.webview.postMessage({ deleteAppConfigRet: message.text });
     },
 
     // 2.4 查询应用  显示详情页
@@ -234,6 +236,37 @@ const imgAppRunTaskMessageHandler = {
 };
 
 
+// 6. 与任务列表首页交互
+const imgAppTasksMessageHandler = {
+    // 查询所有图像识别任务列表
+    getImgAppTasksList(global, message) {
+        console.log(message);
+        let allImgTasks = searchAllImgAppTasks(global.context);
+        global.panel.webview.postMessage({ cmd: 'getImgAppTasksListRet', cbid: message.cbid, data: allImgTasks });
+    },
+
+    // 跳转到新建任务页面，也就是应用列表页面
+    gotoNewImgAppTaskPage(global, message) {
+        console.log(message);
+        openImgAppHomePage(global.context);
+    },
+
+    // 跳转到任务详情页面
+    gotoImgAppTaskPage(global, message) {
+        console.log(message);
+        openImgAppRunTaskPage(global.context, "byID", message.text);
+    },
+
+    // 删除一个任务，也就是将json文件中应用的status恢复为默认值0 
+    deleteImgAppTask(global, message) {
+        console.log(message);
+        let ret = updateImgAppStatusToApp(global.context, message.text);
+        console.log("deleteAppConfig ret: ", ret);
+        global.panel.webview.postMessage({ deleteImgAppTaskRet: message.text });
+    }
+
+}
+
 /**
  * ******************************************************************************************************
  * 新建webview页面
@@ -268,7 +301,7 @@ export function getAppsHomeHtml(context, templatePath) {
 export function openImgAppHomePage(context) {
     const panel = vscode.window.createWebviewPanel(
         'ImgAppWelcome',
-        "图像识别",
+        "图像识别应用",
         vscode.ViewColumn.One,
         {
             enableScripts: true,
@@ -354,7 +387,7 @@ export function openImgAppRunTaskPage(context, kind, val) {
         console.error("can not found the app: ", val);
     }
     // 应用成为一条任务
-    updateImgAppStatus(context, appInfo.id);
+    updateImgAppStatusToTask(context, appInfo.id);
     console.log("become one task: ", appInfo.id);
 
     const panel = vscode.window.createWebviewPanel(
@@ -373,6 +406,30 @@ export function openImgAppRunTaskPage(context, kind, val) {
     panel.webview.onDidReceiveMessage(message => {
         if (imgAppRunTaskMessageHandler[message.command]) {
             imgAppRunTaskMessageHandler[message.command](global, message);
+        } else {
+            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+        }
+    }, undefined, context.subscriptions);
+}
+
+// 5. 打开任务列表首页
+// 以后有多种任务了，可以移到外面，新建一个文件
+export function openImgAppTasksPage(context) {
+    const panel = vscode.window.createWebviewPanel(
+        'ImgAppTasks',
+        "图像识别任务",
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        }
+    );
+
+    let global = { panel, context };
+    panel.webview.html = getAppsHomeHtml(context, imgAppTasksHtmlFilePath);
+    panel.webview.onDidReceiveMessage(message => {
+        if (imgAppTasksMessageHandler[message.command]) {
+            imgAppTasksMessageHandler[message.command](global, message);
         } else {
             vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
         }

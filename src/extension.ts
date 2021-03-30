@@ -14,7 +14,7 @@ import { PageProvideByPort, PageProvideByPath, changeIndexHtmlCss } from "./Page
 import { task_start, task_stop, task_reset, task_deploy, task_delete } from "./os/task_operations"
 import { startHttpServer } from './os/server';
 import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
-import { openImgAppRunTaskPage } from "./pages/ImgAppHome";
+import { openImgAppRunTaskPage, openImgAppTasksPage } from "./pages/ImgAppHome";
 
 import {SystemTreeViewProvider} from "./DataProvider/SystemProvider";
 
@@ -114,7 +114,7 @@ export function activate(context: vscode.ExtensionContext) {
 		AppsHomePageProvide(context);  // overview按钮打开应用视图首页
 	});
 	vscode.commands.registerCommand('task_view.taskOverview', () => {
-		PageProvideByPort("任务视图", 5001, "task")
+		openImgAppTasksPage(context);
 	});
 
 

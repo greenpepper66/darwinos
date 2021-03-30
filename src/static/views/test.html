@@ -1,67 +1,23 @@
-<!DOCTYPE html>
 <html>
-
-    <head>
-        <meta charset="utf-8">
-        <title>Bootstrap 实例 - 模态框（Modal）插件</title>
-        <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    </head>
-
-    <body>
-
-        <h2>创建模态框（Modal）</h2>
-        <!-- 按钮触发模态框 -->
-        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal1">
-    按钮开启
-</button>
-
-        <a href="javascript:void(0)" class="btn btn-default" onclick="openMotai()">JS函数开启</a>
-
-        <script type="text/javascript">
-            function openMotai(){
-                /*alert("准备开启");
-                $("#myModal1").modal('show');  //手动开启
-                alert("准备关闭");
-                $("#myModal1").modal('hide');  //手动关闭
-                alert("准备开启");
-                $("#myModal1").modal();  //手动开启*/
-                $("#myModal1").modal({backdrop: 'static', keyboard: false});  //手动开启
-                
-                
-            }
-        </script>
-
-        <!-- 模态框（Modal） -->
-        <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-　　　　　　　　　　　　　　<!-- 关闭符号(叉号) -->
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    ×
-                </button>
-                        <h4 class="modal-title" id="myModalLabel">
-                    模态框（Modal）标题
-                </h4>
-                    </div>
-                    <div class="modal-body">
-                        username:<input type="text" name="" id="" value="" /><br /> password:
-                        <input type="password" name="" />
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                </button>
-                        <button type="button" class="btn btn-primary">
-                    提交更改
-                </button>
-                    </div>
-                </div>
-                <!-- /.modal-content -->
-            </div>
-            <!-- /.modal -->
-        </div>
-    </body>
-
+<head>
+    <script src="../lib/jquery/jquery.min.js"></script>
+<script>
+ function clearLine(element){
+  $(element).parent().parent().remove();//使用jQuery方法
+  console.log("%%%%", $(element).parent().parent().find("tr"));
+ }
+</script>
+</head>
+<body>
+<table>
+<tr>
+  <td><button onclick="clearLine(this)">点我,我就带着一行都没了</button></td>
+  <td>呵，我不信</td> 
+</tr>
+<tr>
+  <td><button onclick="clearLine(this)">有本事再点我</button></td>
+  <td>哇，没法玩了</td> 
+</tr>
+</table>
+</body>
 </html>

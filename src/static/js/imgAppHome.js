@@ -69,10 +69,24 @@ window.addEventListener('message', event => {
     if (message.deleteAppConfigRet != undefined) {
         console.log('---------------------------message：delete app ', message.deleteAppConfigRet);
         // 表格中删除一行数据
-        document.getElementById('appsTable').deleteRow(message.deleteAppConfigRet + 1);
+        // document.getElementById('appsTable').deleteRow(message.deleteAppConfigRet + 1);
+        deleteRowByID(message.deleteAppConfigRet);
     }
 
 });
+
+// 根据id匹配结果，删除一行记录
+function deleteRowByID(id) {
+    let tab = document.getElementById('appsTable');
+    let trs = tab.getElementsByTagName('tr');
+    for (let i = 0; i <trs.length; i++) {
+        console.log("行号：", trs[i].rowIndex);
+        if(trs[i].cells[0].innerHTML == id) {
+            console.log("列一内容：", trs[i].cells[0].innerHTML);
+            tab.deleteRow(trs[i].rowIndex);
+        }
+    }
+}
 
 
 new Vue({
@@ -113,13 +127,14 @@ new Vue({
             });
         },
 
-        deleteAppConfig(index, appID) {
+        deleteAppConfig(appID) {
             console.log("delete app: ", appID);
             // 给插件发送消息 删除一条应用
             vscode.postMessage({
                 command: 'deleteAppConfig',
-                text: [index, appID],
+                text: appID,
             });
+
         }
     }
 });

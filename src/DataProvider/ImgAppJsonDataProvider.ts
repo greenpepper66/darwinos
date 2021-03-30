@@ -119,19 +119,8 @@ export function deleteJson(context, id) {
     console.log("json deleting...");
     let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
 
-
     try {
-        
-    } catch (error) {
-        
-    }
-
-
-    
-    fs.readFile(resourcePath, function (err, data) {
-        if (err) {
-            return console.error(err);
-        }
+        let data = fs.readFileSync(resourcePath, 'utf-8');
         var stringContent = data.toString();//将二进制的数据转换为字符串
         var jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
         //把数据读出来删除
@@ -145,17 +134,15 @@ export function deleteJson(context, id) {
         jsonContent.total = jsonContent.data.length;
         var str = JSON.stringify(jsonContent);
         //然后再把数据写进去
-        fs.writeFile(resourcePath, str, function (err) {
-            if (err) {
-                console.error(err);
-                return console.error(err);
-            }
-            console.log("----------删除成功------------");
-            // 更新任务导航栏
-            vscode.commands.executeCommand('task_view.refreshEntry');
-            return console.log("delete app config success");
-        })
-    })
+        fs.writeFileSync(resourcePath, str);
+        console.log("----------删除成功------------");
+        // 更新任务导航栏
+        vscode.commands.executeCommand('task_view.refreshEntry');
+        return "success";
+    } catch (error) {
+        console.error(error);
+        return "error";
+    }
 }
 
 // 3. 查所有：同步处理
@@ -211,7 +198,7 @@ export function searchImgAppByName(context, name) {
 }
 
 // 6. 更新一条应用的状态，应用生成一条任务： 根据id  将默认的状态0变为1
-export function updateImgAppStatus(context, id) {
+export function updateImgAppStatusToTask(context, id) {
     console.log("json update...");
     let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     try {
@@ -264,11 +251,11 @@ export function checkImgAppExist(context, message) {
                     && modelInfo[2] == jsonContent.data[i].modelFileNodeID && modelInfo[3] == jsonContent.data[i].modelFileNodeIP
                     && message.text[4] == jsonContent.data[i].encodeMethodID && message.text[5] == jsonContent.data[i].encodeConfigFile
                     && message.text[6] == jsonContent.data[i].outputDir) {
-                        return "exist: app already saved!"
+                    return "exist: app already saved!"
                 } else {
                     return "error: the app name is repeated, please uodate the information and save it first!"
                 }
-            } 
+            }
         }
         console.log('----------检查成功-------------');
         return "error: the app is not saved, please save it first!";
@@ -278,3 +265,53 @@ export function checkImgAppExist(context, message) {
     }
 }
 
+
+// 8. 查所有任务：status 值为1的返回
+export function searchAllImgAppTasks(context) {
+    console.log("json searching all task...");
+    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+
+    let data = fs.readFileSync(resourcePath, 'utf-8');
+
+    let stringContent = data.toString();//将二进制的数据转换为字符串
+    let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
+    //把数据读出来
+
+    let allImgTasks = [];
+    for (var i = 0; i < jsonContent.data.length; i++) {
+        if (jsonContent.data[i].status == 1) {
+            allImgTasks.push(jsonContent.data[i]);
+        }
+    }
+
+    console.log('------------------------查询成功allImgTasks');
+    console.log(allImgTasks);
+    return allImgTasks;
+}
+
+// 6. 更新一条应用的状态，将任务的status 1 恢复为默认值0
+export function updateImgAppStatusToApp(context, id) {
+    console.log("json update...");
+    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    try {
+        let data = fs.readFileSync(resourcePath, 'utf-8');
+        var stringContent = data.toString();
+        var jsonContent: ImgAppJsonData = JSON.parse(stringContent);
+
+        for (var i = 0; i < jsonContent.data.length; i++) {
+            if (id == jsonContent.data[i].id) {
+                jsonContent.data[i].status = 0;  // 将状态置为1
+            }
+        }
+        console.log(jsonContent);
+        var str = JSON.stringify(jsonContent);//因为nodejs的写入文件只认识字符串或者二进制数，所以把json对象转换成字符串重新写入json文件中
+        fs.writeFileSync(resourcePath, str);
+        console.log('----------更新成功-------------');
+        // 更新任务导航栏
+        vscode.commands.executeCommand('task_view.refreshEntry');
+        return "success";
+    } catch (error) {
+        console.error(error);
+        return "error";
+    }
+}
