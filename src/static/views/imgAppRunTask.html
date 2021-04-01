@@ -29,110 +29,6 @@
             overflow: auto;
         }
 
-        .top {
-            min-height: 100px;
-        }
-
-        .middle {
-            min-height: 210px;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-
-
-        .taskDescBox {
-            border: 1px solid #7B7B7B;
-            margin-top: 50px;
-            margin-bottom: 20px;
-        }
-
-        .taskDesc {
-            margin-left: 50px;
-            margin-right: 50px;
-        }
-
-        .logOutputBox,
-        .taskResultBox {
-            border: 1px solid #7B7B7B;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-
-        .logOutputText,
-        .taskResultTab {
-            margin-left: 20px;
-            height: 200px;
-            overflow: auto;
-            text-align: left;
-        }
-
-        .bottom {
-            min-height: 1000px;
-            text-align: center;
-        }
-        .taskIframeBox {
-            border: 1px solid #7B7B7B;
-        }
-
-        .taskIframeContent {
-            width: 100%;
-            height: 1000px;
-        }
-
-        .probarBox {
-            text-align: center;
-            margin-top: 50px;
-            margin-left: 50px;
-            margin-right: 50px;
-        }
-
-        @font-face {
-            font-family: 'Material Icons';
-            font-style: normal;
-            font-weight: 400;
-            src: local('Material Icons'), local('MaterialIcons-Regular'), url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2) format('woff2');
-        }
-
-        .material-icons {
-            font-family: 'Material Icons';
-            font-weight: normal;
-            font-style: normal;
-            font-size: 24px;
-            line-height: 1;
-            text-transform: none;
-            display: inline-block;
-            -webkit-font-feature-settings: 'liga';
-            -webkit-font-smoothing: antialiased;
-        }
-
-
-        table.recRetTable {
-            font-family: verdana, arial, sans-serif;
-            border-width: 1px;
-            border-collapse: collapse;
-            margin: 0 auto;
-            margin-top: 30px;
-        }
-
-        table.recRetTable th {
-            border-width: 1px;
-            padding: 8px;
-            border-style: solid;
-            border-color: #ADADAD;
-        }
-
-        table.recRetTable tr {
-            background-color: #7B7B7B;
-        }
-
-        table.recRetTable td {
-            border-width: 1px;
-            padding: 8px;
-            border-style: solid;
-            border-color: #ADADAD;
-
-        }
     </style>
 
     <script>
@@ -142,49 +38,74 @@
 </head>
 
 <body>
-    <div id="imgAppRunTask">
-        <div class="clearfix thewrap top">
-            <div class="taskDescBox">
-                <div class="taskDesc">
-                    <h4>"{{ imgAppInformation.name }}" 图像识别应用启动运行: </h4>
-                    <p>步骤一：图像脉冲编码，将png图像转换为.pickle格式的脉冲文件..........</p>
-                    <p>步骤二：编译操作，打包脉冲文件.....................</p>
-                    <p>步骤三：运行任务，将数据发送给芯片，执行图像识别................</p>
+    <div id="imgAppRunTask" class="imgAppRunTask_page">
+        <div class="clearfix thewrap imgAppRunTask_top">
+            <div class="imgAppRunTask_taskDescBox">
+                <div class="imgAppRunTask_title">
+                    "{{ imgAppInformation.name }}" 数字图像识别应用启动运行:
                 </div>
+                <div class="imgAppRunTask_desc">
+                    <p>步骤一：图像脉冲编码，将原数字图像转换为.pickle格式的脉冲文件，文件中保存图片脉冲编码后的结果。当前默认是使用基于频率的脉冲编码方法。</p>
+                    <p>步骤二：打包脉冲文件，根据模型的配置文件等信息，将步骤一生成的脉冲文件打包，发送给芯片。</p>
+                    <p>步骤三：运行任务，将上一步打包后的图像脉冲数据发送给类脑计算机，根据部署模型等信息进行数字图像识别，识别结果会实时发送回来。</p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="clearfix thewrap imgAppRunTask_middle">
+            <div class="row">
+                <div class="imgAppRunTask_probar_title">运行进度</div>
             </div>
 
 
 
-
-            <div class="probarBox">
+            <div class="imgAppRunTask_probarBox">
                 <div class="row">
-                    <h4 style="margin-bottom: 30px;">运行进度</h4>
+                    <div class="col-md-3"></div>
+                    <div class="col-md-2">
+                        <div class="imgAppRunTask_probar_des">图像脉冲编码</div>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2">
+                        <div class="imgAppRunTask_probar_des">打包脉冲文件</div>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2">
+                        <div class="imgAppRunTask_probar_des">进行图像识别</div>
+                    </div>
+                    <div class="col-md-1"></div>
                 </div>
-                <div class="row">
 
-                    <div class="col-md-1">
-                        <span>运行</span>
-                        <i id="start_runtask_btn" class="large material-icons" style="margin-left: 0px;cursor: pointer;"
-                            onclick="doStartRunTask()">play_circle_outline</i>
+
+                <div class="row">
+                    <div class="col-md-1"></div>
+
+                    <div class="col-md-2">
+                        <div class="imgAppRunTask_startRun_btn" onclick="doStartRunTask()">
+                            <span class="imgAppRunTask_startRun_logo">运行</span>
+                            <div class="imgAppRunTask_startRun_logo">
+                                <i class="material-icons">play_circle_outline</i>
+                            </div>
+                        </div>
                     </div>
 
 
-                    <div class="col-md-3">
-                        <div>图像脉冲编码</div>
-                        <div class="progress progress-striped active">
+                    <div class="col-md-2">
+                        <div class="progress progress-striped active imgAppRunTask_probar_logo">
                             <div id="png_convert_progress_div" class="progress-bar progress-bar-info" role="progressbar"
                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-1" style="margin-top: -10px;">
-                        <i class="material-icons" style="font-size: 80px;transform: scaleY(0.4);">arrow_forward</i>
+                    <div class="col-md-1">
+                        <!-- <i class="material-icons">forward</i> -->
+                        <img src="../images/arrow.png" />
                     </div>
 
-                    <div class="col-md-3">
-                        <div>打包脉冲文件</div>
-                        <div class="progress progress-striped active">
+                    <div class="col-md-2">
+                        <div class="progress progress-striped active imgAppRunTask_probar_logo">
                             <div id="pickle_convert_progress_div" class="progress-bar progress-bar-info"
                                 role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                                 style="width: 0%;">
@@ -192,13 +113,13 @@
                         </div>
                     </div>
 
-                    <div class="col-md-1" style="margin-top: -10px;">
-                        <i class="material-icons" style="font-size: 80px;transform: scaleY(0.4);">arrow_forward</i>
+                    <div class="col-md-1">
+                        <img src="../images/arrow.png" />
+                        <!-- <i class="material-icons" style="font-size: 80px;transform: scaleY(0.4);">arrow_forward</i> -->
                     </div>
 
-                    <div class="col-md-3">
-                        <div>进行图像识别</div>
-                        <div class="progress progress-striped active">
+                    <div class="col-md-2">
+                        <div class="progress progress-striped active imgAppRunTask_probar_logo">
                             <div id="recognition_task_progress_div" class="progress-bar progress-bar-info"
                                 role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                                 style="width: 0%;">
@@ -206,56 +127,40 @@
                         </div>
                     </div>
 
+                    <div class="col-md-1"></div>
                 </div>
-
-                <div class="row">
-
-                    <!-- <div class="progress progress-striped active">
-                        <div id="total_progress_div" class="progress-bar progress-bar-success" role="progressbar"
-                            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
-                        </div>
-                    </div> -->
-                </div>
-
-
             </div>
+
         </div>
 
-        <div class="clearfix thewrap middle">
-            <!-- <div class="row">
-                <h4>日志输出</h4>
-                <div class="logOutputBox">
-
-                    <div id="log_output_div" class="logOutputText">
-                    </div>
-                </div>
-            </div> -->
+        <div class="clearfix thewrap imgAppRunTask_middle">
+            <div class="row">
+                <div class="imgAppRunTask_ret_title">图像识别结果</div>
+            </div>
 
             <div class="row">
-                <h4>图像识别结果</h4>
-                <div class="taskResultBox">
-
-                    <div id="recognition_result_div" class="taskResultTab">
-                        <table id="recognition_ret_tab" class="recRetTable">
-                            <tr style="height: 60px;">
-                                <td>原始图像</td>
-                            </tr>
-                            <tr style="height: 60px;">
-                                <td>识别结果</td>
-                            </tr>
-
-                        </table>
-
-                    </div>
+                <div id="recognition_result_div" class="imgAppRunTask_taskResultBox">
+                    <table id="recognition_ret_tab" class="imgAppRunTask_recRetTable">
+                        <tr>
+                            <td>原始图像</td>
+                        </tr>
+                        <tr>
+                            <td>识别结果</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
 
-        
-        <div class="clearfix thewrap bottom">
-            <h4>芯片运行状态</h4>
+
+        <div class="clearfix thewrap imgAppRunTask_bottom">
+            <div class="row">
+                <div class="imgAppRunTask_chip_title">芯片运行状态</div>
+            </div>
+
             <div id="taskIframe" class="taskIframeBox">
-                <iframe :src="iframeRoute" sandbox ="allow-scripts allow-popups allow-same-origin" frameborder="0" scrolling="no" class="taskIframeContent"></iframe>
+                <iframe :src="iframeRoute" sandbox="allow-scripts allow-popups allow-same-origin" frameborder="0"
+                    scrolling="no" class="taskIframeContent"></iframe>
             </div>
         </div>
 

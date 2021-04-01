@@ -6,62 +6,7 @@
     <title>应用视图</title>
     <link href="../css/vs-light.css" rel="stylesheet" />
     <style>
-        /*将页面分为4个部分*/
-        .clearfix:before,
-        .clearfix:after {
-            display: table;
-            content: "";
-        }
 
-        .clearfix:after {
-            clear: both;
-        }
-
-        .clearfix {
-            *zoom: 1;
-        }
-
-        .thewrap {
-            margin-top: 16px;
-            width: 100%;
-            box-sizing: border-box;
-            overflow: auto;
-        }
-
-        .quarter-div {
-            width: 50%;
-            box-sizing: border-box;
-            float: left;
-            overflow: auto;
-            margin-bottom: 10px;
-            border-color: red;
-        }
-
-        .imgApp {
-            min-height: 360px;
-            text-align: right;
-            padding-top: 100px;
-            padding-right: 30px;
-        }
-
-        .voiceApp {
-            min-height: 360px;
-            padding-top: 100px;
-        }
-
-        .brainApp {
-            min-height: 300px;
-            text-align: right;
-            padding-right: 30px;
-        }
-
-        .otherApp {
-            min-height: 300px;
-        }
-
-        hr {
-            width: 90%;
-        }
     </style>
 
     <script>
@@ -78,25 +23,59 @@
 </head>
 
 <body>
-    <div class="appMain">
-        <div class="clearfix thewrap">
-            <div class="quarter-div imgApp">
-                <img src="../images/1.jpg" id="app1" onclick="gotoAppPage(1)" />
-            </div>
+    <div class="appMain_page">
 
-            <div class="quarter-div voiceApp">
-                <img src="../images/2.jpg" id="app2" onclick="gotoAppPage(2)" />
-            </div>
-        </div>
-        <div class="clearfix thewrap">
-            <div class="quarter-div brainApp">
-                <img src="../images/3.jpg" id="app3" onclick="gotoAppPage(3)" />
-            </div>
+        <table class="appMain_page_tab">
+            <tr>
+                <td align="center" valign="middle">
+                    <div class="imgApp_logo_outBox" onclick="gotoAppPage(1)">
+                        <div class="imgApp_logo_inBox">
+                            <img src="../images/图像识别.png" id="app1" class="imgApp_logo" />
+                        </div>
+                        <div class="imgApp_title_box">
+                            <div class="imgApp_title">图像识别</div>
+                        </div>
+                    </div>
+                </td>
 
-            <div class="quarter-div otherApp">
-                <img src="../images/4.jpg" id="app4" onclick="gotoAppPage(4)" />
-            </div>
-        </div>
+                <td align="center" valign="middle">
+                    <div class="imgApp_logo_outBox" onclick="gotoAppPage(2)">
+                        <div class="imgApp_logo_inBox">
+                            <img src="../images/语音识别.png" id="app2" class="imgApp_logo" />
+                        </div>
+                        <div class="imgApp_title_box">
+                            <div class="imgApp_title">语音识别</div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td align="center" valign="middle">
+                    <div class="imgApp_logo_outBox" onclick="gotoAppPage(3)">
+                        <div class="imgApp_logo_inBox">
+                            <img src="../images/脑电模拟.png" id="app3" class="imgApp_logo" />
+                        </div>
+
+                        <div class="imgApp_title_box">
+                            <div class="imgApp_title">脑电模拟</div>
+                        </div>
+                    </div>
+                </td>
+                <td align="center" valign="middle">
+                    <div class="imgApp_logo_outBox" onclick="gotoAppPage(4)">
+                        <div class="imgApp_logo_inBox">
+                            <img src="../images/其他应用.png" id="app4" class="imgApp_logo" />
+                        </div>
+                        <div class="imgApp_title_box">
+                            <div class="imgApp_title">其他应用</div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+        </table>
+
     </div>
 
 </body>

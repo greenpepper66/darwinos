@@ -36,9 +36,9 @@ export function getAppsHomeHtml(context, templatePath) {
     // 任务输入执行页面样式
     let vscodeColorTheme = vscode.window.activeColorTheme.kind;
     if (vscodeColorTheme == 2) {
-        html = html.replace(/light.css/, "dark.css");
+        html = html.replace(/vs-light.css/, "vs-dark.css");
     } else if (vscodeColorTheme == 1) {
-        html = html.replace(/dark.css/, "light.css");
+        html = html.replace(/vs-dark.css/, "vs-light.css");
     }
 
     return html;

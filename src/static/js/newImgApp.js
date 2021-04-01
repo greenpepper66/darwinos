@@ -41,7 +41,7 @@ function saveImgAppConfig() {
     console.log("saveImgAppConfig js function ");
 
     // 获取各个输入项
-    let appName = document.getElementById("project_name").value;                // 应用名称
+    let appName = document.getElementById("newImgApp_appName").value;                // 应用名称
     let imgSrcKind = document.getElementById("select_imgSrc_type").value;       // 数据源
     if (imgSrcKind == "localImg") {
         var imgDir = document.getElementById("img-local-dir").value;            // 本地图像文件夹
@@ -58,7 +58,8 @@ function saveImgAppConfig() {
     if(appName == "" || imgSrcKind == "" || imgDir == "" || modelFileID == "" || encodeMethodID == "" || encodeConfDir == "" || outputDir == "")  {
         console.log("some input is null!");
         document.getElementById("saveAppInfoModalContent").innerText = "保存失败：输入不能为空！";
-        document.getElementById("btn_saveAppInfoRetModal").click();
+        // document.getElementById("btn_saveAppInfoRetModal").click();
+        document.getElementById('newImgApp_alert_result').style.display = 'block';
         return
     }
 
@@ -75,7 +76,7 @@ function gotoImgAppRunTaskPageByName() {
     console.log("saveImgAppConfig js function ");
 
     // 获取各个输入项
-    let appName = document.getElementById("project_name").value;                // 应用名称
+    let appName = document.getElementById("newImgApp_appName").value;                // 应用名称
     let imgSrcKind = document.getElementById("select_imgSrc_type").value;       // 数据源
     if (imgSrcKind == "localImg") {
         var imgDir = document.getElementById("img-local-dir").value;            // 本地图像文件夹
@@ -91,8 +92,9 @@ function gotoImgAppRunTaskPageByName() {
     console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir);
     if(appName == "" || imgSrcKind == "" || imgDir == "" || modelFileID == "" || encodeMethodID == "" || encodeConfDir == "" || outputDir == "")  {
         console.log("some input is null!");
-        document.getElementById("saveAppInfoModalContent").innerText = "启动失败：输入不能为空！";
-        document.getElementById("btn_saveAppInfoRetModal").click();
+        document.getElementById("saveAppInfoModalContent").innerText = "启动失败：各项输入不能为空！";
+        // document.getElementById("btn_saveAppInfoRetModal").click();
+        document.getElementById('newImgApp_alert_result').style.display = 'block';
         return
     }
 
@@ -101,6 +103,13 @@ function gotoImgAppRunTaskPageByName() {
         command: 'gotoImgAppRunTaskPageByName',
         text: [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir],
     });
+}
+
+
+
+// 弹出框 相关
+function closeNewImgAppAlertBox() {
+    document.getElementById('newImgApp_alert_result').style.display = 'none';
 }
 
 
@@ -116,7 +125,7 @@ window.addEventListener('message', event => {
 
     // 点击隐藏的按钮，弹出模态框
     if (message.createImgApplictaion != undefined) {
-        document.getElementById("modal_dialog").click();
+        // document.getElementById("modal_dialog").click();
         console.log("web view, 创建新的应用");
     }
 
@@ -151,7 +160,8 @@ window.addEventListener('message', event => {
         } else if (message.saveImgAppConfigRet.indexOf("error") != -1) {
             document.getElementById("saveAppInfoModalContent").innerText = "保存失败：" + message.saveImgAppConfigRet;
         }
-        document.getElementById("btn_saveAppInfoRetModal").click();
+        // document.getElementById("btn_saveAppInfoRetModal").click();
+        document.getElementById('newImgApp_alert_result').style.display = 'block';
     }
 
     // 用户选择的配置文件目录
@@ -172,7 +182,8 @@ window.addEventListener('message', event => {
     if(message.gotoImgAppRunTaskPageByNameRet != undefined) {
         console.log('---------------------------message：get start app ret: ', message.gotoImgAppRunTaskPageByNameRet);
         document.getElementById("saveAppInfoModalContent").innerText = "启动失败：" + message.gotoImgAppRunTaskPageByNameRet;
-        document.getElementById("btn_saveAppInfoRetModal").click();
+        // document.getElementById("btn_saveAppInfoRetModal").click();
+        document.getElementById('newImgApp_alert_result').style.display = 'block';
     }
 
 });

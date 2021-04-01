@@ -4,55 +4,8 @@
 <head>
     <meta charset="utf-8">
     <title>数字图像识别</title>
-
-    <!-- CSS goes in the document HEAD or added to your external stylesheet -->
-    <style type="text/css">
-        table.hovertable {
-            font-family: verdana, arial, sans-serif;
-            border-width: 1px;
-            border-collapse: collapse;
-            margin: 0 auto;
-            margin-top: 30px;
-        }
-
-        table.hovertable th {
-            border-width: 1px;
-            padding: 8px;
-            border-style: solid;
-            border-color: #ADADAD;
-        }
-
-        table.hovertable tr {
-            background-color: #7B7B7B;
-        }
-
-        table.hovertable td {
-            border-width: 1px;
-            padding: 8px;
-            border-style: solid;
-            border-color: #ADADAD;
-
-        }
-
-        table.hovertable tr td:nth-child(1) {
-            text-align: right;
-            padding-right: 20px;
-            width: 300px;
-        }
-
-        table.hovertable tr td:nth-child(2) {
-            text-align: left;
-            padding-left: 20px;
-            width: 500px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-top: 50px;
-        }
-    </style>
-
     <script>
+        // <tr onmouseover="test2(this)" onmouseout="test(this)">
         function test(tr) {
             tr.style.backgroundColor = '#7B7B7B';
         }
@@ -63,80 +16,82 @@
 </head>
 
 <body>
-    <div id="imgAppInfo">
-        <h2>{{ imgAppInformation.name }}应用详情</h2>
-        <!-- Table goes in the document BODY -->
-        <table class="hovertable">
+    <div id="imgAppInfo" class="imgAppInfo_page">
+        <div class="imgAppInfo_title">
+            {{ imgAppInformation.name }}应用详情
+        </div>
+        <div>
+            <table class="imgAppInfo_table">
+                <tr>
+                    <td>应用ID</td>
+                    <td>{{ imgAppInformation.id }}</td>
+                </tr>
+                <tr>
+                    <td>应用名称</td>
+                    <td>{{ imgAppInformation.name }}</td>
+                </tr>
+                <tr>
+                    <td>应用类型</td>
+                    <td>数字图像识别</td>
+                </tr>
+                <tr>
+                    <td>应用创建时间</td>
+                    <td>{{ imgAppInformation.createTime }}</td>
+                </tr>
+                <tr>
+                    <td>模型ID</td>
+                    <td>{{ imgAppInformation.modeFileID }}</td>
+                </tr>
+                <tr>
+                    <td>模型名称</td>
+                    <td>{{ imgAppInformation.modelFileName }}</td>
+                </tr>
+                <tr>
+                    <td>模型所在节点名称</td>
+                    <td>节点{{ imgAppInformation.modelFileNodeID }}</td>
+                </tr>
+                <tr>
+                    <td>模型所在节点IP</td>
+                    <td>{{ imgAppInformation.modelFileNodeIP }}</td>
+                </tr>
 
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>应用ID</td>
-                <td>{{ imgAppInformation.id }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>应用名称</td>
-                <td>{{ imgAppInformation.name }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>应用类型</td>
-                <td>数字图像识别</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>应用创建时间</td>
-                <td>{{ imgAppInformation.createTime }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>模型ID</td>
-                <td>{{ imgAppInformation.modeFileID }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>模型名称</td>
-                <td>{{ imgAppInformation.modelFileName }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>模型所在节点名称</td>
-                <td>节点{{ imgAppInformation.modelFileNodeID }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>模型所在节点IP</td>
-                <td>{{ imgAppInformation.modelFileNodeIP }}</td>
-            </tr>
+                <tr>
+                    <td>数据源类型</td>
+                    <template v-if="imgAppInformation.imgSrcKind == 'localImg'">
+                        <td>本地图像</td>
+                    </template>
+                    <template v-else>
+                        <td>远程图像</td>
+                    </template>
+                </tr>
 
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>数据源类型</td>
-                <template v-if="imgAppInformation.imgSrcKind == 'localImg'">
-                    <td>本地图像</td>
-                </template>
-                <template v-else>
-                    <td>远程图像</td>
-                </template>
-            </tr>
-
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>数据源所在文件夹</td>
-                <td>{{ imgAppInformation.imgSrcDir }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>图像总数量</td>
-                <td>{{ imgAppInformation.imgNum }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>图像编码方法</td>
-                <template v-if="imgAppInformation.encodeMethodID == 0">
-                    <td>默认方法（李畅+刘铮）</td>
-                </template>
-                <template v-else>
-                    <td>其他方法</td>
-                </template>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>图像编码所需配置文件所在文件夹</td>
-                <td>{{ imgAppInformation.encodeConfigFile }}</td>
-            </tr>
-            <tr onmouseover="test2(this)" onmouseout="test(this)">
-                <td>图像编码过程中输出文件所在文件夹</td>
-                <td>{{ imgAppInformation.outputDir }}</td>
-            </tr>
-        </table>
+                <tr>
+                    <td>数据源所在文件夹</td>
+                    <td>{{ imgAppInformation.imgSrcDir }}</td>
+                </tr>
+                <tr>
+                    <td>图像总数量</td>
+                    <td>{{ imgAppInformation.imgNum }}</td>
+                </tr>
+                <tr>
+                    <td>图像编码方法</td>
+                    <template v-if="imgAppInformation.encodeMethodID == 0">
+                        <td>默认方法</td>
+                    </template>
+                    <template v-else>
+                        <td>其他方法</td>
+                    </template>
+                </tr>
+                <tr>
+                    <td>图像编码所需配置文件所在文件夹</td>
+                    <td>{{ imgAppInformation.encodeConfigFile }}</td>
+                </tr>
+                <tr>
+                    <td>图像编码过程中输出文件所在文件夹</td>
+                    <td>{{ imgAppInformation.outputDir }}</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     <link href="../css/vs-light.css" rel="stylesheet" />

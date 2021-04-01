@@ -4,48 +4,198 @@
 <head>
     <meta charset="utf-8">
     <title>新建应用</title>
-
-
     <style>
-        .local-dir-text {
-            display: inline;
-            width: 82%;
-            height: 34px;
-            padding: 6px 12px;
-            font-size: 14px;
-            line-height: 1.42857143;
-            background-color: #fff;
-            background-image: none;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
     </style>
-
     <script type="text/javascript">
-
-
     </script>
-
 </head>
 
 <body>
-    <div id="newImgApp">
-        <!-- 按钮触发模态框 -->
-        <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal"
+    <div id="newImgApp" class="newImgApp_page">
+        <div class="newImgApp_title">
+            新建数字图像识别应用
+        </div>
+        <div>
+            <table class="newImgApp_table">
+                <tr>
+                    <td>
+                        <div>应用名称:</div>
+                    </td>
+                    <td>
+                        <div><input type="text" class="form-control newImgApp_app_name" id="newImgApp_appName"></div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div>选择数字图像输入源:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <select class="form-control newImgApp_imgSrc_type" id="select_imgSrc_type"
+                                onchange="selectImgSrcKind()">
+                                <option volue="none" style="display: none;"></option>
+                                <option value="localImg">本地文件</option>
+                                <option value="remoteImg">远程文件</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 根据上面select的选项显示不同的tr -->
+                <tr id="select_local_path" style="display: none;">
+                    <td>
+                        <div>选择图像所在的文件夹:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <button type="button" class="newImgApp_btn" onclick="selectImgDir()">选择文件夹</button>
+                            <input type="text" class="form-control newImgApp_ImgSrc_dir" id="img-local-dir" />
+                        </div>
+                    </td>
+                </tr>
+                <tr id="get_remoteIP_addr" style="display: none;">
+                    <td>
+                        <div>请输入远程IP地址:</div>
+                    </td>
+                    <td>
+                        <div><input type="text" class="form-control newImgApp_remoteIP_addr" id="remoteIP_addr"></div>
+                    </td>
+                </tr>
+
+
+
+                <tr>
+                    <td>
+                        <div>绑定模型文件:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <select class="form-control newImgApp_select_model" id="select_model">
+                                <option volue="none" style="display: none;"></option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <div>选择编码方法:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <select class="form-control newImgApp_select_encodeMethod" id="encode_method_type">
+                                <option volue="none" style="display: none;"></option>
+                                <option value="0">基于频率的脉冲编码方法</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <div>选择配置文件:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <button type="button" class="newImgApp_btn" onclick="selectEncodeConfFile()">选择文件</button>
+                            <input type="text" class="form-control newImgApp_configFile" id="encode_config_file" />
+                        </div>
+                    </td>
+                </tr>
+
+
+
+                <tr>
+                    <td>
+                        <div>选择中间输出结果保存路径:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <button type="button" class="newImgApp_btn" onclick="selectOutputDir()">选择文件夹</button>
+                            <input type="text" class="form-control newImgApp_output_dir" id="output_dir" />
+                        </div>
+                    </td>
+                </tr>
+
+
+
+                <tr>
+                    <td>
+                        <div>选择识别结果输出方式:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <select class="form-control newImgApp_select_retShow_way" id="select_retShow_way"
+                                onchange="selectRetShowWay()">
+                                <option volue="none" style="display: none;"></option>
+                                <option value="localShow">本地展示</option>
+                                <option value="remoteShow">远程输出</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+
+
+                <tr id="get_remoteIP_addr_forRet" style="display: none;">
+                    <td>
+                        <div>请输入远程IP地址:</div>
+                    </td>
+                    <td>
+                        <div><input type="text" class="form-control newImgApp_remoteIP_forRet"
+                                id="remoteIP_addr_forRet"></div>
+                    </td>
+                </tr>
+            </table>
+
+
+            <div class="newImgApp_btnBox">
+                <div>
+                    <button type="button" class="newImgApp_btn_saveApp" id="saveConfig"
+                        onclick="saveImgAppConfig()">保存应用
+                    </button>
+                    <button type="button" class="newImgApp_btn_runApp" id="create"
+                        onclick="gotoImgAppRunTaskPageByName()">启动应用
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div>
+            <div id="newImgApp_alert_result" class="newImgApp_alert-box">
+                <p align="center" class="newImgApp_alert-txt" id="saveAppInfoModalContent"></p>
+                <button class="newImgApp_alert-btn" onclick="closeNewImgAppAlertBox()">关闭</button>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- 模态框实现 -->
+        <!-- <button id="modal_dialog" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal"
             style="display: none;">
             创建新的项目
         </button>
 
-
-        <!-- 模态框（Modal） -->
         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
             aria-hidden="true" data-backdrop="static" data-keyboard="false">
             <div class="modal-dialog">
                 <div class="modal-content, myModalContent">
                     <div class="modal-header">
-                        <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                            &times;
-                        </button> -->
                         <h4 class="modal-title" id="myModalLabel">
                             新建数字图像识别应用
                         </h4>
@@ -131,48 +281,48 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <!-- <button type="button" class="btn btn-default" data-dismiss="modal" id="dismiss">关闭
-                        </button> -->
                         <button type="button" class="btn btn-default" id="saveConfig" onclick="saveImgAppConfig()">保存应用
                         </button>
-                        <button type="button" class="btn btn-primary" id="create" onclick="gotoImgAppRunTaskPageByName()">启动应用
+                        <button type="button" class="btn btn-primary" id="create"
+                            onclick="gotoImgAppRunTaskPageByName()">启动应用
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
 
 
-    <!-- 确认信息-成功-->
-    <!-- 按钮触发模态框 -->
-    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#saveAppInfoModal" style="display: none;"
-        id="btn_saveAppInfoRetModal">
-        开始演示模态框
-    </button>
-    <!-- 模态框（Modal） -->
-    <div class="modal fade" id="saveAppInfoModal" tabindex="-1" role="dialog" aria-labelledby="saveAppInfoModalLabel"
-        aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content, myModalContent">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
-                    </button>
-                    <h4 class="modal-title" id="saveAppInfoModalLabel">
-                        应用保存结果
-                    </h4>
+        <!-- 确认信息-模态框实现-->
+        <!-- <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#saveAppInfoModal"
+            style="display: none;" id="btn_saveAppInfoRetModal">
+            开始演示模态框
+        </button>
+
+        <div class="modal fade" id="saveAppInfoModal" tabindex="-1" role="dialog"
+            aria-labelledby="saveAppInfoModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content, myModalContent">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="saveAppInfoModalLabel">
+                            应用保存结果
+                        </h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <span class="modal-body" id="saveAppInfoModalContent"> </span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                    </div>
                 </div>
-                
-                <div class="modal-body">
-                    <span class="modal-body" id="saveAppInfoModalContent"> </span>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                    </button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+            </div>
+        </div> -->
+
+
     </div>
 
 </body>
