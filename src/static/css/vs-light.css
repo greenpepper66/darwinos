@@ -593,8 +593,7 @@ table.newImgApp_table td {
   text-align: center;
 }
 .imgAppRunTask_probar_title,
-.imgAppRunTask_ret_title,
-.imgAppRunTask_chip_title {
+.imgAppRunTask_ret_title {
   font-size: 20px;
   color: #333333;
   letter-spacing: 1.14px;
@@ -641,6 +640,7 @@ table.newImgApp_table td {
   font-size: 16px;
   color: #ffffff;
   letter-spacing: 0.91px;
+  padding-top: 5px;
 }
 .imgAppRunTask_probar_des {
   font-size: 16px;
@@ -654,9 +654,6 @@ table.newImgApp_table td {
   background-color: #eeeeee;
 }
 /** 显示识别结果的表格样式 **/
-.imgAppRunTask_taskResultBox {
-}
-
 table.imgAppRunTask_recRetTable {
   font-family: verdana, arial, sans-serif;
   border-collapse: collapse;
@@ -680,8 +677,23 @@ table.imgAppRunTask_recRetTable td {
   width: 100px;
 }
 .imgAppRunTask_bottom {
-  background: #f5f5f5;
-  height: 1000px;
+  min-height: 1600px;
   margin-top: 30px;
   text-align: center;
+  background: #f5f5f5;
+}
+.imgAppRunTask_chip_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  height: 70px;
+  padding-top: 20px;
+  background: #eeeeee;
+}
+
+.imgAppRunTask_taskIframeContent {
+  width: 100%;
+  min-height: 1500px;
+  margin-top: 0;
+  padding-top: 0;
 }

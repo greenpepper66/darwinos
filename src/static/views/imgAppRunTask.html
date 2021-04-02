@@ -22,13 +22,8 @@
         }
 
         .thewrap {
-            margin-top: 16px;
-            padding-left: 20px;
-            padding-right: 20px;
             box-sizing: border-box;
-            overflow: auto;
         }
-
     </style>
 
     <script>
@@ -85,7 +80,8 @@
                         <div class="imgAppRunTask_startRun_btn" onclick="doStartRunTask()">
                             <span class="imgAppRunTask_startRun_logo">运行</span>
                             <div class="imgAppRunTask_startRun_logo">
-                                <i class="material-icons">play_circle_outline</i>
+                                <!-- <i class="material-icons">play_circle_outline</i> -->
+                                <img src="../images/start.png" />
                             </div>
                         </div>
                     </div>
@@ -154,13 +150,10 @@
 
 
         <div class="clearfix thewrap imgAppRunTask_bottom">
-            <div class="row">
+            <div id="taskIframe" class="imgAppRunTask_taskIframeBox">
                 <div class="imgAppRunTask_chip_title">芯片运行状态</div>
-            </div>
-
-            <div id="taskIframe" class="taskIframeBox">
                 <iframe :src="iframeRoute" sandbox="allow-scripts allow-popups allow-same-origin" frameborder="0"
-                    scrolling="no" class="taskIframeContent"></iframe>
+                    scrolling="no" class="imgAppRunTask_taskIframeContent"></iframe>
             </div>
         </div>
 
