@@ -24,6 +24,7 @@
         .thewrap {
             box-sizing: border-box;
         }
+        
     </style>
 
     <script>
@@ -151,8 +152,8 @@
 
         <div class="clearfix thewrap imgAppRunTask_bottom">
             <div id="taskIframe" class="imgAppRunTask_taskIframeBox">
-                <div class="imgAppRunTask_chip_title">芯片运行状态</div>
-                <iframe :src="iframeRoute" sandbox="allow-scripts allow-popups allow-same-origin" frameborder="0"
+                <!-- <div class="imgAppRunTask_chip_title">芯片运行状态</div> -->
+                <iframe :src="iframeRoute" sandbox="allow-scripts allow-popups allow-same-origin" frameborder="0" marginwidth="0"  marginheight="0"
                     scrolling="no" class="imgAppRunTask_taskIframeContent"></iframe>
             </div>
         </div>

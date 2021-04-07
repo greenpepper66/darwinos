@@ -6,6 +6,7 @@ import { exec } from "child_process";
 import { allData } from '../os/server';
 import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToTask, updateImgAppStatusToApp, checkImgAppExist, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
 import { glob } from 'glob';
+import { FILE } from 'dns';
 
 const imgAppHomeHtmlFilePath = "src/static/views/imgAppHome.html";
 const newImgAppHtmlFilePath = "src/static/views/newImgApp.html";
@@ -127,7 +128,7 @@ const newImgAppMessageHandler = {
         vscode.window.showOpenDialog(options).then(fileUri => {
             console.log("选择目录为", fileUri);
             // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
-            global.panel.webview.postMessage({ selectedImgDir: fileUri[0].path.substr(1) });
+            global.panel.webview.postMessage({ selectedImgDir: fileUri[0].fsPath });
         });
     },
 
@@ -156,7 +157,7 @@ const newImgAppMessageHandler = {
         vscode.window.showOpenDialog(options).then(fileUri => {
             console.log("选择配置文件为", fileUri);
             // 将选择的目录返回给webview
-            global.panel.webview.postMessage({ selectedEncodeConfDir: fileUri[0].path.substr(1) });
+            global.panel.webview.postMessage({ selectedEncodeConfDir: fileUri[0].fsPath });
         });
     },
 
@@ -170,7 +171,7 @@ const newImgAppMessageHandler = {
         vscode.window.showOpenDialog(options).then(fileUri => {
             console.log("选择目录为", fileUri);
             // 将选择的目录返回给webview
-            global.panel.webview.postMessage({ selectedOutputDir: fileUri[0].path.substr(1) });
+            global.panel.webview.postMessage({ selectedOutputDir: fileUri[0].fsPath });
         });
     },
 
@@ -467,10 +468,10 @@ function unpackConfigFiles(global) {
     // 脚本位置
     let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "pack_bin_files.py");
 
-    let configFile = global.appInfo.encodeConfigFile.replace(/\//g, "\\");      // 配置文件
-    let outputDir = global.appInfo.outputDir.replace(/\//g, "\\");            // 输出pickle保存目录,脚本里会新建一个文件夹unpack_target
+    let configFile = global.appInfo.encodeConfigFile;      // 配置文件
+    let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹unpack_target
 
-    let command_str = "python " + scriptPath + " " + configFile + " " + outputDir;
+    let command_str = "python3 " + scriptPath + " " + configFile + " " + outputDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -495,7 +496,8 @@ function unpackConfigFiles(global) {
 
     scriptProcess.on("exit", function () {
         console.log("done!!");
-        let str = "Unpack config files finished, the result is saved in " + outputDir + "\\unpack_target";
+        let unpackPath = path.join(outputDir, "unpack_target");
+        let str = "Unpack config files finished, the result is saved in " + unpackPath;
         global.panel.webview.postMessage({ unpackConfigFileProcessFinish: str });
     });
 
@@ -509,14 +511,14 @@ function runImgConvertScript(global) {
     let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "encode_input.py");
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
-    let imgSrcDir = global.appInfo.imgSrcDir.replace(/\//g, "\\");            // 图像源目录
-    let outputDir = global.appInfo.outputDir.replace(/\//g, "\\");            // 输出pickle保存目录,脚本里会新建一个文件夹pickleDir
-    let configDir = outputDir + "\\unpack_target";                            // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+    let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
+    let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹pickleDir
+    let configDir = path.join(outputDir,"unpack_target");                            // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
 
     let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
+    let command_str = "python3 " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -545,7 +547,8 @@ function runImgConvertScript(global) {
 
     scriptProcess.on("exit", function () {
         console.log("done!!");
-        let str = "Convert imgage into pickle finished, the result is saved in " + outputDir + "\\pickleDir";
+        let pickPath = path.join(outputDir, "pickleDir");
+        let str = "Convert imgage into pickle finished, the result is saved in " + pickPath;
         global.panel.webview.postMessage({ imgConvertProcessFinish: str });
     });
 }
@@ -558,13 +561,13 @@ function runPickleConvertScript(global) {
     let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "input_out.py");
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
-    let outputDir = global.appInfo.outputDir.replace(/\//g, "\\");            // 用户指定的输出目录
-    let configDir = outputDir + "\\unpack_target";                            // 配置文件目录，要保证有 connfiles1_1、 layerWidth1_1、 nodelist1_1、 input_to_layer_1.pickle 4个文件
+    let outputDir = global.appInfo.outputDir;            // 用户指定的输出目录
+    let configDir = path.join(outputDir,"unpack_target");                            // 配置文件目录，要保证有 connfiles1_1、 layerWidth1_1、 nodelist1_1、 input_to_layer_1.pickle 4个文件
 
     let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python " + scriptPath + " " + outputDir + " " + configDir;
+    let command_str = "python3 " + scriptPath + " " + outputDir + " " + configDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -600,18 +603,18 @@ function runMnistSendInputScript(global) {
     console.log("start mnist image recognition: ", global.appInfo.name);
 
     // 脚本位置 mnist_send_input_back.py
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "test.py");
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "mnist_send_input_back.py");
     let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
-    let outputDir = global.appInfo.outputDir.replace(/\//g, "\\");            // 用户指定的输出目录
-    let configDir = outputDir + "\\unpack_target";                            // 配置文件目录，要保证有 config.b 文件
+    let outputDir = global.appInfo.outputDir;            // 用户指定的输出目录
+    let configDir = path.join(outputDir,"unpack_target");                         // 配置文件目录，要保证有 config.b 文件
 
 
     let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python " + scriptPath + " " + outputDir + " " + configDir;
+    let command_str = "python3 " + scriptPath + " " + outputDir + " " + configDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -630,11 +633,13 @@ function runMnistSendInputScript(global) {
             // 图像识别结果
             let ret = data.split("**")[1];
             // 对应的原始图像数据
+            let imgName = data.split("**")[2].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$44", ret, imgName);
             // todo
             let datauri = "";
             fs.readdirSync(imgSrcDir).forEach((file, index) => {
-                console.log("tesatatat", file, index);
-                if (index == imgNum) {
+                console.log("tesatatat", file, index, file.indexOf(imgName));
+                if (file.indexOf(imgName) != -1) {
                     let bData = fs.readFileSync(imgSrcDir + "/" + file);
                     let base64Str = bData.toString('base64');
                     datauri = 'data:image/png;base64,' + base64Str;

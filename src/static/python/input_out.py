@@ -112,8 +112,14 @@ if __name__ == "__main__":
         # f = open(f"bin_darwin_out/inputs/img_idx_{k}.pickle",'rb')
         t1 = pickle.load(f)
 
-        # 输出文件所在目录，以编号命名文件夹
-        outputPath = os.path.join(outputDir, str(count))
+        # 输出文件所在目录，以pickle文件
+        # get file name
+        name_arr = file.split(".")
+        img_name = ""
+        for m in range(len(name_arr) - 1):
+            img_name += name_arr[m]
+
+        outputPath = os.path.join(outputDir, str(img_name))
         isExists = os.path.exists(outputPath)
         if not isExists:
             os.mkdir(outputPath)

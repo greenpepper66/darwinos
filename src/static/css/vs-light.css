@@ -175,7 +175,7 @@ table.imgAppHome_page_table-list tr {
   font-size: 22px;
   color: #333333;
   letter-spacing: 1.6px;
-  margin-top: 15%;
+  margin-top: 5%;
 }
 .imgAppHome_deploy_alert-btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
@@ -334,14 +334,14 @@ table.imgAppTasks_page_table-list tr {
 table.appMain_page_tab {
   width: 80%;
   margin: auto;
-  margin-top: 100px;
+  margin-top: 50px;
 }
 table.appMain_page_tab tr {
-  height: 600px;
+  height: 400px;
 }
 .imgApp_logo_outBox {
-  width: 520px;
-  height: 410px;
+  width: 60%;
+  height: 300px;
   box-sizing: border-box;
   overflow: auto;
   background-image: linear-gradient(180deg, #afd1ff 0%, #dee8fc 100%);
@@ -352,15 +352,15 @@ table.appMain_page_tab tr {
 .imgApp_logo_inBox {
   margin: 0 auto;
   margin-top: 20px;
-  height: 294px;
+  height: 200px;
   background-image: linear-gradient(180deg, #fbfbfb 0%, #ececec 100%);
 }
 .imgApp_logo {
-  margin-top: 70px;
+  margin-top: 50px;
 }
 .imgApp_title_box {
   background: #e6d4bd;
-  height: 74px;
+  height: 60px;
 }
 .imgApp_title {
   font-family: SourceHanSansCN-Normal;
@@ -437,7 +437,7 @@ table.newImgApp_table {
   margin: 0 auto;
   width: 60%;
   margin-top: 25px;
-  font-size: 22px;
+  font-size: 18px;
   color: #333333;
   letter-spacing: 1.26px;
 }
@@ -471,7 +471,7 @@ table.newImgApp_table td {
   border: 1px solid #d9d9d9;
   border-radius: 6px;
   height: 50px;
-  font-size: 20px;
+  font-size: 18px;
   color: #999999;
   letter-spacing: 0;
   line-height: 14px;
@@ -479,7 +479,7 @@ table.newImgApp_table td {
 .newImgApp_btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
-  font-size: 18px;
+  font-size: 16px;
   color: #ffffff;
   letter-spacing: 1.03px;
   height: 47px;
@@ -494,7 +494,7 @@ table.newImgApp_table td {
   border: 1px solid #d9d9d9;
   border-radius: 6px;
   height: 50px;
-  width: 78.5%;
+  width: 78%;
   display: inline;
 }
 
@@ -547,7 +547,7 @@ table.newImgApp_table td {
   font-size: 22px;
   color: #333333;
   letter-spacing: 1.6px;
-  margin-top: 15%;
+  margin-top: 5%;
 }
 .newImgApp_alert-btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
@@ -694,6 +694,4 @@ table.imgAppRunTask_recRetTable td {
 .imgAppRunTask_taskIframeContent {
   width: 100%;
   min-height: 1500px;
-  margin-top: 0;
-  padding-top: 0;
 }

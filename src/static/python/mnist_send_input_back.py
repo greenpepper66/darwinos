@@ -14,6 +14,7 @@ import datetime
 # 用户指定目录
 oriOutputDir = sys.argv[1]                             # 用户选择的输出文件目录
 configDir = sys.argv[2]                                # 用户指定的配置文件所在目录
+pickleDataDir = os.path.join(oriOutputDir, "pickleDir") # pickle data dir
 inputDataDir = os.path.join(oriOutputDir, "textDir")  # 上一步转换pickle后生成的input数据所在目录
 
 
@@ -66,6 +67,7 @@ print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Config file
 conn1 = ClientConnection(ip, port)
 conn1._socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, True)
 def set_tick_time(conn, tick_time):
+    print("set tick time")
     tick_times = [tick_time]
     length = len(tick_times)
     send_bytes = bytearray()
@@ -105,11 +107,16 @@ for file in os.listdir(inputDataDir): #file 表示的是文件名
         count = count+1
 print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] There are all ", str(count), " files.", flush=True)
 
-for j in range(count):
-    i = j + 1
+for file in os.listdir(pickleDataDir):
+    # get file name
+    name_arr = file.split(".")
+    img_name = ""
+    for m in range(len(name_arr) - 1):
+        img_name += name_arr[m]
+    
     # 首先发送给MASTER 模型
-    roxTxt = os.path.join(inputDataDir, str(i), "row.txt")
-    inputTxt = os.path.join(inputDataDir, str(i), "input.txt")
+    roxTxt = os.path.join(inputDataDir, str(img_name), "row.txt")
+    inputTxt = os.path.join(inputDataDir, str(img_name), "input.txt")
     
     with open(roxTxt, 'r') as row:
         row_list = row.readlines()
@@ -152,8 +159,9 @@ for j in range(count):
     max_index = spike.index(max(spike))    
     Number = str(max_index)
     print(Number + " ")
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] The ", str(i), " image recognition results is ", str(Number), ". ", flush=True)
-    print("RECOGNITION RESULT: **", Number, "**", flush=True)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] The ", str(file), " image recognition results is ", str(Number), ". ", flush=True)
+    print("RECOGNITION RESULT: **", Number, "**", img_name, "**", flush=True)
+    print("ORIGINAL IMAGE: ##", img_name, "##", flush=True)
     # f.write(Number)
     # f.write('\r')
     # exit(0)
