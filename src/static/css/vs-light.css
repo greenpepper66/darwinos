@@ -592,6 +592,12 @@ table.newImgApp_table td {
   margin-top: 30px;
   text-align: center;
 }
+.imgAppRunTask_middle_ret {
+  background: #f5f5f5;
+  height: 250px;
+  margin-top: 30px;
+  text-align: center;
+}
 .imgAppRunTask_probar_title,
 .imgAppRunTask_ret_title {
   font-size: 20px;
@@ -642,29 +648,68 @@ table.newImgApp_table td {
   letter-spacing: 0.91px;
   padding-top: 5px;
 }
+.imgAppRunTask_probar_idx {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  opacity: 0.5;
+  background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%);
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+  padding-top: 1%;
+}
 .imgAppRunTask_probar_des {
   font-size: 16px;
   color: #333333;
   letter-spacing: 0.91px;
   margin-bottom: 10px;
+  vertical-align: middle;
 }
 .imgAppRunTask_probar_logo {
   height: 33px;
   margin-top: 5px;
   background-color: #eeeeee;
+  /* background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%); */
+  border-radius: 15px;
+}
+.imgAppRunTask_probar_arrow {
+  height: 5px;
+  width: 90%;
+  background: #ffa73c;
+  margin-top: 15px;
+}
+.progress-bar-info {
+  background-color: #a5cbff;
+}
+.progress-bar {
+  opacity: 0.7;
+  background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%);
 }
 /** 显示识别结果的表格样式 **/
+.imgAppRunTask_taskResultBox {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  overflow-x: auto; /** overflow:auto 内容会被修剪，超出设置的宽高后会出现滚动条**/
+}
 table.imgAppRunTask_recRetTable {
-  font-family: verdana, arial, sans-serif;
+  empty-cells: show;
   border-collapse: collapse;
   margin: 0 auto;
   margin-top: 25px;
   text-align: center;
   font-size: 16px;
   color: #333333;
+  width: auto;
 }
 table.imgAppRunTask_recRetTable tr {
   height: 60px;
+}
+table.imgAppRunTask_recRetTable th {
+  white-space: nowrap;
 }
 table.imgAppRunTask_recRetTable tr td:nth-child(1) {
   background-color: #eeeeee;
@@ -674,7 +719,8 @@ table.imgAppRunTask_recRetTable td {
   padding: 8px;
   border-style: solid;
   border-color: #d6d6d6;
-  width: 100px;
+  min-width: 100px;
+  white-space: nowrap;
 }
 .imgAppRunTask_bottom {
   min-height: 1600px;

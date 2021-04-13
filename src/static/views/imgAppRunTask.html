@@ -60,15 +60,18 @@
                 <div class="row">
                     <div class="col-md-3"></div>
                     <div class="col-md-2">
-                        <div class="imgAppRunTask_probar_des">图像脉冲编码</div>
+                        <div class="imgAppRunTask_probar_idx">1</div>
+                        <span class="imgAppRunTask_probar_des">图像脉冲编码</span>
                     </div>
                     <div class="col-md-1"></div>
                     <div class="col-md-2">
-                        <div class="imgAppRunTask_probar_des">打包脉冲文件</div>
+                        <div class="imgAppRunTask_probar_idx">2</div>
+                        <span class="imgAppRunTask_probar_des">打包脉冲文件</span>
                     </div>
                     <div class="col-md-1"></div>
                     <div class="col-md-2">
-                        <div class="imgAppRunTask_probar_des">进行图像识别</div>
+                        <div class="imgAppRunTask_probar_idx">3</div>
+                        <span class="imgAppRunTask_probar_des">进行图像识别</span>
                     </div>
                     <div class="col-md-1"></div>
                 </div>
@@ -97,8 +100,9 @@
                     </div>
 
                     <div class="col-md-1">
+                        <div class="imgAppRunTask_probar_arrow"></div>
+                        <!-- <img src="../images/arrow.png" /> -->
                         <!-- <i class="material-icons">forward</i> -->
-                        <img src="../images/arrow.png" />
                     </div>
 
                     <div class="col-md-2">
@@ -111,7 +115,8 @@
                     </div>
 
                     <div class="col-md-1">
-                        <img src="../images/arrow.png" />
+                        <div class="imgAppRunTask_probar_arrow"></div>
+                        <!-- <img src="../images/arrow.png" /> -->
                         <!-- <i class="material-icons" style="font-size: 80px;transform: scaleY(0.4);">arrow_forward</i> -->
                     </div>
 
@@ -130,16 +135,17 @@
 
         </div>
 
-        <div class="clearfix thewrap imgAppRunTask_middle">
+        <div class="clearfix thewrap imgAppRunTask_middle_ret">
             <div class="row">
                 <div class="imgAppRunTask_ret_title">图像识别结果</div>
             </div>
 
             <div class="row">
-                <div id="recognition_result_div" class="imgAppRunTask_taskResultBox">
+                <div id="recognition_result_div" class="imgAppRunTask_taskResultBox" >
                     <table id="recognition_ret_tab" class="imgAppRunTask_recRetTable">
                         <tr>
                             <td>原始图像</td>
+                           
                         </tr>
                         <tr>
                             <td>识别结果</td>

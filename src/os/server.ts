@@ -61,31 +61,31 @@ export function startHttpServer(ResDataProvider: ResProvider,
 	server.listen(5002);
 
 
-	// // test for newApp page
-	// let model_dep = {
-	// 	id: 11,
-	// 	name:"model_name",
-	// 	nodeID: 1,
-	// 	nodeIP: "192.168.1.1"              
-	// }
-	// allData.deployedModelList = [model_dep];
+	// test for newApp page
+	let model_dep = {
+		id: 11,
+		name:"model_name",
+		nodeID: 1,
+		nodeIP: "192.168.1.1"              
+	}
+	allData.deployedModelList = [model_dep];
 
-	// // test for 导航栏
-	// let model = {
-	// 	id: 11,
-	// 	name:"model_name",
-	// 	nodeID: 1,
-	// 	nodeIP: "192.168.1.1"              
-	// }
-	// ModelDataProvider.updateModels([model]);
+	// test for 导航栏
+	let model = {
+		id: 11,
+		name:"model_name",
+		nodeID: 1,
+		nodeIP: "192.168.1.1"              
+	}
+	ModelDataProvider.updateModels([model]);
 
-	// let node = {
-	// 	id: 11,
-	// 	name:"node-test",
-	// 	chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	// 	usedNeureNums:[],
-	// }
-	// ResDataProvider.updateNodes([node]);
+	let node = {
+		id: 11,
+		name:"node-test",
+		chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		usedNeureNums:[],
+	}
+	ResDataProvider.updateNodes([node]);
 }
 
 

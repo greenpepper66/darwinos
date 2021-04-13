@@ -138,7 +138,7 @@ for file in os.listdir(pickleDataDir):
         while result is None:
             id_,result = conn1.receive()
         if len(result) > 8:
-            fmt = 'Q' * int(len(result)/8)
+            fmt = 'Q' * int(len(result)/8)    # Q: unsigned long long
             result = struct.unpack(fmt,result)
             for i in range(0, len(result), 2):
                 spike[int(result[i + 1] % (1 << 32) // (1 << 16))] += 1

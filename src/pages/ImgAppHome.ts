@@ -471,7 +471,7 @@ function unpackConfigFiles(global) {
     let configFile = global.appInfo.encodeConfigFile;      // 配置文件
     let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹unpack_target
 
-    let command_str = "python3 " + scriptPath + " " + configFile + " " + outputDir;
+    let command_str = "python " + scriptPath + " " + configFile + " " + outputDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -503,12 +503,21 @@ function unpackConfigFiles(global) {
 
 }
 
-// 1. 运行李畅脚本
+// 1. 运行脉冲编码脚本
+// 根据保存的应用配置：encodeMethodID 0——李畅的频率编码， 1——宏泽的泊松编码 
 function runImgConvertScript(global) {
     console.log("start run a task for app: ", global.appInfo.name);
 
-    // 脚本位置
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "encode_input.py");
+    // 脚本位置 encode_input.py——频率编码， poisson_encode.py——泊松编码
+    let selectedEncodeMethod = ""
+    if(global.appInfo.encodeMethodID == 0) {
+        console.log("选择频率编码")
+        selectedEncodeMethod = "encode_input.py"
+    } else if (global.appInfo.encodeMethodID == 1) {
+        console.log("选择泊松编码")
+        selectedEncodeMethod = "poisson_encode.py"
+    }
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", selectedEncodeMethod);
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
     let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
@@ -518,7 +527,7 @@ function runImgConvertScript(global) {
     let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python3 " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
+    let command_str = "python " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -567,7 +576,7 @@ function runPickleConvertScript(global) {
     let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python3 " + scriptPath + " " + outputDir + " " + configDir;
+    let command_str = "python " + scriptPath + " " + outputDir + " " + configDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -603,7 +612,7 @@ function runMnistSendInputScript(global) {
     console.log("start mnist image recognition: ", global.appInfo.name);
 
     // 脚本位置 mnist_send_input_back.py
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "mnist_send_input_back.py");
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "test.py");
     let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
@@ -614,7 +623,7 @@ function runMnistSendInputScript(global) {
     let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python3 " + scriptPath + " " + outputDir + " " + configDir;
+    let command_str = "python " + scriptPath + " " + outputDir + " " + configDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -643,7 +652,7 @@ function runMnistSendInputScript(global) {
                     let bData = fs.readFileSync(imgSrcDir + "/" + file);
                     let base64Str = bData.toString('base64');
                     datauri = 'data:image/png;base64,' + base64Str;
-                    console.log("src images datauti: ", datauri);
+                    console.log("src images datauri: ", datauri);
                     // global.panel.webview.postMessage({ recognitionOneSrcImg: datauri });
                 }
             });

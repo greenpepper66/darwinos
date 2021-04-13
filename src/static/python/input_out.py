@@ -48,6 +48,7 @@ if __name__ == "__main__":
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Loading config ", str2, ". ", flush=True)
     fw = open(str2, 'rb')
     layerWidth = pickle.load(fw)
+    print("########################### layerWidth", layerWidth)
     fw.close()
 
     # str3 = 'bin_darwin_out/nodelist1_1'
@@ -55,6 +56,7 @@ if __name__ == "__main__":
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] Loading config ", str3, ". ", flush=True)
     fw = open(str3, 'rb')
     nodelist = pickle.load(fw)
+    print("########################### nodelist", nodelist)
     fw.close()
 
     # ------------------------------------- input ----------------------------------------------总共只要一个
