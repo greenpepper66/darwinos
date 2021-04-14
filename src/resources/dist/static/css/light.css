@@ -1,0 +1,707 @@
+
+/**********************************************************************************************
+** UI设计后调整
+** 0. common style
+**********************************************************************************************/
+
+.home_page,
+.nodeInfo_page,
+.chipInfo_page,
+.model_page {
+  margin: 25px;
+  min-height: 1000px;
+  text-align: center;
+}
+
+
+table,
+td {
+  border-collapse: collapse; /** 合并单元格边框 */
+}
+
+/**********************************************************************************************
+** 1. 首页样式
+**********************************************************************************************/
+
+.home_page {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-align: center;
+  padding-top: 100px;
+  min-height: 1300px;
+  background-color: #f5f5f5;
+}
+
+/** 类脑logo样式 **/
+
+.home_logo_box {
+  margin-bottom: 38px;
+}
+
+.home_os_logo {
+  width: 100px;
+  height: 90px;
+}
+
+/** 统计信息 **/
+
+.home_introduction {
+  width: 35%;
+  float: right;
+  margin-right: 90px;
+  height: 90%;
+}
+
+.home_statusOkLogo {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background-color: #45b700;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.home_statusErrLogo {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background-color: red;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/** 拓扑图样式 **/
+
+.home_topology {
+  width: 60%;
+  height: 800px;
+  margin-right: 38%;
+}
+
+.home_node_logoBox {
+  font-size: 14px;
+  letter-spacing: 0.8px;
+}
+
+.home_logoDesc {
+  margin-right: 30px;
+  vertical-align: middle;
+}
+
+/** 节点颜色标注样式 */
+
+.home_coommonNodeLogo {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+  /* 修改元素基线 同行显示*/
+  border-radius: 50%;
+}
+
+.masterNodeLogo {
+  background-image: radial-gradient(#0054ff 15%, #4e98ff 100%);
+}
+
+.shadowNodeLogo {
+  background-image: radial-gradient(#ffa73c 15%, #ffdda6 100%);
+}
+
+.slaveNodeLogo {
+  background-image: radial-gradient(#ff77e0 15%, #ffd1f9 100%);
+}
+
+.outlineNodeLogo {
+  background-image: radial-gradient(#77a4ff 15%, #afd1ff 100%);
+}
+
+/** 表格样式 */
+
+table.home_hovertable {
+  font-family: verdana, arial, sans-serif;
+  border-collapse: collapse;
+  margin: 0 auto;
+  height: 700px;
+}
+
+table.home_hovertable tr td:nth-child(1) {
+  text-align: right;
+  padding-right: 20px;
+  width: 200px;
+  background-color: #eeeeee;
+}
+
+table.home_hovertable tr td:nth-child(2) {
+  text-align: left;
+  padding-left: 20px;
+  width: 300px;
+}
+
+table.home_hovertable td {
+  border-width: 2px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #d6d6d6;
+}
+
+/**********************************************************************************************
+** 2. 节点详情页
+**********************************************************************************************/
+
+.node_quarter-div {
+  width: 48%;
+  height: 500px;
+  float: left;
+  margin-bottom: 20px;
+  background-color: #f5f5f5;
+ 
+}
+
+.node_chips {
+  margin-right: 10px;
+}
+.node_infor {
+  margin-right: 10px;
+  height: 600px;
+}
+
+.node_title,
+.chip_title {
+  font-family: SourceHanSansCN-Normal;
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-top: 20px;
+  margin-bottom: 28px;
+}
+
+.node_models {
+  margin-left: 10px;
+}
+.node_tasks {
+  margin-left: 10px;
+  height: 600px;
+}
+
+table.node_page_table { 
+  font-size: 14px;
+  color: #666666;
+  width: 90%;
+  margin: auto;
+}
+
+table.node_page_table th {
+  background: rgba(238, 238, 238, 1);
+  height: 50px;
+  text-align: center;
+}
+
+table.node_page_table tr {
+  border-width: 2px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #d6d6d6;
+  height: 50px;
+}
+
+.node_nodata_box {
+  text-align: center;
+  height: 200px;
+}
+
+.node_nodata_logo {
+  height: 100px;
+}
+
+/**********************************************************************************************
+** 3. 芯片详情页
+**********************************************************************************************/
+
+.chip_quarter-div {
+  width: 48%;
+  height: 500px;
+  float: left;
+  margin-bottom: 20px;
+  background-color: #f5f5f5;
+}
+
+.chip_matrix{
+  margin-right: 10px;
+}
+.chip_infor {
+  margin-right: 10px;
+  height: 600px;
+}
+.chip_pie {
+  margin-left: 10px;
+}
+.chip_tasks {
+  margin-left: 10px;
+  height: 600px;
+}
+
+.chip_title {
+  font-family: SourceHanSansCN-Normal;
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-top: 20px;
+  margin-bottom: 28px;
+}
+.chip_nodata_box {
+  text-align: center;
+  height: 200px;
+}
+
+.chip_nodata_logo {
+  height: 100px;
+}
+.chip_heatmap_div {
+  background: rgba(238, 238, 238, 1);
+}
+
+/** 神经元状态图图标 **/
+.chip_coommonNeureLogo {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  vertical-align: middle;
+  /* 修改元素基线 同行显示*/
+  border-radius: 50%;
+}
+
+.freeNeureLogo {
+  background-color: #45b700;
+}
+.runNeureLogo {
+  background-color: #ff9700;
+}
+.outputNeureLogo {
+  background-color: #ff4530;
+}
+.chip_neure_logoBox {
+  font-size: 14px;
+  letter-spacing: 0.8px;
+}
+
+.chip_logoDesc {
+  margin-right: 30px;
+  vertical-align: middle;
+}
+
+/**********************************************************************************************
+** 4. 模型列表页
+**********************************************************************************************/
+.model_top {
+  margin-top: 25px;
+  height: 150px;
+  margin: 0 auto;
+  background: #f5f5f5;
+}
+
+table.model_page_table-search {
+  margin-left: 20px;
+  margin-right: 20px;
+  font-size: 14px;
+  color: #666666;
+  font-family: PingFangSC-Regular;
+  width: 90%;
+  margin: auto;
+  margin-top: 35px;
+}
+table.model_page_table-search tr {
+  padding: 8px;
+  height: 70px;
+}
+table.model_page_table-search tr td:nth-child(1),
+table.model_page_table-search tr td:nth-child(3) {
+  text-align: right;
+  padding-right: 20px;
+}
+table.model_page_table-search tr td:nth-child(2),
+table.model_page_table-search tr td:nth-child(4),
+table.model_page_table-search tr td:nth-child(5) {
+  text-align: left;
+}
+.model_search_title {
+  font-size: 16px;
+  color: #333333;
+  letter-spacing: 0.91px;
+  vertical-align: middle;
+}
+.model_inputBox {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  height: 40px;
+  font-size: 16px;
+  color: #999999;
+  letter-spacing: 0;
+  line-height: 14px;
+  width: 80%;
+}
+.model_search_btn {
+  background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
+  border-radius: 2px;
+  height: 45px;
+  width: 111px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+}
+.model_upload_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 2px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  height: 45px;
+  width: 220px;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+}
+
+.model_middle {
+  background: #f5f5f5;
+  height: 40%;
+  min-height: 800px;
+}
+.model_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.model_deploy_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 2px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 12px;
+  color: #ffffff;
+  letter-spacing: 0.69px;
+  height: 29px;
+  width: 73px;
+  margin-right: 10px;
+}
+.model_delete_btn {
+  background-image: linear-gradient(180deg, #ffc4b9 0%, #ff8777 100%);
+  border-radius: 2px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 12px;
+  color: #ffffff;
+  letter-spacing: 0.69px;
+  height: 29px;
+  width: 73px;
+  margin-right: 10px;
+}
+
+table.model_page_table-list {
+  margin-left: 20px;
+  margin-right: 20px;
+  font-size: 14px;
+  color: #666666;
+  width: 90%;
+  margin: auto;
+  margin-bottom: 50px;
+}
+
+table.model_page_table-list th {
+  background: rgba(238, 238, 238, 1);
+  height: 50px;
+  text-align: center;
+}
+
+table.model_page_table-list tr {
+  border-width: 2px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #d6d6d6;
+  height: 50px;
+}
+.model_bottom {
+  background: #f5f5f5;
+  height: 40%;
+  min-height: 300px;
+}
+
+table.model_page_table-total {
+  font-family: verdana, arial, sans-serif;
+  border-collapse: collapse;
+  margin: 0 auto;
+  width: 90%;
+}
+
+table.model_page_table-total tr td:nth-child(1) {
+  text-align: right;
+  padding-right: 20px;
+  width: 40%;
+  background-color: #eeeeee;
+}
+
+table.model_page_table-total tr td:nth-child(2) {
+  text-align: left;
+  padding-left: 20px;
+  width: 60%;
+}
+
+table.model_page_table-total td {
+  border-width: 2px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #d6d6d6;
+  height: 30px;
+}
+
+/** 模型部署结果弹出框 **/
+.model_deploy_alert-box {
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 30%;
+  width: 40%;
+  height: 30%;
+  padding: 10px;
+  z-index: 1002;
+  overflow: auto;
+}
+.model_deploy_alert-txt {
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+  margin-top: 5%;
+}
+.model_deploy_alert-btn {
+  background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
+  border-radius: 2px;
+  font-size: 20px;
+  color: #ffffff;
+  letter-spacing: 1.14px;
+  height: 47px;
+  width: 20%;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  margin-top: 10%;
+}
+/**********************************************************************************************
+** 5. 上传模型页
+**********************************************************************************************/
+.uploadModel_page {
+  padding-top: 50px;
+  min-height: 1300px;
+  background-color: #f5f5f5;
+  margin: 25px;
+}
+table.uploadModel_page_table {
+  margin-left: 20px;
+  margin-right: 20px;
+  font-size: 14px;
+  color: #666666;
+  width: 80%;
+  margin: auto;
+  margin-top: 35px;
+}
+table.uploadModel_page_table tr td:nth-child(2) {
+  text-align: right;
+}
+table.uploadModel_page_table tr td:nth-child(3) {
+  text-align: left;
+}
+.uploadModel_input {
+  height: 60px;
+  width: 400px;
+  background: #eeeeee;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+}
+.uploadModel_select_file_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 2px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+  height: 36px;
+  width: 40%;
+  float: left;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+.uploadModel_select_file_txt {
+  height: 30px;
+  width: 45%;
+  float: left;
+  margin-top: 12px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 16px;
+  color: #333333;
+  letter-spacing: 0.91px;
+}
+
+.el-input__inner {
+  background-color: #eeeeee !important; /** 覆盖 el-select 原有样式**/
+  height: 60px !important;
+  width: 240px !important;
+  font-size: 16px !important;
+  color: #999999 !important;
+  letter-spacing: 0 !important;
+  line-height: 14px !important;
+}
+.el-select-dropdown__item {
+  font-size: 16px !important;
+  color: #999999 !important;
+  letter-spacing: 0 !important;
+  line-height: 14px !important;
+  padding-top: 10px !important;
+}
+.el-popper[x-placement^="bottom"] .popper__arrow::after {
+  border-bottom-color: #999999 !important;
+}
+.el-scrollbar__view,
+.el-select-dropdown__list {
+  background-color: #eeeeee !important;
+}
+.uploadModel_upload_btn {
+  background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
+  border-radius: 2px;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+  height: 45px;
+  width: 220px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+}
+.uploadModel_title {
+  font-size: 16px;
+  color: #333333;
+  letter-spacing: 0.91px;
+  vertical-align: middle;
+}
+/** 模型文件上传结果弹出框 **/
+.uploadModel_alert-box {
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 30%;
+  width: 40%;
+  height: 30%;
+  padding: 10px;
+  z-index: 1002;
+  overflow: auto;
+}
+.uploadModel_alert-txt {
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+  margin-top: 5%;
+}
+.uploadModel_alert-btn {
+  background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
+  border-radius: 2px;
+  font-size: 20px;
+  color: #ffffff;
+  letter-spacing: 1.14px;
+  height: 47px;
+  width: 20%;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  margin-top: 10%;
+}
+
+/**********************************************************************************************
+** 6. 任务详情页
+**********************************************************************************************/
+.taskDetail_page {
+  background-color: #f5f5f5;
+  text-align: center;
+  height: 1500px;
+}
+.taskDetail_total_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  height: 70px;
+  padding-top: 20px;
+  background: #eeeeee;
+}
+.taskDetail_info_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-top: 50px;
+  margin-bottom: 10px;
+}
+.taskDetail_draw_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-bottom: 10px;
+}
+table.taskDetail_table {
+  width: 90%;
+  margin: auto;
+  margin-bottom: 50px;
+}
+
+table.taskDetail_table th {
+  background: rgba(238, 238, 238, 1);
+  height: 50px;
+  font-size: 16px;
+  color: #666666;
+  text-align: center;
+}
+
+table.taskDetail_table tr {
+  border-width: 2px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #d6d6d6;
+  height: 50px;
+  font-size: 16px;
+  color: #333333;
+}
+
+.taskDetail_echart_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-top: 50px;
+}
+.taskDetail_echart_input {
+  background: #eeeeee;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 20px;
+  color: #999999;
+  letter-spacing: 0;
+  line-height: 14px;
+  height: 45px;
+}
+.taskDetail_echart_box {
+  min-height: 400px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+/* .taskDetail_chipEchart {
+  background: rgba(238, 238, 238, 1);
+} */
