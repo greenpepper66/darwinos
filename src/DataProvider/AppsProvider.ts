@@ -2,6 +2,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+/**
+ * 应用视图
+ */
 
 export class AppKind extends vscode.TreeItem {
 

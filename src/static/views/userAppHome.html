@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title>用户应用</title>
+    <style>
+        .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix {
+            *zoom: 1;
+        }
+
+        .thewrap {
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+        const vscode = acquireVsCodeApi();
+
+        function gotoUserAppPage(kind, appName) {
+            vscode.postMessage({
+                command: 'gotoUserAppPage',
+                text: [kind, appName],
+            })
+        }
+    </script>
+</head>
+
+<body>
+    <div id="userAppHome" class="userAppHome_page">
+        <div class="clearfix thewrap userAppHome_top">
+            <div class="row">
+                <div class="userAppHome_title">选择应用类型</div>
+            </div>
+        </div>
+
+
+        <div class="clearfix thewrap userAppHome_middle">
+            <div class="row">
+                <div class="userAppHome_title">本地应用</div>
+            </div>
+
+            <div class="userAppHome_appBox">
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-3">
+                        <div class="userAppHome_app_btn" onclick="gotoUserAppPage('local', 'mnist')">
+                            <span class="userAppHome_app_logo">手写体数字图像识别</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="userAppHome_app_btn">
+                            <span class="userAppHome_app_logo">汽车图像目标检测</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="userAppHome_app_btn">
+                            <span class="userAppHome_app_logo">其它应用</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="clearfix thewrap userAppHome_middle">
+            <div class="row">
+                <div class="userAppHome_title">远程应用</div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-4">
+                    <div class="userAppHome_app_btn">
+                        <span class="userAppHome_app_logo">摄像头应用</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="userAppHome_app_btn">
+                        <span class="userAppHome_app_logo">其它应用</span>
+                    </div>
+                </div>
+                <div class="col-md-2"></div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
+    <link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../css/vs-light.css" rel="stylesheet" />
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+    <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script>Vue.config.ProductionTip = false</script>
+</body>
+
+</html>

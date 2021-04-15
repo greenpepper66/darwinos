@@ -15,16 +15,16 @@
 		"onView:resource_view",
 		"onView:apps_view",
 		"onView:task_view",
-		"onView:apps_view",
+		"onView:user_view",
 		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
-            {
-                "command": "darwinos.showHomePage",
-                "title": "显示home页面"
-            },
+			{
+				"command": "darwinos.showHomePage",
+				"title": "显示home页面"
+			},
 			{
 				"command": "darwinos.helloWorld",
 				"title": "Hello World"
@@ -104,6 +104,18 @@
 			{
 				"command": "task_view.resetTask",
 				"title": "Reset"
+			},
+			{
+				"command": "user_view.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "media/light/refresh.svg",
+					"dark": "media/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "user_view.appsOverview",
+				"title": "Overview"
 			}
 		],
 		"viewsContainers": {
@@ -125,31 +137,40 @@
 				{
 					"id": "resource_view",
 					"name": "资源视图",
+					"icon": "media/light/资源视图.png",
 					"contextualTitle": "resource view"
 				},
 				{
 					"id": "model_view",
 					"name": "模型视图",
+					"icon": "media/light/模型视图.png",
 					"contextualTitle": "model view"
 				},
 				{
 					"id": "apps_view",
 					"name": "应用视图",
+					"icon": "media/light/应用视图.png",
 					"contextualTitle": "application view"
 				},
 				{
 					"id": "task_view",
 					"name": "任务视图",
+					"icon": "media/light/任务视图.png",
 					"contextualTitle": "task view"
+				},
+				{
+					"id": "user_view",
+					"name": "用户视图",
+					"icon": "media/light/应用视图.png",
+					"contextualTitle": "user view"
 				}
 			],
-			"upload_model":[
+			"upload_model": [
 				{
-					"id":"upload_model_view",
-					"name":"上传模型",
+					"id": "upload_model_view",
+					"name": "上传模型",
 					"contextualTitle": "upload model view"
 				}
-				
 			]
 		},
 		"menus": {
@@ -174,7 +195,6 @@
 					"when": "view == model_view",
 					"group": "navigation"
 				},
-				
 				{
 					"command": "apps_view.refreshEntry",
 					"when": "view == apps_view",
@@ -193,6 +213,16 @@
 				{
 					"command": "task_view.taskOverview",
 					"when": "view == task_view",
+					"group": "navigation"
+				},
+				{
+					"command": "user_view.refreshEntry",
+					"when": "view == user_view",
+					"group": "navigation"
+				},
+				{
+					"command": "user_view.appsOverview",
+					"when": "view == user_view",
 					"group": "navigation"
 				}
 			],
@@ -219,7 +249,7 @@
 				}
 			]
 		},
-		"viewsWelcome":[
+		"viewsWelcome": [
 			{
 				"view": "resource_view",
 				"contents": "无数据，请检查网络或点击刷新按钮"
@@ -234,7 +264,7 @@
 			},
 			{
 				"view": "upload_model_view",
-				"contents": "（此处可以添加相关说明）"
+				"contents": "上传模型文件"
 			}
 		]
 	},

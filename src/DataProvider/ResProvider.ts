@@ -29,9 +29,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
 
   getChildren(element?: Node): Thenable<Node[]> {
     if (element) {
-
       return Promise.resolve(this.getChips(element));
-
     }
     else {
       return Promise.resolve(this.nodes);
@@ -102,12 +100,9 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
 
 
 export class Node extends vscode.TreeItem {
-
   constructor(
     public readonly label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-
-
     public readonly nodeRole?: number,  //节点角色，1-master, 2-shadow,3-slave
     public readonly nodeID?: number,
     public readonly nodeIP?: string,
@@ -116,7 +111,6 @@ export class Node extends vscode.TreeItem {
     public readonly command?: vscode.Command
   ) {
     super(label, collapsibleState);
-
     this.tooltip = `${this.label}`;
     this.description = this.nodeRole === 1 ? "master" : (this.nodeRole === 2 ? "shadow" : "slave");
   }
@@ -134,7 +128,6 @@ export class Chip extends vscode.TreeItem {
   constructor(
     public readonly label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-
     public readonly nodeID: number,
     public readonly chipID: number,
     public readonly usedNeureNum: number,

@@ -17,6 +17,8 @@ import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
 import { openImgAppRunTaskPage, openImgAppTasksPage } from "./pages/ImgAppHome";
 
 import {SystemTreeViewProvider} from "./DataProvider/SystemProvider";
+import { UserProvider } from './DataProvider/UserProvider';
+import {UserAppHomePageProvide} from './pages/UserAppHome';
 
 const PORT = 5001;
 
@@ -61,6 +63,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const AppsDataProvider = new AppsProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('apps_view', AppsDataProvider);
+
+	const UserDataProvider = new UserProvider(vscode.workspace.rootPath);
+	vscode.window.registerTreeDataProvider('user_view', UserDataProvider);
 
 
 	//启动httpserver，接收来自web页面的数据
@@ -116,6 +121,9 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('task_view.taskOverview', () => {
 		openImgAppTasksPage(context);
 	});
+	vscode.commands.registerCommand('user_view.appsOverview', () => {
+		UserAppHomePageProvide(context);
+	});
 
 
 	// 应用视图
@@ -160,7 +168,6 @@ export function activate(context: vscode.ExtensionContext) {
 	// });
 
 	require('./pages/TaskStart')(context); // 
-	// require('./DataProvider/welcome')(context); // 欢迎提示
 
 	vscode.commands.registerCommand('task_view.stopTask', (task: Task) => {
 		task_stop(task.nodeIp, task.modelId);
