@@ -109,13 +109,18 @@
                                 <td>{{ item.name }}</td>
                                 <td>数字图像识别</td>
                                 <td>{{ item.modeFileID }}</td>
-                                <td>{{ item.encodeMethodID }}</td>
+                                <template v-if="item.encodeMethodID == 0">
+                                    <td>频率编码</td>
+                                </template>
+                                <template v-else-if="item.encodeMethodID == 1">
+                                    <td>泊松编码</td>
+                                </template>
                                 <td>{{ item.createTime }}</td>
                                 <td>
                                     <button type="button" class="imgAppHome_detail_btn"
                                         @click="gotoImgAppInfoPage(item.id)">详情</button>
-                                    <button type="button" class="imgAppHome_runApp_btn" title="应用启动后成为一个任务"
-                                        @click="gotoImgAppRunTaskPageByID(item.id)">启动</button>
+                                    <!-- <button type="button" class="imgAppHome_runApp_btn" title="应用启动后成为一个任务"
+                                        @click="gotoImgAppRunTaskPageByID(item.id)">启动</button> -->
                                     <button type="button" class="imgAppHome_delete_btn"
                                         @click="deleteAppConfig(item.id)">删除</button>
                                 </td>

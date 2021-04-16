@@ -96,6 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('resource_view.refreshEntry', () => ResDataProvider.refresh());
 	vscode.commands.registerCommand('model_view.refreshEntry', () => ModelDataProvider.refresh());
 	vscode.commands.registerCommand('apps_view.refreshEntry', () => AppsDataProvider.refresh());
+	vscode.commands.registerCommand('user_view.refreshEntry', () => UserDataProvider.refresh());
 	vscode.commands.registerCommand('task_view.refreshEntry', () => TaskDataProvider.refresh());
 
 
@@ -141,6 +142,7 @@ export function activate(context: vscode.ExtensionContext) {
 	setTimeout(function refreshEntrys() {
 		vscode.commands.executeCommand('resource_view.refreshEntry');
 		vscode.commands.executeCommand('model_view.refreshEntry');
+		vscode.commands.executeCommand('user_view.refreshEntry');
 		vscode.commands.executeCommand('task_view.refreshEntry');
 	}, 500);
 

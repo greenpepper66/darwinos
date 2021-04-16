@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToTask, updateImgAppStatusToApp, checkImgAppExist, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
+
 
 const userAppHomeHtmlFilePath = "src/static/views/userAppHome.html";
 const userLocalMnistHtmlFilePath = "src/static/views/userLocalMnistApp.html";
@@ -8,8 +10,16 @@ const userLocalMnistHtmlFilePath = "src/static/views/userLocalMnistApp.html";
 
 // 1. 与应用视图首页webview的交互
 const messageHandler = {
+
+     // 查询所有图像识别应用列表
+     getUserAppsList(global, message) {
+        console.log(message);
+        let allImgTasks = searchAllJson(global.context);
+        global.panel.webview.postMessage({ cmd: 'getUserAppsListRet', cbid: message.cbid, data: allImgTasks });
+    },
+
+
     // 单击首页按钮，跳转到对应的应用页面
-    
     gotoUserAppPage(global, message) {
         // text: [kind, appName],
         openCertainUserAppPage(global.context, message.text);

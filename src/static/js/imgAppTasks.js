@@ -37,7 +37,7 @@ window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
 
-    // 获取模型文件列表
+    // 获取任务文件列表
     if (message.cmd == 'getImgAppTasksListRet') {
         this.imgAppTasksList = message.data;
         console.log(message.data);

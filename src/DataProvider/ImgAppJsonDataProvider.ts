@@ -35,7 +35,7 @@ export class ImgAppConfigData {
     public encodeMethodID: number;  // 编码方法ID（0： 默认方法，当前就一个）
     public createTime: string;      // 应用创建时间
     public encodeConfigFile: string; // 编码和运行任务所需的配置文件 - 打包成一个文件packed_bin_files.dat
-    public outputDir: string;       // 编码过程中间输出文件所在目录
+    public outputDir: string;       // 应用文件保存路径，也是编码过程中间输出文件所在目录
 
     constructor(id: number, name: string) {  // 构造函数 实例化类的时候触发的方法
         this.id = id;
@@ -105,7 +105,7 @@ export function writeJson(context, imgAppConfig) {
         fs.writeFileSync(resourcePath, str);
         console.log('----------新增成功-------------');
         // 更新任务导航栏
-        // vscode.commands.executeCommand('task_view.refreshEntry');
+        vscode.commands.executeCommand('user_view.refreshEntry');
         return "success";
     } catch (error) {
         console.error(error);
@@ -138,6 +138,7 @@ export function deleteJson(context, id) {
         console.log("----------删除成功------------");
         // 更新任务导航栏
         vscode.commands.executeCommand('task_view.refreshEntry');
+        vscode.commands.executeCommand('user_view.refreshEntry');
         return "success";
     } catch (error) {
         console.error(error);

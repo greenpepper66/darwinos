@@ -153,16 +153,16 @@
 					"contextualTitle": "application view"
 				},
 				{
-					"id": "task_view",
-					"name": "任务视图",
-					"icon": "media/light/任务视图.png",
-					"contextualTitle": "task view"
-				},
-				{
 					"id": "user_view",
 					"name": "用户视图",
 					"icon": "media/light/应用视图.png",
 					"contextualTitle": "user view"
+				},
+				{
+					"id": "task_view",
+					"name": "任务视图",
+					"icon": "media/light/任务视图.png",
+					"contextualTitle": "task view"
 				}
 			],
 			"upload_model": [
@@ -259,8 +259,12 @@
 				"contents": "无数据，请检查网络或点击刷新按钮"
 			},
 			{
+				"view": "user_view",
+				"contents": "无数据"
+			},
+			{
 				"view": "task_view",
-				"contents": "无数据，请检查网络或点击刷新按钮"
+				"contents": "无数据"
 			},
 			{
 				"view": "upload_model_view",

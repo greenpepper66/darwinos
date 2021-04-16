@@ -5,8 +5,7 @@ import { exec } from "child_process";
 
 import { allData } from '../os/server';
 import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToTask, updateImgAppStatusToApp, checkImgAppExist, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
-import { glob } from 'glob';
-import { FILE } from 'dns';
+
 
 const imgAppHomeHtmlFilePath = "src/static/views/imgAppHome.html";
 const newImgAppHtmlFilePath = "src/static/views/newImgApp.html";

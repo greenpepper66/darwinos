@@ -462,6 +462,7 @@ table.newImgApp_table td {
 
 .newImgApp_app_name,
 .newImgApp_imgSrc_type,
+.newImgApp_configSrc_type,
 .newImgApp_remoteIP_addr,
 .newImgApp_select_model,
 .newImgApp_select_encodeMethod,
@@ -763,7 +764,7 @@ table.imgAppRunTask_recRetTable td {
   }
   .userAppHome_middle {
     background: #f5f5f5;
-    height: 250px;
+    min-height: 800px;
     margin-top: 30px;
     text-align: center;
   }
@@ -775,7 +776,8 @@ table.imgAppRunTask_recRetTable td {
     background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%);
     border-radius: 5px;
     width: 170px;
-    height: 80px;
+    height: 120px;
+    margin-top: 50px;
   }
   .userAppHome_app_logo {
     display: inline-block;
