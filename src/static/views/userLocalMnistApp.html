@@ -31,11 +31,11 @@
     <div id="userLocalMnistApp" class="localMnistApp_page">
         <div class="clearfix thewrap localMnistApp_top">
             <div class="row localMnistApp_btnBox">
-                <div class="col-md-2"></div>
+                <div class="col-md-4"></div>
                 <div class="col-md-4">
                     <div class="localMnistApp_input">
                         <button type="button" class="localMnistApp_select_file_btn" >
-                            选择单幅图像
+                            选择图像
                         </button>
 
                         <input type="text" class="localMnistApp_select_file_txt" id="localMnistApp_select_file_ret"
@@ -43,7 +43,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     <div class="localMnistApp_input">
                         <button type="button" class="localMnistApp_select_file_btn"
                             onclick="">
@@ -53,8 +53,8 @@
                         <input type="text" class="localMnistApp_select_file_txt" id="localMnistApp_select_file_ret"
                             readonly="readonly" placeholder="未选择任何文件夹" />
                     </div>
-                </div>
-                <div class="col-md-2"></div>
+                </div> -->
+                <div class="col-md-4"></div>
             </div>
         </div>
 
@@ -80,12 +80,12 @@
                     <div class="col-md-3"></div>
                     <div class="col-md-2">
                         <div class="localMnistApp_probar_idx">1</div>
-                        <span class="localMnistApp_probar_des">预处理</span>
+                        <span class="localMnistApp_probar_des">图像脉冲编码</span>
                     </div>
                     <div class="col-md-1"></div>
                     <div class="col-md-2">
                         <div class="localMnistApp_probar_idx">2</div>
-                        <span class="localMnistApp_probar_des">图像脉冲编码</span>
+                        <span class="localMnistApp_probar_des">脉冲文件打包</span>
                     </div>
                     <div class="col-md-1"></div>
                     <div class="col-md-2">
@@ -168,6 +168,35 @@
                         </tr>
                         <tr>
                             <td>识别结果</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix thewrap localMnistApp_middle">
+            <div class="row">
+                <div class="localMnistApp_title">结果分析</div>
+            </div>
+
+            <div class="row">
+                <div>
+                    <table class="imgAppRunTask_recRetAnaTable">
+                        <tr>
+                            <td>图像数量</td>
+                            <td>3幅</td>
+                        </tr>
+                        <tr>
+                            <td>应用运行总耗时</td>
+                            <td>2分钟</td>
+                        </tr>
+                        <tr>
+                            <td>识别单幅图像耗时</td>
+                            <td>50ms</td>
+                        </tr>
+                        <tr>
+                            <td>识别准确率</td>
+                            <td>100%</td>
                         </tr>
                     </table>
                 </div>

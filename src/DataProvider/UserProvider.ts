@@ -57,9 +57,9 @@ export class UserProvider implements vscode.TreeDataProvider<UserApp> {
                 nodeID,
                 nodeIP,
                 {
-                    command: '',
+                    command: 'extension.gotoOneUserAppPage',
                     title: '',
-                    arguments: []
+                    arguments: [name, "用户应用"]
                 }
             );
             this.userApps.push(task);

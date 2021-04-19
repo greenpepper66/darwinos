@@ -27,6 +27,13 @@ const messageHandler = {
 };
 
 
+// 2. 单个应用页面
+const oneUserAppMessageHandler = {
+
+ 
+};
+
+
 
 // html页面处理
 export function getHtmlContent(context, templatePath) {
@@ -71,6 +78,44 @@ export function UserAppHomePageProvide(context) {
     }, undefined, context.subscriptions);
 
 }
+
+// 单击导航栏跳转页面
+export function openOneUserAppPage(context) {
+    const panel = vscode.window.createWebviewPanel(
+        'userWelcome',
+        "用户应用视图",
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+        }
+    );
+    let global = { panel, context };
+    panel.webview.html = getHtmlContent(context, userLocalMnistHtmlFilePath);
+    panel.webview.onDidReceiveMessage(message => {
+        if (oneUserAppMessageHandler[message.command]) {
+            oneUserAppMessageHandler[message.command](global, message);
+        } else {
+            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+        }
+    }, undefined, context.subscriptions);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // 单击首页按钮打开对应的应用主页
 export function openCertainUserAppPage(context, messages) {

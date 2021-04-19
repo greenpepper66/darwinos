@@ -18,7 +18,7 @@ import { openImgAppRunTaskPage, openImgAppTasksPage } from "./pages/ImgAppHome";
 
 import {SystemTreeViewProvider} from "./DataProvider/SystemProvider";
 import { UserProvider } from './DataProvider/UserProvider';
-import {UserAppHomePageProvide} from './pages/UserAppHome';
+import {UserAppHomePageProvide, openOneUserAppPage} from './pages/UserAppHome';
 
 const PORT = 5001;
 
@@ -135,6 +135,11 @@ export function activate(context: vscode.ExtensionContext) {
 	// 任务视图导航栏子选项单击命令
 	vscode.commands.registerCommand('extension.gotoImgAppTaskPage', (name, id, type) => {
 		openImgAppRunTaskPage(context, "byID", id);
+	});
+
+	// 用戶视图导航栏子选项单击命令
+	vscode.commands.registerCommand('extension.gotoOneUserAppPage', (name, id, type) => {
+		openOneUserAppPage(context);
 	});
 
 
