@@ -743,117 +743,191 @@ table.imgAppRunTask_recRetTable td {
   min-height: 1500px;
 }
 
-
 /****************************************************************************
   **** 7. 用户视图 - 首页
   ****************************************************************************/
-  .userAppHome_page {
-    margin: 25px;
-    text-align: center;
-  }
-  .userAppHome_top {
-    background: #f5f5f5;
-    height: 100px;
-  }
-  .userAppHome_title {
-    font-size: 20px;
-    color: #333333;
-    letter-spacing: 1.14px;
-    margin-top: 30px;
-    margin-bottom: 30px;
-  }
-  .userAppHome_middle {
-    background: #f5f5f5;
-    min-height: 800px;
-    margin-top: 30px;
-    text-align: center;
-  }
-  .userAppHome_appBox {
-    margin: 0 auto;
-  }
-  .userAppHome_app_btn {
-    margin: auto;
-    background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%);
-    border-radius: 5px;
-    width: 170px;
-    height: 120px;
-    margin-top: 50px;
-  }
-  .userAppHome_app_logo {
-    display: inline-block;
-    vertical-align: middle;
-    font-size: 16px;
-    color: #ffffff;
-    letter-spacing: 0.91px;
-    margin-top: 15%;
-  }
-
-  /****************************************************************************
-  **** 7. 用户视图 - 手写体数字图像识别页面
-  ****************************************************************************/
-  .localMnistApp_page {
-    margin: 25px;
-    text-align: center;
-  }
-  .localMnistApp_top {
-    background: #f5f5f5;
-    height: 200px;
-  }
-  .localMnistApp_btnBox {
-    margin-top: 50px;
-  }
-  .localMnistApp_middle {
-    background: #f5f5f5;
-    min-height: 300px;
-    margin-top: 30px;
-    text-align: center;
-  }
-  .localMnistApp_title {
-    font-size: 20px;
-    color: #333333;
-    letter-spacing: 1.14px;
-    margin-top: 30px;
-    margin-bottom: 30px;
-  }
-/** 选择文件按钮样式 **/
-  .localMnistApp_input {
-    height: 60px;
-    width: 400px;
-    background: #eeeeee;
-    border: 1px solid #d9d9d9;
-    border-radius: 6px;
-    margin: 0 auto;
-  }
-  .localMnistApp_select_file_btn {
-    background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
-    border-radius: 2px;
-    background-color: Transparent; /** 使得button没有边框 **/
-    border-style: none;
-    font-size: 16px;
-    color: #ffffff;
-    letter-spacing: 0.91px;
-    height: 36px;
-    width: 40%;
-    float: left;
-    margin-top: 10px;
-    margin-left: 20px;
-  }
-  .localMnistApp_select_file_txt {
-    height: 30px;
-    width: 45%;
-    float: left;
-    margin-top: 12px;
-    background-color: Transparent; /** 使得button没有边框 **/
-    border-style: none;
-    font-size: 16px;
-    color: #333333;
-    letter-spacing: 0.91px;
-  }
-/** 进度条样式 **/
-.localMnistApp_probarBox {
+.userAppHome_page {
+  margin: 25px;
+  text-align: center;
+}
+.userAppHome_top {
+  background: #f5f5f5;
+  height: 100px;
+}
+.userAppHome_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.userAppHome_middle {
+  background: #f5f5f5;
+  min-height: 800px;
+  margin-top: 30px;
+  text-align: center;
+}
+.userAppHome_appBox {
+  margin: 0 auto;
+}
+.userAppHome_app_btn {
+  margin: auto;
+  background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%);
+  border-radius: 5px;
+  width: 170px;
+  height: 120px;
   margin-top: 50px;
 }
-.localMnistApp_probar_idx {
+.userAppHome_app_logo {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+  margin-top: 15%;
+}
+
+/****************************************************************************
+  **** 7. 用户视图 - 手写体数字图像识别页面
+  ****************************************************************************/
+.userMnistOneApp_page {
+  margin: 25px;
+  text-align: center;
+}
+.userMnistOneApp_top {
+  background: #f5f5f5;
+  min-height: 150px;
+  text-align: center;
+}
+.userMnistOneApp_middle_process {
+  background: #f5f5f5;
+  min-height: 150px;
+  margin-top: 30px;
+  text-align: center;
+}
+.userMnistOneApp_middle_ret {
+  background: #f5f5f5;
+  min-height: 200px;
+  margin-top: 30px;
+  text-align: center;
+}
+.userMnistOneApp_middle_analyse {
+  background: #f5f5f5;
+  min-height: 300px;
+  margin-top: 30px;
+  text-align: center;
+}
+.userMnistOneApp_title {
+  font-size: 20px;
+  color: #333333;
+  letter-spacing: 1.14px;
+  margin-top: 10px;
+}
+/** 选择文件样式 **/
+table.userMnistOneApp_imgSrc_table {
+  empty-cells: show;
+  border-collapse: collapse;
+  margin: 0 auto;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #333333;
+  width: 80%;
+}
+table.userMnistOneApp_imgSrc_table tr {
+  height: 40px;
+}
+
+table.userMnistOneApp_imgSrc_table tr td:nth-child(1) {
+  text-align: right;
+}
+table.userMnistOneApp_imgSrc_table tr td:nth-child(2) {
+  text-align: left;
+}
+
+table.userMnistOneApp_imgSrc_table td {
+  padding: 8px;
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+.userMnistOneApp_remoteIP_input {
+  background: #eeeeee;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  height: 50px;
+  font-size: 18px;
+  color: #999999;
+  letter-spacing: 0;
+  line-height: 14px;
+  width: 250px;
+}
+.userMnistOneApp_select_imgSrc {
+  background: #eeeeee;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  height: 50px;
+  font-size: 18px;
+  color: #999999;
+  letter-spacing: 0;
+  line-height: 14px;
+  width: 250px;
+}
+.userMnistOneApp_input {
+  height: 60px;
+  width: 400px;
+  background: #eeeeee;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  margin: 0 auto;
+}
+.userMnistOneApp_select_file_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 2px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+  height: 36px;
+  width: 20%;
+  float: left;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+.userMnistOneApp_select_file_txt {
+  height: 30px;
+  width: 65%;
+  float: left;
+  margin-top: 12px;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  font-size: 16px;
+  color: #333333;
+  letter-spacing: 0.91px;
+}
+.userMnistOneApp_startRun_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 5px;
+  width: 180px;
+  height: 40px;
+  padding-top: 2px;
+  margin-left: 60px;
+}
+.userMnistOneApp_startRun_logo {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+  padding-top: 5px;
+}
+/** 进度条样式 **/
+.userMnistOneApp_probarBox {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.userMnistOneApp_probar_idx {
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -866,43 +940,67 @@ table.imgAppRunTask_recRetTable td {
   letter-spacing: 0.91px;
   padding-top: 1%;
 }
-.localMnistApp_probar_des {
+.userMnistOneApp_probar_des {
   font-size: 16px;
   color: #333333;
   letter-spacing: 0.91px;
   margin-bottom: 10px;
   vertical-align: middle;
 }
-.localMnistApp_startRun_btn {
-  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
-  border-radius: 5px;
-  width: 100px;
-  height: 40px;
-  padding-top: 2px;
-}
-.localMnistApp_startRun_logo {
-  display: inline-block;
-  vertical-align: middle;
-  font-size: 16px;
-  color: #ffffff;
-  letter-spacing: 0.91px;
-  padding-top: 5px;
-}
-.localMnistApp_probar_logo {
+
+.userMnistOneApp_probar_logo {
   height: 33px;
   margin-top: 5px;
   background-color: #eeeeee;
   /* background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%); */
   border-radius: 15px;
 }
-.localMnistApp_probar_arrow {
+.userMnistOneApp_probar_arrow {
   height: 5px;
   width: 90%;
   background: #ffa73c;
   margin-top: 15px;
 }
 
-table.imgAppRunTask_recRetAnaTable {
+/** 图像识别结果表格 **/
+/** 显示识别结果的表格样式 **/
+.userMnistOneApp_taskResultBox {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  overflow-x: auto; /** overflow:auto 内容会被修剪，超出设置的宽高后会出现滚动条**/
+}
+table.userMnistOneApp_recRetTable {
+  empty-cells: show;
+  border-collapse: collapse;
+  margin: 0 auto;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  text-align: center;
+  font-size: 16px;
+  color: #333333;
+  width: auto;
+}
+table.userMnistOneApp_recRetTable tr {
+  height: 60px;
+}
+table.userMnistOneApp_recRetTable th {
+  white-space: nowrap;
+}
+table.userMnistOneApp_recRetTable tr td:nth-child(1) {
+  background-color: #eeeeee;
+}
+table.userMnistOneApp_recRetTable td {
+  border-width: 2px;
+  padding: 8px;
+  border-style: solid;
+  border-color: #d6d6d6;
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+/** 应用运行结果分析表格 **/
+table.userMnistOneApp_recRetAnaTable {
   empty-cells: show;
   border-collapse: collapse;
   margin: 0 auto;
@@ -912,26 +1010,63 @@ table.imgAppRunTask_recRetAnaTable {
   color: #333333;
   width: 80%;
 }
-table.imgAppRunTask_recRetAnaTable tr {
-  height: 60px;
+table.userMnistOneApp_recRetAnaTable tr {
+  height: 40px;
 }
-table.imgAppRunTask_recRetAnaTable th {
+table.userMnistOneApp_recRetAnaTable th {
   white-space: nowrap;
 }
-table.imgAppRunTask_recRetAnaTable tr td:nth-child(1) {
+table.userMnistOneApp_recRetAnaTable tr td:nth-child(1) {
   background-color: #eeeeee;
   text-align: right;
   width: 40%;
 }
-table.imgAppRunTask_recRetAnaTable tr td:nth-child(2) {
+table.userMnistOneApp_recRetAnaTable tr td:nth-child(2) {
   text-align: left;
   width: 60%;
 }
-table.imgAppRunTask_recRetAnaTable td {
+table.userMnistOneApp_recRetAnaTable td {
   border-width: 2px;
   padding: 8px;
   border-style: solid;
   border-color: #d6d6d6;
   min-width: 100px;
   white-space: nowrap;
+}
+
+/** 弹出框样式 **/
+.userMnistOneApp_alert-box {
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 30%;
+  width: 40%;
+  height: 30%;
+  padding: 10px;
+  z-index: 1002;
+  overflow: auto;
+}
+.userMnistOneApp_alert-txt {
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+  margin-top: 5%;
+}
+.userMnistOneApp_alert-btn {
+  background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
+  border-radius: 2px;
+  font-size: 20px;
+  color: #ffffff;
+  letter-spacing: 1.14px;
+  height: 47px;
+  width: 20%;
+  background-color: Transparent; /** 使得button没有边框 **/
+  border-style: none;
+  margin-top: 10%;
 }

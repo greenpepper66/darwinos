@@ -19,8 +19,8 @@ const imgAppTasksHtmlFilePath = "src/static/views/imgAppTasks.html";
  * ******************************************************************************************************
  */
 
-const log_output_channel = vscode.window.createOutputChannel("darwinos output");
-log_output_channel.show();
+// const log_output_channel = vscode.window.createOutputChannel("darwinos output");
+// log_output_channel.show();
 
 // 2. 与数字图像识别应用首页交互
 const imgAppMessageHandler = {
@@ -60,9 +60,10 @@ const imgAppMessageHandler = {
 };
 
 // 保存应用配置到json文件中
+// message.text: [appName, modelFileID, encodeMethodID, encodeConfDir, outputDir]
 function writeImgAppInfoToJson(global, message) {
-    if (message.text.length != 7 || message.text[0] == "" || message.text[1] == "" || message.text[2] == ""
-        || message.text[3] == "" || message.text[4] == "" || message.text[5] == "" || message.text[6] == "") {
+    if (message.text.length != 5 || message.text[0] == "" || message.text[1] == "" || message.text[2] == ""
+        || message.text[3] == "" || message.text[4] == "" ) {
         return "error: save failed, please check your input!";
     } else {
         // 检查名字是否重复
@@ -81,14 +82,8 @@ function writeImgAppInfoToJson(global, message) {
             imgAppConfig.createTime = createTime;
             console.log("id:", id, "time: ", createTime);
 
-            imgAppConfig.imgSrcKind = message.text[1];
-            if (imgAppConfig.imgSrcKind == "localImg") {
-                imgAppConfig.imgSrcDir = message.text[2];
-                imgAppConfig.imgNum = getImgFileNum(imgAppConfig.imgSrcDir);
-            }
-
             // 分割模型信息
-            let modelInfo = message.text[3].split(" - ");
+            let modelInfo = message.text[1].split(" - ");
             if (modelInfo.length != 4) {
                 return "error: inner error!";
             } else {
@@ -97,9 +92,9 @@ function writeImgAppInfoToJson(global, message) {
                 imgAppConfig.modelFileNodeID = modelInfo[2];
                 imgAppConfig.modelFileNodeIP = modelInfo[3];
 
-                imgAppConfig.encodeMethodID = message.text[4];
-                imgAppConfig.encodeConfigFile = message.text[5];
-                imgAppConfig.outputDir = message.text[6];
+                imgAppConfig.encodeMethodID = message.text[2];
+                imgAppConfig.encodeConfigFile = message.text[3];
+                imgAppConfig.outputDir = message.text[4];
 
                 imgAppConfig.status = 0; // 状态默认为0
 
@@ -126,7 +121,6 @@ const newImgAppMessageHandler = {
         };
         vscode.window.showOpenDialog(options).then(fileUri => {
             console.log("选择目录为", fileUri);
-            // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
             global.panel.webview.postMessage({ selectedImgDir: fileUri[0].fsPath });
         });
     },
@@ -209,29 +203,7 @@ const imgAppRunTaskMessageHandler = {
     },
 
 
-    // 开始运行应用, 先解包配置文件
-    doStartRunTask(global, message) {
-        console.log(message);
-        unpackConfigFiles(global);
-    },
 
-    // 执行脉冲编码脚本
-    startImgConvertProcess(global, message) {
-        console.log(message);
-        runImgConvertScript(global);
-    },
-
-    // 将脉冲编码文件打包
-    startPickleConvertProcess(global, message) {
-        console.log(message);
-        runPickleConvertScript(global);
-    },
-
-    // 手写体识别
-    startRecognitionProcess(global, message) {
-        console.log(message);
-        runMnistSendInputScript(global);
-    },
 
 };
 
@@ -461,221 +433,7 @@ function imgAppRunTaskAllProcess(global) {
 
 }
 
-// 0. 解包配置文件
-function unpackConfigFiles(global) {
-    console.log("start unpack config files for app: ", global.appInfo.name);
-    // 脚本位置
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "pack_bin_files.py");
 
-    let configFile = global.appInfo.encodeConfigFile;      // 配置文件
-    let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹unpack_target
-
-    let command_str = "python " + scriptPath + " " + configFile + " " + outputDir;
-    console.log("执行命令为", command_str);
-    let scriptProcess = exec(command_str, {});
-
-
-
-    scriptProcess.stdout?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        // if (data.indexOf("UNPACKCONFIG FINISHED") !== -1) {
-        //     global.panel.webview.postMessage({ unpackConfigFileProcessFinish: "unpack finish" });
-        // }
-        let formatted_data = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ unpackConfigFileProcessLog: formatted_data });
-    });
-
-    scriptProcess.stderr?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        let formatted_err = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ unpackConfigFileProcessErrorLog: formatted_err });
-    });
-
-    scriptProcess.on("exit", function () {
-        console.log("done!!");
-        let unpackPath = path.join(outputDir, "unpack_target");
-        let str = "Unpack config files finished, the result is saved in " + unpackPath;
-        global.panel.webview.postMessage({ unpackConfigFileProcessFinish: str });
-    });
-
-}
-
-// 1. 运行脉冲编码脚本
-// 根据保存的应用配置：encodeMethodID 0——李畅的频率编码， 1——宏泽的泊松编码 
-function runImgConvertScript(global) {
-    console.log("start run a task for app: ", global.appInfo.name);
-
-    // 脚本位置 encode_input.py——频率编码， poisson_encode.py——泊松编码
-    let selectedEncodeMethod = ""
-    if(global.appInfo.encodeMethodID == 0) {
-        console.log("选择频率编码")
-        selectedEncodeMethod = "encode_input.py"
-    } else if (global.appInfo.encodeMethodID == 1) {
-        console.log("选择泊松编码")
-        selectedEncodeMethod = "poisson_encode.py"
-    }
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", selectedEncodeMethod);
-
-    // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
-    let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
-    let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹pickleDir
-    let configDir = path.join(outputDir,"unpack_target");                            // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
-
-    let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
-    let imgNum = 0;
-
-    let command_str = "python " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
-    console.log("执行命令为", command_str);
-    let scriptProcess = exec(command_str, {});
-
-    scriptProcess.stdout?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        // if (data.indexOf("CONVERT FINISHED") !== -1) {
-        //     global.panel.webview.postMessage({imgConvertProcessFinish: "convert finish"});
-        // }
-        if (data.indexOf("Converting one image") !== -1) {
-            // 传递 转换成功的图像个数
-            // todo
-            imgNum++;
-            global.panel.webview.postMessage({ imgConvertOneDone: [imgNum, totalImgNum] });
-        }
-        let formatted_data = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ imgConvertProcessLog: formatted_data });
-    });
-
-    scriptProcess.stderr?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        let formatted_err = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ imgConvertProcessErrorLog: formatted_err });
-    });
-
-    scriptProcess.on("exit", function () {
-        console.log("done!!");
-        let pickPath = path.join(outputDir, "pickleDir");
-        let str = "Convert imgage into pickle finished, the result is saved in " + pickPath;
-        global.panel.webview.postMessage({ imgConvertProcessFinish: str });
-    });
-}
-
-// 2. 运行柳铮的脚本
-function runPickleConvertScript(global) {
-    console.log("start convert pickle files: ", global.appInfo.name);
-
-    // 脚本位置
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "input_out.py");
-
-    // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
-    let outputDir = global.appInfo.outputDir;            // 用户指定的输出目录
-    let configDir = path.join(outputDir,"unpack_target");                            // 配置文件目录，要保证有 connfiles1_1、 layerWidth1_1、 nodelist1_1、 input_to_layer_1.pickle 4个文件
-
-    let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
-    let imgNum = 0;
-
-    let command_str = "python " + scriptPath + " " + outputDir + " " + configDir;
-    console.log("执行命令为", command_str);
-    let scriptProcess = exec(command_str, {});
-
-    scriptProcess.stdout?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        if (data.indexOf("Converting one image") !== -1) {
-            // 传递 转换成功的图像个数
-            imgNum++;
-            global.panel.webview.postMessage({ pickleConvertOneDone: [imgNum, totalImgNum] });
-        }
-        let formatted_data = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ pickleConvertProcessLog: formatted_data });
-    });
-
-    scriptProcess.stderr?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        let formatted_err = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ pickleConvertProcessErrorLog: formatted_err });
-    });
-
-    scriptProcess.on("exit", function () {
-        console.log("done!!");
-        let str = "Convert pickle files all finished, the result is saved in " + outputDir;
-        global.panel.webview.postMessage({ pickleConvertProcessFinish: str });
-    });
-}
-
-
-// 3. 运行发送任务的脚本
-function runMnistSendInputScript(global) {
-    console.log("start mnist image recognition: ", global.appInfo.name);
-
-    // 脚本位置 mnist_send_input_back.py
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "test.py");
-    let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
-
-    // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
-    let outputDir = global.appInfo.outputDir;            // 用户指定的输出目录
-    let configDir = path.join(outputDir,"unpack_target");                         // 配置文件目录，要保证有 config.b 文件
-
-
-    let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
-    let imgNum = 0;
-
-    let command_str = "python " + scriptPath + " " + outputDir + " " + configDir;
-    console.log("执行命令为", command_str);
-    let scriptProcess = exec(command_str, {});
-
-    scriptProcess.stdout?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        if (data.indexOf("Recognize one image ok") !== -1) {
-            // 传递 转换成功的图像个数
-            imgNum++;
-            global.panel.webview.postMessage({ recognitionOneDone: [imgNum, totalImgNum] });
-        }
-
-        // 解析识别结果的输出
-        if (data.indexOf("RECOGNITION RESULT") !== -1) {
-            console.log("*************", data);
-            // 图像识别结果
-            let ret = data.split("**")[1];
-            // 对应的原始图像数据
-            let imgName = data.split("**")[2].replace(/(^\s*)|(\s*$)/g, "");
-            console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$44", ret, imgName);
-            // todo
-            let datauri = "";
-            fs.readdirSync(imgSrcDir).forEach((file, index) => {
-                console.log("tesatatat", file, index, file.indexOf(imgName));
-                if (file.indexOf(imgName) != -1) {
-                    let bData = fs.readFileSync(imgSrcDir + "/" + file);
-                    let base64Str = bData.toString('base64');
-                    datauri = 'data:image/png;base64,' + base64Str;
-                    console.log("src images datauri: ", datauri);
-                    // global.panel.webview.postMessage({ recognitionOneSrcImg: datauri });
-                }
-            });
-            global.panel.webview.postMessage({ recognitionOneResult: [ret, datauri] });
-        }
-
-        let formatted_data = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ recognitionProcessLog: formatted_data });
-    });
-
-    scriptProcess.stderr?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        let formatted_err = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ recognitionProcessErrorLog: formatted_err });
-    });
-
-    scriptProcess.on("exit", function () {
-        console.log("done!!");
-        let str = "This image recognition task is all finished！";
-        global.panel.webview.postMessage({ recognitionProcessFinish: str });
-    });
-
-}
 
 
 

@@ -55,7 +55,7 @@
                     <td>{{ imgAppInformation.modelFileNodeIP }}</td>
                 </tr>
 
-                <tr>
+                <!-- <tr>
                     <td>数据源类型</td>
                     <template v-if="imgAppInformation.imgSrcKind == 'localImg'">
                         <td>本地图像</td>
@@ -72,14 +72,14 @@
                 <tr>
                     <td>图像总数量</td>
                     <td>{{ imgAppInformation.imgNum }}</td>
-                </tr>
+                </tr> -->
                 <tr>
                     <td>图像编码方法</td>
                     <template v-if="imgAppInformation.encodeMethodID == 0">
-                        <td>默认方法</td>
+                        <td>频率编码</td>
                     </template>
-                    <template v-else>
-                        <td>其他方法</td>
+                    <template v-if="imgAppInformation.encodeMethodID == 1">
+                        <td>泊松编码</td>
                     </template>
                 </tr>
                 <tr>

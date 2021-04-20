@@ -42,20 +42,20 @@ function saveImgAppConfig() {
 
     // 获取各个输入项
     let appName = document.getElementById("newImgApp_appName").value;                // 应用名称
-    let imgSrcKind = document.getElementById("select_imgSrc_type").value;       // 数据源
-    if (imgSrcKind == "localImg") {
-        var imgDir = document.getElementById("img-local-dir").value;            // 本地图像文件夹
-    } else if (imgSrcKind == "remoteImg") {
-        var imgDir = document.getElementById("remoteIP_addr").value;
-    }
+    // let imgSrcKind = document.getElementById("select_imgSrc_type").value;       // 数据源
+    // if (imgSrcKind == "localImg") {
+    //     var imgDir = document.getElementById("img-local-dir").value;            // 本地图像文件夹
+    // } else if (imgSrcKind == "remoteImg") {
+    //     var imgDir = document.getElementById("remoteIP_addr").value;
+    // }
 
     let modelFileID = document.getElementById("select_model").value;            // 绑定模型
     let encodeMethodID = document.getElementById("encode_method_type").value;   // 编码方法
     let encodeConfDir = document.getElementById("encode_config_file").value;     // 编码配置文件所在目录
     let outputDir = document.getElementById("output_dir").value;                // 编码过程中间文件输出目录 
 
-    console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir);
-    if(appName == "" || imgSrcKind == "" || imgDir == "" || modelFileID == "" || encodeMethodID == "" || encodeConfDir == "" || outputDir == "")  {
+    console.log("获取各个输入项", appName, modelFileID, encodeMethodID, encodeConfDir, outputDir);
+    if (appName == "" || modelFileID == "" || encodeMethodID == "" || encodeConfDir == "" || outputDir == "") {
         console.log("some input is null!");
         document.getElementById("saveAppInfoModalContent").innerText = "保存失败：输入不能为空！";
         // document.getElementById("btn_saveAppInfoRetModal").click();
@@ -65,7 +65,7 @@ function saveImgAppConfig() {
 
     vscode.postMessage({
         command: 'saveImgAppConfig',
-        text: [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir],
+        text: [appName, modelFileID, encodeMethodID, encodeConfDir, outputDir],
     });
 }
 
@@ -77,20 +77,20 @@ function gotoImgAppRunTaskPageByName() {
 
     // 获取各个输入项
     let appName = document.getElementById("newImgApp_appName").value;                // 应用名称
-    let imgSrcKind = document.getElementById("select_imgSrc_type").value;       // 数据源
-    if (imgSrcKind == "localImg") {
-        var imgDir = document.getElementById("img-local-dir").value;            // 本地图像文件夹
-    } else if (imgSrcKind == "remoteImg") {
-        var imgDir = document.getElementById("remoteIP_addr").value;
-    }
+    // let imgSrcKind = document.getElementById("select_imgSrc_type").value;       // 数据源
+    // if (imgSrcKind == "localImg") {
+    //     var imgDir = document.getElementById("img-local-dir").value;            // 本地图像文件夹
+    // } else if (imgSrcKind == "remoteImg") {
+    //     var imgDir = document.getElementById("remoteIP_addr").value;
+    // }
 
     let modelFileID = document.getElementById("select_model").value;            // 绑定模型
     let encodeMethodID = document.getElementById("encode_method_type").value;   // 编码方法
     let encodeConfDir = document.getElementById("encode_config_file").value;     // 编码配置文件所在目录
     let outputDir = document.getElementById("output_dir").value;                // 编码过程中间文件输出目录 
 
-    console.log("获取各个输入项", appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir);
-    if(appName == "" || imgSrcKind == "" || imgDir == "" || modelFileID == "" || encodeMethodID == "" || encodeConfDir == "" || outputDir == "")  {
+    console.log("获取各个输入项", appName, modelFileID, encodeMethodID, encodeConfDir, outputDir);
+    if (appName == "" || modelFileID == "" || encodeMethodID == "" || encodeConfDir == "" || outputDir == "") {
         console.log("some input is null!");
         document.getElementById("saveAppInfoModalContent").innerText = "启动失败：各项输入不能为空！";
         // document.getElementById("btn_saveAppInfoRetModal").click();
@@ -101,7 +101,7 @@ function gotoImgAppRunTaskPageByName() {
     // 跳转到任务界面
     vscode.postMessage({
         command: 'gotoImgAppRunTaskPageByName',
-        text: [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir],
+        text: [appName, modelFileID, encodeMethodID, encodeConfDir, outputDir],
     });
 }
 
@@ -179,7 +179,7 @@ window.addEventListener('message', event => {
     }
 
     // 用户点击“启动应用”按钮 ，如果应用没有保存，弹出提示框
-    if(message.gotoImgAppRunTaskPageByNameRet != undefined) {
+    if (message.gotoImgAppRunTaskPageByNameRet != undefined) {
         console.log('---------------------------message：get start app ret: ', message.gotoImgAppRunTaskPageByNameRet);
         document.getElementById("saveAppInfoModalContent").innerText = "启动失败：" + message.gotoImgAppRunTaskPageByNameRet;
         // document.getElementById("btn_saveAppInfoRetModal").click();

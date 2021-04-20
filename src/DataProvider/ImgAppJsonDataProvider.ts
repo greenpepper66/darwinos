@@ -316,3 +316,32 @@ export function updateImgAppStatusToApp(context, id) {
         return "error";
     }
 }
+
+// 7. 更新一条应用信息，将应用的数据源写入
+export function updateImgAppInfo(context, id, imgSrcKind, imgSrcDir) {
+    console.log("json update imgSrc info...");
+    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    try {
+        let data = fs.readFileSync(resourcePath, 'utf-8');
+        var stringContent = data.toString();
+        var jsonContent: ImgAppJsonData = JSON.parse(stringContent);
+
+        for (var i = 0; i < jsonContent.data.length; i++) {
+            if (id == jsonContent.data[i].id) {
+                jsonContent.data[i].imgSrcKind = imgSrcKind;
+                jsonContent.data[i].imgSrcDir = imgSrcDir;
+                jsonContent.data[i].status = 1;  // 将状态置为1
+            }
+        }
+        console.log(jsonContent);
+        var str = JSON.stringify(jsonContent);//因为nodejs的写入文件只认识字符串或者二进制数，所以把json对象转换成字符串重新写入json文件中
+        fs.writeFileSync(resourcePath, str);
+        console.log('----------更新成功-------------');
+        // 更新任务导航栏
+        vscode.commands.executeCommand('task_view.refreshEntry');
+        return "success";
+    } catch (error) {
+        console.error(error);
+        return "error";
+    }
+}

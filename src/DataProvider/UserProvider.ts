@@ -5,28 +5,71 @@ import { ImgAppJsonData } from '../DataProvider/ImgAppJsonDataProvider';
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
 
 
-export class UserProvider implements vscode.TreeDataProvider<UserApp> {
-    private _onDidChangeTreeData: vscode.EventEmitter<UserApp | undefined | void> = new vscode.EventEmitter<UserApp | undefined | void>();
-    readonly onDidChangeTreeData: vscode.Event<UserApp | undefined | void> = this._onDidChangeTreeData.event;
+export class UserProvider implements vscode.TreeDataProvider<UserAppKind> {
+    private _onDidChangeTreeData: vscode.EventEmitter<UserAppKind | undefined | void> = new vscode.EventEmitter<UserAppKind | undefined | void>();
+    readonly onDidChangeTreeData: vscode.Event<UserAppKind | undefined | void> = this._onDidChangeTreeData.event;
 
 
-    public userApps: UserApp[];
+    public userAppKinds: UserAppKind[];
 
     constructor(private workspaceRoot: string) {
-        this.getUserAppsList();
+        this.userAppKinds = [];
+		var imgApp = new UserAppKind(
+			"数字图像识别",
+			UserProvider.getIconUriForLabel("数字图像识别.png"),
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: 'extension.gotoOneKindUserAppPage',
+				title: '',
+				arguments: ["imgApp", 1]
+			}
+		);
+		this.userAppKinds.push(imgApp);
+		var voiceApp = new UserAppKind(
+			"语音识别",
+			UserProvider.getIconUriForLabel("语音识别.png"),
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: '',
+				title: '',
+				arguments: []
+			}
+		);
+		this.userAppKinds.push(voiceApp);
+		var brainApp = new UserAppKind(
+			"脑电模拟",
+			UserProvider.getIconUriForLabel("脑电模拟.png"),
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: '',
+				title: '',
+				arguments: []
+			}
+		);
+		this.userAppKinds.push(brainApp);
+		var otherApp = new UserAppKind(
+			"其它应用",
+			UserProvider.getIconUriForLabel("其它应用.png"),
+			vscode.TreeItemCollapsibleState.None,
+			{
+				command: '',
+				title: '',
+				arguments: []
+			}
+		);
+		this.userAppKinds.push(otherApp);
     }
 
     refresh(): void {
-        this.getUserAppsList();
         this._onDidChangeTreeData.fire();
     }
 
-    getTreeItem(element: UserApp): vscode.TreeItem {
+    getTreeItem(element: UserAppKind): vscode.TreeItem {
         return element;
     }
 
-    getChildren(element?: UserApp): Thenable<UserApp[]> {
-        return Promise.resolve(this.userApps);
+    getChildren(element?: UserAppKind): Thenable<UserAppKind[]> {
+        return Promise.resolve(this.userAppKinds);
     }
 
 
@@ -34,42 +77,55 @@ export class UserProvider implements vscode.TreeDataProvider<UserApp> {
         return vscode.Uri.file(path.join(__filename, "..", "..", "..", "media", "light", name));
     }
 
-    public getUserAppsList() {
-        this.userApps = [];
-        console.log("task list searching ...", __filename);
-        let resourcePath = path.join(__filename, "..", "..", "..", imgAppsConfigFile);
-        let data = fs.readFileSync(resourcePath, 'utf-8');
-        let stringContent = data.toString();//将二进制的数据转换为字符串
-        let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
+    // public getUserAppsList() {
+    //     this.userApps = [];
+    //     console.log("task list searching ...", __filename);
+    //     let resourcePath = path.join(__filename, "..", "..", "..", imgAppsConfigFile);
+    //     let data = fs.readFileSync(resourcePath, 'utf-8');
+    //     let stringContent = data.toString();//将二进制的数据转换为字符串
+    //     let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
 
-        for (var i = 0; i < jsonContent.data.length; i++) {
-            var appId = jsonContent.data[i].id;
-            var name = jsonContent.data[i].name;
-            var modelID = jsonContent.data[i].modeFileID;
-            var nodeID = jsonContent.data[i].modelFileNodeID;
-            var nodeIP = jsonContent.data[i].modelFileNodeIP;
+    //     for (var i = 0; i < jsonContent.data.length; i++) {
+    //         var appId = jsonContent.data[i].id;
+    //         var name = jsonContent.data[i].name;
+    //         var modelID = jsonContent.data[i].modeFileID;
+    //         var nodeID = jsonContent.data[i].modelFileNodeID;
+    //         var nodeIP = jsonContent.data[i].modelFileNodeIP;
 
-            var task = new UserApp(
-                name,
-                vscode.TreeItemCollapsibleState.None,
-                appId,
-                modelID,
-                nodeID,
-                nodeIP,
-                {
-                    command: 'extension.gotoOneUserAppPage',
-                    title: '',
-                    arguments: [name, "用户应用"]
-                }
-            );
-            this.userApps.push(task);
-        }
-    }
+    //         var app = new UserApp(
+    //             name,
+    //             vscode.TreeItemCollapsibleState.None,
+    //             appId,
+    //             modelID,
+    //             nodeID,
+    //             nodeIP,
+    //             {
+    //                 command: 'extension.gotoOneUserAppPage',
+    //                 title: '',
+    //                 arguments: [name, "用户应用"]
+    //             }
+    //         );
+    //         this.userApps.push(app);
+    //     }
+    // }
 
 }
 
 
-export class UserApp extends vscode.TreeItem {
+export class UserAppKind extends vscode.TreeItem {
+	constructor(
+		public readonly label: string,
+		public readonly iconPath: vscode.Uri,
+		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+		public readonly command?: vscode.Command
+	) {
+		super(label, collapsibleState);
+	}
+
+	contextValue = 'user-view Application Kind';
+}
+
+export class UserAppItem extends vscode.TreeItem {
     constructor(
         public readonly label: string,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
@@ -84,9 +140,9 @@ export class UserApp extends vscode.TreeItem {
         super(label, collapsibleState);
     }
     iconPath = {
-		light: path.join(__filename, '..', '..', '..', 'media', 'light', '文件.png'),
-		dark: path.join(__filename, '..', '..', 'media', 'dark', 'document.svg')
-	};
+        light: path.join(__filename, '..', '..', '..', 'media', 'light', '文件.png'),
+        dark: path.join(__filename, '..', '..', 'media', 'dark', 'document.svg')
+    };
 
     contextValue = 'User Application';
 }

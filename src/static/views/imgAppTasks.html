@@ -87,6 +87,7 @@
                 <table class="imgAppTasks_page_table-list" id="imgAppTasksTable">
                     <thead>
                         <tr>
+                            <th>编号</th>
                             <th>任务ID</th>
                             <th>任务名称</th>
                             <th>任务类型</th>
@@ -99,18 +100,24 @@
                     <tbody>
                         <template v-if="imgAppTasksList.length == 0">
                             <tr>
-                                <template v-for="j in 7">
+                                <template v-for="j in 8">
                                     <td :key="j">-</td>
                                 </template>
                             </tr>
                         </template>
                         <template>
                             <tr v-for="(item, index) in imgAppTasksList" :key="item.id">
+                                <td>{{ index + 1 }}</td>
                                 <td>{{ item.id }}</td>
                                 <td>{{ item.name }}</td>
                                 <td>数字图像识别</td>
                                 <td>{{ item.modeFileID }}</td>
-                                <td>{{ item.encodeMethodID }}</td>
+                                <template v-if="item.encodeMethodID == 0">
+                                    <td>频率编码</td>
+                                </template>
+                                <template v-else-if="item.encodeMethodID == 1">
+                                    <td>泊松编码</td>
+                                </template>
                                 <td>{{ item.createTime }}</td>
                                 <td>
                                     <button type="button" class="imgAppTasks_detail_btn"

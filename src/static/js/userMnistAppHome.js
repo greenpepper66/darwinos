@@ -65,13 +65,19 @@ new Vue({
             this.userAppsList = userAppsList;
             this.appsRowsCount = Math.ceil(userAppsList.length / 3);  // 向上取整
             console.log("行数： ", this.appsRowsCount);
-            
         });
     },
     watch: {
 
     },
     methods: {
-
-    }
+        gotoOneMnistUserAppPage(id) {
+            console.log("run app: ", id);
+            // 给插件发送消息 跳转到用户应用页面
+            vscode.postMessage({
+                command: 'gotoOneMnistUserAppPage',
+                text: id,
+            });
+        },
+    } 
 });
