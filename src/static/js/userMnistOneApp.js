@@ -34,6 +34,11 @@ function userAppSelectImgDir() {
 }
 
 function userAppStartRun() {
+    // 清空进度条
+    document.getElementById("png_convert_progress_div").style.width = "0%";
+    document.getElementById("pickle_convert_progress_div").style.width = "0%";
+    document.getElementById("recognition_task_progress_div").style.width = "0%";
+
     // 保存图像源信息
     console.log("start run task button is clicked.");
     let imgKind = document.getElementById("userMnistOneApp_select_imgSrc_type").value;
@@ -53,12 +58,6 @@ function userAppStartRun() {
         command: 'userAppStartRun',
         text: [imgKind, imgDir]
     });
-
-    // 清空进度条
-    document.getElementById("png_convert_progress_div").style.width = "0%";
-    document.getElementById("pickle_convert_progress_div").style.width = "0%";
-    document.getElementById("recognition_task_progress_div").style.width = "0%";
-
 
     // 清空结果
 
@@ -114,9 +113,12 @@ window.addEventListener('message', event => {
         document.getElementById("userMnistOneApp_select_file_ret").value = message.userAppSelectImgDirRet;
     }
 
+    // 获取图像数量
+    if (message.userAppStartRunReturnImgNum != undefined) {
+        console.log('---------------------------message：get img num', userAppStartRunReturnImgNum);
+        document.getElementById("userAppInfo_imgNum").innerHTML = message.userAppStartRunReturnImgNum;
+    }
 
-
-    
 
 
     // 0. 解包配置文件的脚本
@@ -250,7 +252,22 @@ new Vue({
 
     },
     methods: {
-
+        userAppGotoImgAppInfoPage(imgAppID) {
+            console.log("search app: ", imgAppID);
+            // 给插件发送消息 跳转到详情页
+            vscode.postMessage({
+                command: 'userAppGotoImgAppInfoPage',
+                text: imgAppID,
+            });
+        },
+        userAppGotoImgAppTaskPage(imgAppID) {
+            console.log("run app: ", imgAppID);
+            // 给插件发送消息 跳转到任务页面
+            vscode.postMessage({
+                command: 'userAppGotoImgAppTaskPage',
+                text: imgAppID,
+            });
+        },
     }
 });
 

@@ -2,9 +2,10 @@
 ** UI设计后调整
 ** 0. common style
 **********************************************************************************************/
-table,
-td {
-  border-collapse: collapse; /** 合并单元格边框 */
+
+table, td {
+  border-collapse: collapse;
+  /** 合并单元格边框 */
 }
 
 body {
@@ -16,10 +17,12 @@ body {
 /****************************************************************************
   **** 1. 图像识别首页-应用列表
   ****************************************************************************/
+
 .imgAppHome_page {
   margin: 25px;
   text-align: center;
 }
+
 .imgAppHome_top {
   margin-top: 25px;
   height: 150px;
@@ -37,26 +40,28 @@ table.imgAppHome_page_table-search {
   margin: auto;
   margin-top: 35px;
 }
+
 table.imgAppHome_page_table-search tr {
   padding: 8px;
   height: 70px;
 }
-table.imgAppHome_page_table-search tr td:nth-child(1),
-table.imgAppHome_page_table-search tr td:nth-child(3) {
+
+table.imgAppHome_page_table-search tr td:nth-child(1), table.imgAppHome_page_table-search tr td:nth-child(3) {
   text-align: right;
   padding-right: 20px;
 }
-table.imgAppHome_page_table-search tr td:nth-child(2),
-table.imgAppHome_page_table-search tr td:nth-child(4),
-table.imgAppHome_page_table-search tr td:nth-child(5) {
+
+table.imgAppHome_page_table-search tr td:nth-child(2), table.imgAppHome_page_table-search tr td:nth-child(4), table.imgAppHome_page_table-search tr td:nth-child(5) {
   text-align: left;
 }
+
 .imgAppHome_search_title {
   font-size: 16px;
   color: #333333;
   letter-spacing: 0.91px;
   vertical-align: middle;
 }
+
 .imgAppHome_inputBox {
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -67,21 +72,25 @@ table.imgAppHome_page_table-search tr td:nth-child(5) {
   line-height: 14px;
   width: 80%;
 }
+
 .imgAppHome_search_btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
   height: 45px;
   width: 111px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   font-size: 16px;
   color: #ffffff;
   letter-spacing: 0.91px;
 }
+
 .imgAppHome_newApp_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 2px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   height: 45px;
   width: 220px;
@@ -95,6 +104,7 @@ table.imgAppHome_page_table-search tr td:nth-child(5) {
   height: 80%;
   min-height: 1100px;
 }
+
 .imgAppHome_title {
   font-size: 20px;
   color: #333333;
@@ -102,11 +112,12 @@ table.imgAppHome_page_table-search tr td:nth-child(5) {
   margin-top: 30px;
   margin-bottom: 30px;
 }
-.imgAppHome_detail_btn,
-.imgAppHome_runApp_btn {
+
+.imgAppHome_detail_btn, .imgAppHome_runApp_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 2px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   font-size: 12px;
   color: #ffffff;
@@ -115,10 +126,12 @@ table.imgAppHome_page_table-search tr td:nth-child(5) {
   width: 73px;
   margin-right: 10px;
 }
+
 .imgAppHome_delete_btn {
   background-image: linear-gradient(180deg, #ffc4b9 0%, #ff8777 100%);
   border-radius: 2px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   font-size: 12px;
   color: #ffffff;
@@ -153,6 +166,7 @@ table.imgAppHome_page_table-list tr {
 }
 
 /** 模型部署结果弹出框 **/
+
 .imgAppHome_deploy_alert-box {
   background-color: #ffffff;
   border: 1px solid #d6d6d6;
@@ -160,7 +174,6 @@ table.imgAppHome_page_table-list tr {
   font-size: 22px;
   color: #333333;
   letter-spacing: 1.6px;
-
   display: none;
   position: absolute;
   top: 25%;
@@ -171,12 +184,14 @@ table.imgAppHome_page_table-list tr {
   z-index: 1002;
   overflow: auto;
 }
+
 .imgAppHome_deploy_alert-txt {
   font-size: 22px;
   color: #333333;
   letter-spacing: 1.6px;
   margin-top: 5%;
 }
+
 .imgAppHome_deploy_alert-btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
@@ -185,7 +200,8 @@ table.imgAppHome_page_table-list tr {
   letter-spacing: 1.14px;
   height: 47px;
   width: 20%;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   margin-top: 10%;
 }
@@ -193,10 +209,12 @@ table.imgAppHome_page_table-list tr {
 /****************************************************************************
   **** 2. 图像识别-任务列表
   ****************************************************************************/
+
 .imgAppTasks_page {
   margin: 25px;
   text-align: center;
 }
+
 .imgAppTasks_top {
   margin-top: 25px;
   height: 150px;
@@ -214,26 +232,28 @@ table.imgAppTasks_page_table-search {
   margin: auto;
   margin-top: 35px;
 }
+
 table.imgAppTasks_page_table-search tr {
   padding: 8px;
   height: 70px;
 }
-table.imgAppTasks_page_table-search tr td:nth-child(1),
-table.imgAppTasks_page_table-search tr td:nth-child(3) {
+
+table.imgAppTasks_page_table-search tr td:nth-child(1), table.imgAppTasks_page_table-search tr td:nth-child(3) {
   text-align: right;
   padding-right: 20px;
 }
-table.imgAppTasks_page_table-search tr td:nth-child(2),
-table.imgAppTasks_page_table-search tr td:nth-child(4),
-table.imgAppTasks_page_table-search tr td:nth-child(5) {
+
+table.imgAppTasks_page_table-search tr td:nth-child(2), table.imgAppTasks_page_table-search tr td:nth-child(4), table.imgAppTasks_page_table-search tr td:nth-child(5) {
   text-align: left;
 }
+
 .imgAppTasks_search_title {
   font-size: 16px;
   color: #333333;
   letter-spacing: 0.91px;
   vertical-align: middle;
 }
+
 .imgAppTasks_inputBox {
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -244,21 +264,25 @@ table.imgAppTasks_page_table-search tr td:nth-child(5) {
   line-height: 14px;
   width: 80%;
 }
+
 .imgAppTasks_search_btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
   height: 45px;
   width: 111px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   font-size: 16px;
   color: #ffffff;
   letter-spacing: 0.91px;
 }
+
 .imgAppTasks_newTask_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 2px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   height: 45px;
   width: 220px;
@@ -272,6 +296,7 @@ table.imgAppTasks_page_table-search tr td:nth-child(5) {
   height: 80%;
   min-height: 1100px;
 }
+
 .imgAppTasks_title {
   font-size: 20px;
   color: #333333;
@@ -279,10 +304,12 @@ table.imgAppTasks_page_table-search tr td:nth-child(5) {
   margin-top: 30px;
   margin-bottom: 30px;
 }
+
 .imgAppTasks_detail_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 2px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   font-size: 12px;
   color: #ffffff;
@@ -291,10 +318,12 @@ table.imgAppTasks_page_table-search tr td:nth-child(5) {
   width: 73px;
   margin-right: 10px;
 }
+
 .imgAppTasks_delete_btn {
   background-image: linear-gradient(180deg, #ffc4b9 0%, #ff8777 100%);
   border-radius: 2px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   font-size: 12px;
   color: #ffffff;
@@ -331,14 +360,17 @@ table.imgAppTasks_page_table-list tr {
 /****************************************************************************
   **** 3. 应用视图首页
   ****************************************************************************/
+
 table.appMain_page_tab {
   width: 80%;
   margin: auto;
   margin-top: 50px;
 }
+
 table.appMain_page_tab tr {
   height: 400px;
 }
+
 .imgApp_logo_outBox {
   width: 60%;
   height: 300px;
@@ -349,19 +381,23 @@ table.appMain_page_tab tr {
   padding-left: 20px;
   padding-right: 20px;
 }
+
 .imgApp_logo_inBox {
   margin: 0 auto;
   margin-top: 20px;
   height: 200px;
   background-image: linear-gradient(180deg, #fbfbfb 0%, #ececec 100%);
 }
+
 .imgApp_logo {
   margin-top: 50px;
 }
+
 .imgApp_title_box {
   background: #e6d4bd;
   height: 60px;
 }
+
 .imgApp_title {
   font-family: SourceHanSansCN-Normal;
   font-size: 32px;
@@ -373,18 +409,21 @@ table.appMain_page_tab tr {
 /****************************************************************************
   **** 4. 应用视图 - 图像识别应用详情页面
   ****************************************************************************/
+
 .imgAppInfo_page {
   text-align: center;
   min-height: 1300px;
   background-color: #f5f5f5;
   margin: 25px;
 }
+
 .imgAppInfo_title {
   font-size: 20px;
   color: #333333;
   letter-spacing: 1.14px;
   padding-top: 35px;
 }
+
 table.imgAppInfo_table {
   font-family: verdana, arial, sans-serif;
   border-collapse: collapse;
@@ -393,9 +432,11 @@ table.imgAppInfo_table {
   width: 80%;
   margin-top: 25px;
 }
+
 table.imgAppInfo_table tr {
   height: 70px;
 }
+
 table.imgAppInfo_table tr td:nth-child(1) {
   text-align: right;
   padding-right: 20px;
@@ -415,15 +456,18 @@ table.imgAppInfo_table td {
   border-style: solid;
   border-color: #d6d6d6;
 }
+
 /****************************************************************************
   **** 5. 应用视图 - 新建图像识别应用 页面
   ****************************************************************************/
+
 .newImgApp_page {
   text-align: center;
   min-height: 1300px;
   background-color: #f5f5f5;
   margin: 25px;
 }
+
 .newImgApp_title {
   font-family: SourceHanSansCN-Normal;
   font-size: 20px;
@@ -431,6 +475,7 @@ table.imgAppInfo_table td {
   letter-spacing: 1.14px;
   padding-top: 50px;
 }
+
 table.newImgApp_table {
   font-family: verdana, arial, sans-serif;
   border-collapse: collapse;
@@ -441,9 +486,11 @@ table.newImgApp_table {
   color: #333333;
   letter-spacing: 1.26px;
 }
+
 table.newImgApp_table tr {
   height: 80px;
 }
+
 table.newImgApp_table tr td:nth-child(1) {
   text-align: right;
   padding-right: 20px;
@@ -460,14 +507,7 @@ table.newImgApp_table td {
   padding: 8px;
 }
 
-.newImgApp_app_name,
-.newImgApp_imgSrc_type,
-.newImgApp_configSrc_type,
-.newImgApp_remoteIP_addr,
-.newImgApp_select_model,
-.newImgApp_select_encodeMethod,
-.newImgApp_select_retShow_way,
-.newImgApp_remoteIP_forRet {
+.newImgApp_app_name, .newImgApp_imgSrc_type, .newImgApp_configSrc_type, .newImgApp_remoteIP_addr, .newImgApp_select_model, .newImgApp_select_encodeMethod, .newImgApp_select_retShow_way, .newImgApp_remoteIP_forRet {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -477,6 +517,7 @@ table.newImgApp_table td {
   letter-spacing: 0;
   line-height: 14px;
 }
+
 .newImgApp_btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
@@ -485,12 +526,12 @@ table.newImgApp_table td {
   letter-spacing: 1.03px;
   height: 47px;
   width: 20%;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
 }
-.newImgApp_ImgSrc_dir,
-.newImgApp_configFile,
-.newImgApp_output_dir {
+
+.newImgApp_ImgSrc_dir, .newImgApp_configFile, .newImgApp_output_dir {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -502,6 +543,7 @@ table.newImgApp_table td {
 .newImgApp_btnBox {
   margin-top: 90px;
 }
+
 .newImgApp_btn_runApp {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
@@ -510,9 +552,11 @@ table.newImgApp_table td {
   letter-spacing: 1.14px;
   height: 47px;
   width: 150px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
 }
+
 .newImgApp_btn_saveApp {
   background: #eeeeee;
   border: 1px solid #d7d7d7;
@@ -527,6 +571,7 @@ table.newImgApp_table td {
 }
 
 /** 弹出框样式 **/
+
 .newImgApp_alert-box {
   background-color: #ffffff;
   border: 1px solid #d6d6d6;
@@ -544,12 +589,14 @@ table.newImgApp_table td {
   z-index: 1002;
   overflow: auto;
 }
+
 .newImgApp_alert-txt {
   font-size: 22px;
   color: #333333;
   letter-spacing: 1.6px;
   margin-top: 5%;
 }
+
 .newImgApp_alert-btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
@@ -558,54 +605,64 @@ table.newImgApp_table td {
   letter-spacing: 1.14px;
   height: 47px;
   width: 20%;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   margin-top: 10%;
 }
+
 /****************************************************************************
   **** 6. 任务视图 - 任务详情 页面
   ****************************************************************************/
+
 .imgAppRunTask_page {
   margin: 25px;
 }
+
 .imgAppRunTask_top {
   background: #f5f5f5;
   height: 190px;
 }
+
 .imgAppRunTask_taskDescBox {
   margin: 25px;
 }
+
 .imgAppRunTask_title {
   font-size: 20px;
   color: #333333;
   letter-spacing: 1.14px;
   margin-bottom: 20px;
 }
+
 .imgAppRunTask_desc {
   font-size: 16px;
   color: #333333;
   letter-spacing: 0.91px;
   line-height: 20px;
 }
+
 .imgAppRunTask_middle {
   background: #f5f5f5;
   height: 250px;
   margin-top: 30px;
   text-align: center;
 }
+
 .imgAppRunTask_middle_ret {
   background: #f5f5f5;
   height: 250px;
   margin-top: 30px;
   text-align: center;
 }
-.imgAppRunTask_probar_title,
-.imgAppRunTask_ret_title {
+
+.imgAppRunTask_probar_title, .imgAppRunTask_ret_title {
   font-size: 20px;
   color: #333333;
   letter-spacing: 1.14px;
   margin-top: 30px;
 }
+
 .imgAppRunTask_probarBox {
   margin-top: 50px;
 }
@@ -614,9 +671,7 @@ table.newImgApp_table td {
   font-family: "Material Icons";
   font-style: normal;
   font-weight: 400;
-  src: local("Material Icons"), local("MaterialIcons-Regular"),
-    url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2)
-      format("woff2");
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2) format("woff2");
 }
 
 .material-icons {
@@ -641,6 +696,7 @@ table.newImgApp_table td {
   height: 45px;
   padding-top: 6px;
 }
+
 .imgAppRunTask_startRun_logo {
   display: inline-block;
   vertical-align: middle;
@@ -649,6 +705,7 @@ table.newImgApp_table td {
   letter-spacing: 0.91px;
   padding-top: 5px;
 }
+
 .imgAppRunTask_probar_idx {
   width: 26px;
   height: 26px;
@@ -662,6 +719,7 @@ table.newImgApp_table td {
   letter-spacing: 0.91px;
   padding-top: 1%;
 }
+
 .imgAppRunTask_probar_des {
   font-size: 16px;
   color: #333333;
@@ -669,6 +727,7 @@ table.newImgApp_table td {
   margin-bottom: 10px;
   vertical-align: middle;
 }
+
 .imgAppRunTask_probar_logo {
   height: 33px;
   margin-top: 5px;
@@ -676,26 +735,33 @@ table.newImgApp_table td {
   /* background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%); */
   border-radius: 15px;
 }
+
 .imgAppRunTask_probar_arrow {
   height: 5px;
   width: 90%;
   background: #ffa73c;
   margin-top: 15px;
 }
+
 .progress-bar-info {
   background-color: #a5cbff;
 }
+
 .progress-bar {
   opacity: 0.7;
   background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%);
 }
+
 /** 显示识别结果的表格样式 **/
+
 .imgAppRunTask_taskResultBox {
   width: 90%;
   margin-left: 5%;
   margin-right: 5%;
-  overflow-x: auto; /** overflow:auto 内容会被修剪，超出设置的宽高后会出现滚动条**/
+  overflow-x: auto;
+  /** overflow:auto 内容会被修剪，超出设置的宽高后会出现滚动条**/
 }
+
 table.imgAppRunTask_recRetTable {
   empty-cells: show;
   border-collapse: collapse;
@@ -706,15 +772,19 @@ table.imgAppRunTask_recRetTable {
   color: #333333;
   width: auto;
 }
+
 table.imgAppRunTask_recRetTable tr {
   height: 60px;
 }
+
 table.imgAppRunTask_recRetTable th {
   white-space: nowrap;
 }
+
 table.imgAppRunTask_recRetTable tr td:nth-child(1) {
   background-color: #eeeeee;
 }
+
 table.imgAppRunTask_recRetTable td {
   border-width: 2px;
   padding: 8px;
@@ -723,12 +793,14 @@ table.imgAppRunTask_recRetTable td {
   min-width: 100px;
   white-space: nowrap;
 }
+
 .imgAppRunTask_bottom {
   min-height: 1600px;
   margin-top: 30px;
   text-align: center;
   background: #f5f5f5;
 }
+
 .imgAppRunTask_chip_title {
   font-size: 20px;
   color: #333333;
@@ -746,14 +818,17 @@ table.imgAppRunTask_recRetTable td {
 /****************************************************************************
   **** 7. 用户视图 - 首页
   ****************************************************************************/
+
 .userAppHome_page {
   margin: 25px;
   text-align: center;
 }
+
 .userAppHome_top {
   background: #f5f5f5;
   height: 100px;
 }
+
 .userAppHome_title {
   font-size: 20px;
   color: #333333;
@@ -761,15 +836,18 @@ table.imgAppRunTask_recRetTable td {
   margin-top: 30px;
   margin-bottom: 30px;
 }
+
 .userAppHome_middle {
   background: #f5f5f5;
   min-height: 800px;
   margin-top: 30px;
   text-align: center;
 }
+
 .userAppHome_appBox {
   margin: 0 auto;
 }
+
 .userAppHome_app_btn {
   margin: auto;
   background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%);
@@ -778,6 +856,7 @@ table.imgAppRunTask_recRetTable td {
   height: 120px;
   margin-top: 50px;
 }
+
 .userAppHome_app_logo {
   display: inline-block;
   vertical-align: middle;
@@ -790,40 +869,48 @@ table.imgAppRunTask_recRetTable td {
 /****************************************************************************
   **** 7. 用户视图 - 手写体数字图像识别页面
   ****************************************************************************/
+
 .userMnistOneApp_page {
   margin: 25px;
   text-align: center;
 }
+
 .userMnistOneApp_top {
   background: #f5f5f5;
   min-height: 150px;
   text-align: center;
 }
+
 .userMnistOneApp_middle_process {
   background: #f5f5f5;
   min-height: 150px;
   margin-top: 30px;
   text-align: center;
 }
+
 .userMnistOneApp_middle_ret {
   background: #f5f5f5;
   min-height: 200px;
   margin-top: 30px;
   text-align: center;
 }
+
 .userMnistOneApp_middle_analyse {
   background: #f5f5f5;
   min-height: 300px;
   margin-top: 30px;
   text-align: center;
 }
+
 .userMnistOneApp_title {
   font-size: 20px;
   color: #333333;
   letter-spacing: 1.14px;
   margin-top: 10px;
 }
+
 /** 选择文件样式 **/
+
 table.userMnistOneApp_imgSrc_table {
   empty-cells: show;
   border-collapse: collapse;
@@ -834,6 +921,7 @@ table.userMnistOneApp_imgSrc_table {
   color: #333333;
   width: 80%;
 }
+
 table.userMnistOneApp_imgSrc_table tr {
   height: 40px;
 }
@@ -841,6 +929,7 @@ table.userMnistOneApp_imgSrc_table tr {
 table.userMnistOneApp_imgSrc_table tr td:nth-child(1) {
   text-align: right;
 }
+
 table.userMnistOneApp_imgSrc_table tr td:nth-child(2) {
   text-align: left;
 }
@@ -862,6 +951,7 @@ table.userMnistOneApp_imgSrc_table td {
   line-height: 14px;
   width: 250px;
 }
+
 .userMnistOneApp_select_imgSrc {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
@@ -873,47 +963,53 @@ table.userMnistOneApp_imgSrc_table td {
   line-height: 14px;
   width: 250px;
 }
+
 .userMnistOneApp_input {
   height: 60px;
-  width: 400px;
+  width: 250px;
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
   margin: 0 auto;
 }
+
 .userMnistOneApp_select_file_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 2px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   font-size: 16px;
   color: #ffffff;
   letter-spacing: 0.91px;
   height: 36px;
-  width: 20%;
+  width: 35%;
   float: left;
   margin-top: 10px;
-  margin-left: 20px;
+  margin-left: 5px;
 }
+
 .userMnistOneApp_select_file_txt {
   height: 30px;
-  width: 65%;
+  width: 50%;
   float: left;
   margin-top: 12px;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   font-size: 16px;
   color: #333333;
   letter-spacing: 0.91px;
 }
+
 .userMnistOneApp_startRun_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 5px;
   width: 180px;
   height: 40px;
   padding-top: 2px;
-  margin-left: 60px;
 }
+
 .userMnistOneApp_startRun_logo {
   display: inline-block;
   vertical-align: middle;
@@ -922,11 +1018,14 @@ table.userMnistOneApp_imgSrc_table td {
   letter-spacing: 0.91px;
   padding-top: 5px;
 }
+
 /** 进度条样式 **/
+
 .userMnistOneApp_probarBox {
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
 .userMnistOneApp_probar_idx {
   width: 26px;
   height: 26px;
@@ -940,6 +1039,7 @@ table.userMnistOneApp_imgSrc_table td {
   letter-spacing: 0.91px;
   padding-top: 1%;
 }
+
 .userMnistOneApp_probar_des {
   font-size: 16px;
   color: #333333;
@@ -955,6 +1055,7 @@ table.userMnistOneApp_imgSrc_table td {
   /* background-image: linear-gradient(180deg, #a5cbff 0%, #77a4ff 100%); */
   border-radius: 15px;
 }
+
 .userMnistOneApp_probar_arrow {
   height: 5px;
   width: 90%;
@@ -963,13 +1064,17 @@ table.userMnistOneApp_imgSrc_table td {
 }
 
 /** 图像识别结果表格 **/
+
 /** 显示识别结果的表格样式 **/
+
 .userMnistOneApp_taskResultBox {
   width: 90%;
   margin-left: 5%;
   margin-right: 5%;
-  overflow-x: auto; /** overflow:auto 内容会被修剪，超出设置的宽高后会出现滚动条**/
+  overflow-x: auto;
+  /** overflow:auto 内容会被修剪，超出设置的宽高后会出现滚动条**/
 }
+
 table.userMnistOneApp_recRetTable {
   empty-cells: show;
   border-collapse: collapse;
@@ -981,15 +1086,19 @@ table.userMnistOneApp_recRetTable {
   color: #333333;
   width: auto;
 }
+
 table.userMnistOneApp_recRetTable tr {
   height: 60px;
 }
+
 table.userMnistOneApp_recRetTable th {
   white-space: nowrap;
 }
+
 table.userMnistOneApp_recRetTable tr td:nth-child(1) {
   background-color: #eeeeee;
 }
+
 table.userMnistOneApp_recRetTable td {
   border-width: 2px;
   padding: 8px;
@@ -1000,6 +1109,7 @@ table.userMnistOneApp_recRetTable td {
 }
 
 /** 应用运行结果分析表格 **/
+
 table.userMnistOneApp_recRetAnaTable {
   empty-cells: show;
   border-collapse: collapse;
@@ -1010,21 +1120,33 @@ table.userMnistOneApp_recRetAnaTable {
   color: #333333;
   width: 80%;
 }
+
 table.userMnistOneApp_recRetAnaTable tr {
   height: 40px;
 }
+
 table.userMnistOneApp_recRetAnaTable th {
   white-space: nowrap;
 }
+
 table.userMnistOneApp_recRetAnaTable tr td:nth-child(1) {
   background-color: #eeeeee;
   text-align: right;
-  width: 40%;
 }
+
+table.userMnistOneApp_recRetAnaTable tr td:nth-child(3) {
+  background-color: #eeeeee;
+  text-align: right;
+}
+
 table.userMnistOneApp_recRetAnaTable tr td:nth-child(2) {
   text-align: left;
-  width: 60%;
 }
+
+table.userMnistOneApp_recRetAnaTable tr td:nth-child(4) {
+  text-align: left;
+}
+
 table.userMnistOneApp_recRetAnaTable td {
   border-width: 2px;
   padding: 8px;
@@ -1035,6 +1157,7 @@ table.userMnistOneApp_recRetAnaTable td {
 }
 
 /** 弹出框样式 **/
+
 .userMnistOneApp_alert-box {
   background-color: #ffffff;
   border: 1px solid #d6d6d6;
@@ -1052,12 +1175,14 @@ table.userMnistOneApp_recRetAnaTable td {
   z-index: 1002;
   overflow: auto;
 }
+
 .userMnistOneApp_alert-txt {
   font-size: 22px;
   color: #333333;
   letter-spacing: 1.6px;
   margin-top: 5%;
 }
+
 .userMnistOneApp_alert-btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
@@ -1066,7 +1191,17 @@ table.userMnistOneApp_recRetAnaTable td {
   letter-spacing: 1.14px;
   height: 47px;
   width: 20%;
-  background-color: Transparent; /** 使得button没有边框 **/
+  background-color: Transparent;
+  /** 使得button没有边框 **/
   border-style: none;
   margin-top: 10%;
+}
+
+.userMnistOneApp_detail_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 5px;
+  width: 180px;
+  height: 40px;
+  padding-top: 2px;
+  border-style: none;
 }

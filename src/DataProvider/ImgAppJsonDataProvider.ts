@@ -318,7 +318,7 @@ export function updateImgAppStatusToApp(context, id) {
 }
 
 // 7. 更新一条应用信息，将应用的数据源写入
-export function updateImgAppInfo(context, id, imgSrcKind, imgSrcDir) {
+export function updateImgAppInfo(context, id, imgSrcKind, imgSrcDir, totalImgNum) {
     console.log("json update imgSrc info...");
     let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     try {
@@ -331,6 +331,7 @@ export function updateImgAppInfo(context, id, imgSrcKind, imgSrcDir) {
                 jsonContent.data[i].imgSrcKind = imgSrcKind;
                 jsonContent.data[i].imgSrcDir = imgSrcDir;
                 jsonContent.data[i].status = 1;  // 将状态置为1
+                jsonContent.data[i].imgNum = totalImgNum;
             }
         }
         console.log(jsonContent);

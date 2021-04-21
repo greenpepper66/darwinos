@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { exec } from "child_process";
 import { searchAllJson, deleteJson, searchImgAppByName, updateImgAppInfo, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToTask, updateImgAppStatusToApp, checkImgAppExist, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
-
+import { openImgAppInfoPage, openImgAppRunTaskPage } from './ImgAppHome';
 
 // 日志输出
 const log_output_channel = vscode.window.createOutputChannel("darwinos output");
@@ -66,19 +66,20 @@ const oneUserAppMessageHandler = {
     },
 
     userAppStartRun(global, message) {
-        // 保存图像源信息 并 修改状态 0-1，成为一条任务
-        let ret = updateImgAppInfo(global.context, global.appInfo.id, message.text[0], message.text[1]);
-        console.log("deleteAppConfig ret: ", ret);
+        // 保存图像源信息, 获取图像数量，修改状态 0-1，成为一条任务
+        let totalImgNum = getImgFileNum(message.text[1]);                 // 获取图像数量
 
-        if(ret == "success") {
-             // 开始运行应用, 先解包配置文件
-             unpackConfigFiles(global);
+        let ret = updateImgAppInfo(global.context, global.appInfo.id, message.text[0], message.text[1], totalImgNum);
+        console.log("updateImgAppInfo ret: ", ret);
+
+        if (ret == "success") {
+            global.panel.webview.postMessage({ userAppStartRunReturnImgNum: totalImgNum });
+            // 开始运行应用, 先解包配置文件
+            unpackConfigFiles(global);
         }
     },
 
 
-
-    
     // 执行脉冲编码脚本
     startImgConvertProcess(global, message) {
         console.log(message);
@@ -98,6 +99,18 @@ const oneUserAppMessageHandler = {
     },
 
 
+
+
+    // 查询应用  显示详情页
+    userAppGotoImgAppInfoPage(global, message) {
+        console.log(message);
+        openImgAppInfoPage(global.context, message.text);
+    },
+    // 跳转到任务详情页面
+    userAppGotoImgAppTaskPage(global, message) {
+        console.log(message);
+        openImgAppRunTaskPage(global.context, "byID", message.text);
+    },
 };
 
 
@@ -261,7 +274,7 @@ function unpackConfigFiles(global) {
     let configFile = global.appInfo.encodeConfigFile;      // 配置文件
     let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹unpack_target
 
-    let command_str = "python " + scriptPath + " " + configFile + " " + outputDir;
+    let command_str = "python3 " + scriptPath + " " + configFile + " " + outputDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -298,7 +311,7 @@ function runImgConvertScript(global) {
 
     // 脚本位置 encode_input.py——频率编码， poisson_encode.py——泊松编码
     let selectedEncodeMethod = ""
-    if(global.appInfo.encodeMethodID == 0) {
+    if (global.appInfo.encodeMethodID == 0) {
         console.log("选择频率编码")
         selectedEncodeMethod = "encode_input.py"
     } else if (global.appInfo.encodeMethodID == 1) {
@@ -310,12 +323,12 @@ function runImgConvertScript(global) {
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
     let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
     let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹pickleDir
-    let configDir = path.join(outputDir,"unpack_target");                            // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+    let configDir = path.join(outputDir, "unpack_target");                            // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
 
-    let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
+    let totalImgNum = global.appInfo.imgNum;                 // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
+    let command_str = "python3 " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -359,12 +372,12 @@ function runPickleConvertScript(global) {
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
     let outputDir = global.appInfo.outputDir;            // 用户指定的输出目录
-    let configDir = path.join(outputDir,"unpack_target");                            // 配置文件目录，要保证有 connfiles1_1、 layerWidth1_1、 nodelist1_1、 input_to_layer_1.pickle 4个文件
+    let configDir = path.join(outputDir, "unpack_target");                            // 配置文件目录，要保证有 connfiles1_1、 layerWidth1_1、 nodelist1_1、 input_to_layer_1.pickle 4个文件
 
-    let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
+    let totalImgNum = global.appInfo.imgNum;                // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python " + scriptPath + " " + outputDir + " " + configDir;
+    let command_str = "python3 " + scriptPath + " " + outputDir + " " + configDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 
@@ -405,13 +418,13 @@ function runMnistSendInputScript(global) {
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
     let outputDir = global.appInfo.outputDir;            // 用户指定的输出目录
-    let configDir = path.join(outputDir,"unpack_target");                         // 配置文件目录，要保证有 config.b 文件
+    let configDir = path.join(outputDir, "unpack_target");                         // 配置文件目录，要保证有 config.b 文件
 
 
-    let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
+    let totalImgNum = global.appInfo.imgNum;                 // 获取图像数量
     let imgNum = 0;
 
-    let command_str = "python " + scriptPath + " " + outputDir + " " + configDir;
+    let command_str = "python3 " + scriptPath + " " + outputDir + " " + configDir;
     console.log("执行命令为", command_str);
     let scriptProcess = exec(command_str, {});
 

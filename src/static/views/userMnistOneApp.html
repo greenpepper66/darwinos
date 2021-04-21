@@ -32,7 +32,7 @@
         <div class="clearfix thewrap userMnistOneApp_top">
             <table class="userMnistOneApp_imgSrc_table">
                 <tr>
-                    <td  class="userMnistOneApp_title">请选择图像输入源：</td>
+                    <td>请选择图像输入源：</td>
 
                     <td>
                         <div>
@@ -47,7 +47,8 @@
 
                     <td id="userMnistOneApp_select_local_path">
                         <div class="userMnistOneApp_input">
-                            <button type="button" class="userMnistOneApp_select_file_btn" onclick="userAppSelectImgDir()">
+                            <button type="button" class="userMnistOneApp_select_file_btn"
+                                onclick="userAppSelectImgDir()">
                                 选择图像
                             </button>
                             <input type="text" class="userMnistOneApp_select_file_txt"
@@ -181,25 +182,39 @@
 
         <div class="clearfix thewrap userMnistOneApp_middle_analyse">
             <div class="row">
-                <div class="userMnistOneApp_title">结果分析{{userAppInfo.name}}</div>
+                <div class="userMnistOneApp_title">结果分析</div>
             </div>
 
             <div class="row">
                 <div>
                     <table class="userMnistOneApp_recRetAnaTable">
                         <tr>
+                            <td>应用名称</td>
+                            <td>{{userAppInfo.name}}</td>
                             <td>图像数量</td>
-                            <td>3幅</td>
+                            <td id="userAppInfo_imgNum">{{userAppInfo.imgNum}}幅</td>
                         </tr>
                         <tr>
+                            <td>应用ID</td>
+                            <td>{{userAppInfo.id}}</td>
                             <td>应用运行总耗时</td>
                             <td>2分钟</td>
                         </tr>
                         <tr>
+                            <td>应用详情</td>
+                            <td>
+                                <button type="button" class="userMnistOneApp_detail_btn"
+                                    @click="userAppGotoImgAppInfoPage(userAppInfo.id)">应用详情</button>
+                            </td>
                             <td>识别单幅图像耗时</td>
                             <td>50ms</td>
                         </tr>
                         <tr>
+                            <td>任务详情</td>
+                            <td>
+                                <button type="button" class="userMnistOneApp_detail_btn"
+                                    @click="userAppGotoImgAppTaskPage(userAppInfo.id)">任务详情</button>
+                            </td>
                             <td>识别准确率</td>
                             <td>100%</td>
                         </tr>
