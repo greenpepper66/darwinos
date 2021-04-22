@@ -16,9 +16,14 @@ import { startHttpServer } from './os/server';
 import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
 import { openImgAppRunTaskPage, openImgAppTasksPage } from "./pages/ImgAppHome";
 
-import {SystemTreeViewProvider} from "./DataProvider/SystemProvider";
+import { SystemTreeViewProvider } from "./DataProvider/SystemProvider";
 import { UserProvider } from './DataProvider/UserProvider';
-import {UserAppHomePageProvide, openOneKindUserAppPage} from './pages/UserAppHome';
+import { UserAppHomePageProvide, openOneKindUserAppPage } from './pages/UserAppHome';
+
+export module LoginInfo {
+	export let test: boolean;
+}
+
 
 const PORT = 5001;
 
@@ -39,6 +44,23 @@ export function activate(context: vscode.ExtensionContext) {
 	let _vscodeThemeKind = vscode.window.activeColorTheme.kind;
 	changeIndexHtmlCss(context, _vscodeThemeKind);
 
+	// 打开登录页
+	PageProvideByPath(context, "登录页面", "src/static/views/login.html")
+
+	//自动弹出导航栏
+	const welcomeDataProvider = new EmptyDataProvider(vscode.workspace.rootPath);
+	vscode.window.registerTreeDataProvider('login-treeView', welcomeDataProvider);
+	let welcomeTreeView = vscode.window.createTreeView('login-treeView', { treeDataProvider: welcomeDataProvider });
+	welcomeTreeView.reveal(null);
+
+	// startSystemForAdmin(context);
+
+}
+
+
+
+/** 系统管理员和开发者用户登录 */
+export function startSystemForAdmin(context) {
 
 	//启动一个terminal，运行网页服务端
 	const resourcePath = path.join(context.extensionPath, 'src/resources');
@@ -48,9 +70,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	//打开home页
 	PageProvideByPort("类脑计算机", 5001, "")
-
-	// 导航栏重构尝试
-	// SystemTreeViewProvider.initTreeViewItem();
 
 	const ResDataProvider = new ResProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('resource_view', ResDataProvider);
@@ -72,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 	startHttpServer(ResDataProvider, ModelDataProvider, TaskDataProvider, context);
 
 	//自动弹出导航栏
-	let ResTreeView = vscode.window.createTreeView('resource_view', { treeDataProvider: ResDataProvider});
+	let ResTreeView = vscode.window.createTreeView('resource_view', { treeDataProvider: ResDataProvider });
 	ResTreeView.reveal(ResDataProvider.nodes[0]);
 
 
@@ -185,11 +204,9 @@ export function activate(context: vscode.ExtensionContext) {
 		task_reset(task.nodeIp, task.modelId);
 		vscode.window.showInformationMessage(`Successfully called reset task.`);
 	});
-
-
-
-
 }
+
+
 
 // this method is called when your extension is deactivated
 export function deactivate() { }

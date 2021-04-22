@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>登陆</title>
+
+
+    <style type="text/css">
+        .login_body_bg {
+            text-align: center;
+        }
+
+        .login_body_bg::after {
+            content: "";
+            background: url("../images/zhijiang.JPG");
+            opacity: 0.3;
+            top: 25px;
+            left: 25px;
+            bottom: 25px;
+            right: 25px;
+            position: absolute;
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="login" class="login_body_bg">
+        <div class="login_top">
+            <img src="../images/zhijiang-logo.png" alt="zhejiang lab" class="login_zhijiang_logo" />
+            <span class="login_title">达尔文类脑计算机系统</span>
+            <img src="../images/zheda-logo.png" alt="zhejiang university" class="login_zheda_logo" />
+        </div>
+        <div class="login_box">
+            <form class="login_form">
+                <span class="login_desc">用户名：</span>
+                <input type="text" name="username" class="login_input">
+                <br><br><br>
+                <span class="login_desc">密&nbsp;&nbsp;&nbsp;&nbsp;码：</span>
+                <input type="password" name="password" class="login_input">
+                <br><br><br>
+                <button type="button" class="login_btn" onclick="login()">登录</button>
+            </form>
+        </div>
+    </div>
+
+
+
+
+    <link href="../css/vs-light.css" rel="stylesheet" />
+    <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/login.js"></script>
+    <script>Vue.config.ProductionTip = false</script>
+</body>
+
+</html>

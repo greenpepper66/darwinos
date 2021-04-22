@@ -1,33 +1,37 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import{Chip, Node} from "./ResProvider"
-import  get_slave_boards  from "../os/get_slave_boards";
+import { Chip, Node } from "./ResProvider"
+import get_slave_boards from "../os/get_slave_boards";
 
 
 
 
 export class EmptyDataProvider implements vscode.TreeDataProvider<EmptyData> {
-    private _onDidChangeTreeData: vscode.EventEmitter<EmptyData | undefined | void> = new vscode.EventEmitter<EmptyData | undefined | void>();
+	private _onDidChangeTreeData: vscode.EventEmitter<EmptyData | undefined | void> = new vscode.EventEmitter<EmptyData | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<EmptyData | undefined | void> = this._onDidChangeTreeData.event;
 
-	
+
 	constructor(private workspaceRoot: string) {
 	}
 
-    refresh(): void {
+	refresh(): void {
 		this._onDidChangeTreeData.fire();
 	}
 
 	getTreeItem(element: EmptyData): vscode.TreeItem {
 		return element;
-	  }
-	
-	getChildren(element?: EmptyData): Thenable<EmptyData[]> {		
-		return Promise.resolve([]);		
-		
 	}
 
+	getChildren(element?: EmptyData): Thenable<EmptyData[]> {
+		return Promise.resolve([]);
+
+	}
+
+	//暂时用于打开vscode时跳出导航栏  
+	getParent(element?: EmptyData | undefined): import("vscode").ProviderResult<EmptyData> {
+		return undefined;
+	}
 }
 
 
@@ -45,9 +49,9 @@ export class EmptyData extends vscode.TreeItem {
 		this.tooltip = `${this.label}`;
 		this.description = this.label;
 	}
-	
+
 	iconPath = {
-		light: path.join(__filename, '..', '..',  '..','media', 'light', 'string.svg'),
+		light: path.join(__filename, '..', '..', '..', 'media', 'light', 'string.svg'),
 		dark: path.join(__filename, '..', '..', '..', 'media', 'dark', 'string.svg')
 	};
 

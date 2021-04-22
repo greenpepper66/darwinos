@@ -39,6 +39,9 @@ function userAppStartRun() {
     document.getElementById("pickle_convert_progress_div").style.width = "0%";
     document.getElementById("recognition_task_progress_div").style.width = "0%";
 
+    // 清空结果
+
+
     // 保存图像源信息
     console.log("start run task button is clicked.");
     let imgKind = document.getElementById("userMnistOneApp_select_imgSrc_type").value;
@@ -58,8 +61,6 @@ function userAppStartRun() {
         command: 'userAppStartRun',
         text: [imgKind, imgDir]
     });
-
-    // 清空结果
 
 }
 

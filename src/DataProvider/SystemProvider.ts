@@ -32,11 +32,11 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
     data: any[];
 
     constructor() {
-        this.data = [];
-        let AppsDataProvider = new AppsProvider(vscode.workspace.rootPath);
-        console.log("TTTTTT", AppsDataProvider.appKinds);
-        this.data = [new SystemTreeItem("类脑计算机", AppsDataProvider.appKinds)];
-        console.log("TTTTTT", this.data);
+        // this.data = [];
+        // let AppsDataProvider = new AppsProvider(vscode.workspace.rootPath);
+        // console.log("TTTTTT", AppsDataProvider.appKinds);
+        // this.data = [new SystemTreeItem("类脑计算机", AppsDataProvider.appKinds)];
+        // console.log("TTTTTT", this.data);
     };
 
 
@@ -58,14 +58,39 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
         return this.data;
     }
 
+    getParent(element? : SystemTreeItem | undefined): import("vscode").ProviderResult<SystemTreeItem>{
+        if(this.data.length === 0 || element === this.data[0]){
+            return undefined;
+        }else{
+            let parentNode= this.data[0];
+            let stack = new Array();
+            stack.push(parentNode);
+            while(stack.length > 0){
+                let tmp_head:SystemTreeItem = stack[0];
+                stack.splice(0,1);
+                if(tmp_head.children){
+                    for(let i=0;i<tmp_head.children.length;++i){
+                        stack.push(tmp_head.children[i]);
+                        if(tmp_head.children[i] === element){
+                            return parentNode;
+                        }
+                    }
+                }
+                parentNode = tmp_head;
+            }
+            return undefined;
+        }
+    }
+
     // 这个静态方法时自己写的，你要写到 extension.ts 也可以
-    public static initTreeViewItem() {
-
+    public static initTreeViewItem(target_view:string):SystemTreeViewProvider{
+    
         // 实例化 TreeViewProvider
-        const systemTreeViewProvider = new SystemTreeViewProvider();
-
+        const treeViewProvider = new SystemTreeViewProvider();
+        
         // registerTreeDataProvider：注册树视图
         // 你可以类比 registerCommand(上面注册 Hello World)
-        vscode.window.registerTreeDataProvider('system_view', systemTreeViewProvider);
+        vscode.window.registerTreeDataProvider(target_view,treeViewProvider);
+        return treeViewProvider;
     }
 }
