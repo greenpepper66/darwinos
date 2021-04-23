@@ -1,1 +1,80 @@
-{"data":[{"id":1618905942793,"name":"yry","createTime":"2021-04-20 16:05","modeFileID":"11","modelFileName":"model_name","modelFileNodeID":"1","modelFileNodeIP":"192.168.1.1","encodeMethodID":"0","encodeConfigFile":"c:\\Users\\Administrator\\get-pip.py","outputDir":"c:\\Users\\Administrator\\Documents","status":0,"imgSrcKind":"localImg","imgSrcDir":"c:\\Users\\Administrator\\Music"},{"id":1618910646830,"name":"new-view","createTime":"2021-04-20 17:24","modeFileID":"11","modelFileName":"model_name","modelFileNodeID":"1","modelFileNodeIP":"192.168.1.1","encodeMethodID":"0","encodeConfigFile":"d:\\workspace\\lab-work\\github\\darwinos-test2\\all_configs\\packed_bin_files.dat","outputDir":"d:\\workspace\\lab-work\\github\\darwinos-test2\\output","status":0,"imgSrcKind":"localImg","imgSrcDir":"d:\\workspace\\lab-work\\github\\darwinos-test2\\test-images"},{"id":1618968278685,"name":"mac-test","createTime":"2021-04-21 09:24","modeFileID":"11","modelFileName":"model_name","modelFileNodeID":"1","modelFileNodeIP":"192.168.1.1","encodeMethodID":"0","encodeConfigFile":"/Users/sunqingjiao/sun18/之江实验室/lab-work/github/darwinos/src/static/model_lib/mnist/packed_bin_files.dat","outputDir":"/Users/sunqingjiao/temDir/test/output","status":1,"imgSrcKind":"localImg","imgSrcDir":"/Users/sunqingjiao/temDir/darwinos-test2/test","imgNum":1},{"id":1619055964814,"name":"同仁堂","createTime":"2021-04-22 09:46","modeFileID":"11","modelFileName":"model_name","modelFileNodeID":"1","modelFileNodeIP":"192.168.1.1","encodeMethodID":"0","encodeConfigFile":"c:\\Users\\Administrator\\get-pip.py","outputDir":"c:\\Users\\Administrator\\Documents","status":0},{"id":1619055981747,"name":"跳跳糖","createTime":"2021-04-22 09:46","modeFileID":"11","modelFileName":"model_name","modelFileNodeID":"1","modelFileNodeIP":"192.168.1.1","encodeMethodID":"0","encodeConfigFile":"c:\\Users\\Administrator\\get-pip.py","outputDir":"c:\\Users\\Administrator\\Documents","status":0,"imgSrcKind":"localImg","imgSrcDir":"c:\\Users\\Administrator\\Pictures","imgNum":7}],"total":5}
+{
+    "data": [
+        {
+            "id": 1618905942793,
+            "name": "yry",
+            "createTime": "2021-04-20 16:05",
+            "modeFileID": "11",
+            "modelFileName": "model_name",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.1",
+            "encodeMethodID": "0",
+            "encodeConfigFile": "c:\\Users\\Administrator\\get-pip.py",
+            "outputDir": "c:\\Users\\Administrator\\Documents",
+            "status": 0,
+            "imgSrcKind": "localImg",
+            "imgSrcDir": "c:\\Users\\Administrator\\Music"
+        },
+        {
+            "id": 1618910646830,
+            "name": "new-view",
+            "createTime": "2021-04-20 17:24",
+            "modeFileID": "11",
+            "modelFileName": "model_name",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.1",
+            "encodeMethodID": "0",
+            "encodeConfigFile": "d:\\workspace\\lab-work\\github\\darwinos-test2\\all_configs\\packed_bin_files.dat",
+            "outputDir": "d:\\workspace\\lab-work\\github\\darwinos-test2\\output",
+            "status": 0,
+            "imgSrcKind": "localImg",
+            "imgSrcDir": "d:\\workspace\\lab-work\\github\\darwinos-test2\\test-images"
+        },
+        {
+            "id": 1618968278685,
+            "name": "mac-test",
+            "createTime": "2021-04-21 09:24",
+            "modeFileID": "11",
+            "modelFileName": "model_name",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.1",
+            "encodeMethodID": "0",
+            "encodeConfigFile": "/Users/sunqingjiao/sun18/之江实验室/lab-work/github/darwinos/src/static/model_lib/mnist/packed_bin_files.dat",
+            "outputDir": "/Users/sunqingjiao/temDir/test/output",
+            "status": 1,
+            "imgSrcKind": "localImg",
+            "imgSrcDir": "/Users/sunqingjiao/temDir/darwinos-test2/test",
+            "imgNum": 1
+        },
+        {
+            "id": 1619055964814,
+            "name": "同仁堂",
+            "createTime": "2021-04-22 09:46",
+            "modeFileID": "11",
+            "modelFileName": "model_name",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.1",
+            "encodeMethodID": "0",
+            "encodeConfigFile": "c:\\Users\\Administrator\\get-pip.py",
+            "outputDir": "c:\\Users\\Administrator\\Documents",
+            "status": 0
+        },
+        {
+            "id": 1619055981747,
+            "name": "跳跳糖",
+            "createTime": "2021-04-22 09:46",
+            "modeFileID": "11",
+            "modelFileName": "model_name",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.1",
+            "encodeMethodID": "0",
+            "encodeConfigFile": "c:\\Users\\Administrator\\get-pip.py",
+            "outputDir": "c:\\Users\\Administrator\\Documents",
+            "status": 0,
+            "imgSrcKind": "localImg",
+            "imgSrcDir": "c:\\Users\\Administrator\\Pictures",
+            "imgNum": 7
+        }
+    ],
+    "total": 5
+}

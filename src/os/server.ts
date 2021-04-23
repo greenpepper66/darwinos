@@ -16,7 +16,6 @@ export module allData {
 
 export function startHttpServer(ResDataProvider: ResProvider,
 	ModelDataProvider: ModelProvider,
-	TaskDataProvider: TaskProvider,
 	context) {
 	var routes = {
 		'/post': function (req, res) {
@@ -37,7 +36,6 @@ export function startHttpServer(ResDataProvider: ResProvider,
 
 			ResDataProvider.updateNodes(nodes);
 			ModelDataProvider.updateModels(models);
-			// TaskDataProvider.updateTasks(tasks);
 		}
 	}
 

@@ -93,9 +93,9 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 	// Uri.file(join(__filename,'..','assert', ITEM_ICON_MAP.get(label)+''));   写成这样图标出不来
 	// 所以小伙伴们就以下面这种写法编写
 	static getIconUriForLabel(name: string): vscode.Uri {
-		return vscode.Uri.file(path.join(__filename, "..", "..", "..", "media", "light", name));
+		console.log(path.join(__filename, "..", "..", "..", "src", "static", "images", name));
+		return vscode.Uri.file(path.join(__filename, "..", "..", "..", "src", "static", "images", name));
 	}
-
 }
 
 

@@ -31,32 +31,32 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 
 
 	// 原来从web页面获取部署的模型列表作为任务，现在改为应用名字
-	public updateTasks(tasks) {
-		this.tasks = [];
-		for (var i = 0; i < tasks.length; i++) {
-			var name = tasks[i].name;
-			var modelID = tasks[i].id;
-			var nodeID = tasks[i].nodeID;
-			var nodeIP = tasks[i].nodeIP;
+	// public updateTasks(tasks) {
+	// 	this.tasks = [];
+	// 	for (var i = 0; i < tasks.length; i++) {
+	// 		var name = tasks[i].name;
+	// 		var modelID = tasks[i].id;
+	// 		var nodeID = tasks[i].nodeID;
+	// 		var nodeIP = tasks[i].nodeIP;
 
-			var task = new Task(
-				name,
-				vscode.TreeItemCollapsibleState.None,
-				0,
-				modelID,
-				nodeID,
-				nodeIP,
-				{
-					command: 'extension.openPage',
-					title: '',
-					arguments: ["任务" + name + "详情",
-						5001,
-					"taskDetail?nodeID=" + nodeID + "&modelID=" + modelID]
-				}
-			);
-			this.tasks.push(task);
-		}
-	}
+	// 		var task = new Task(
+	// 			name,
+	// 			vscode.TreeItemCollapsibleState.None,
+	// 			0,
+	// 			modelID,
+	// 			nodeID,
+	// 			nodeIP,
+	// 			{
+	// 				command: 'extension.openHttpPage',
+	// 				title: '',
+	// 				arguments: ["任务" + name + "详情",
+	// 					5001,
+	// 				"taskDetail?nodeID=" + nodeID + "&modelID=" + modelID]
+	// 			}
+	// 		);
+	// 		this.tasks.push(task);
+	// 	}
+	// }
 
 	public getTasksList() {
 		this.tasks = [];

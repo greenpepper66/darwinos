@@ -11,11 +11,19 @@
 	],
 	"activationEvents": [
 		"onCommand:darwinos.helloWorld",
-		"onView:model_view",
-		"onView:resource_view",
-		"onView:apps_view",
-		"onView:task_view",
-		"onView:user_view",
+		"onView:system-treeView",
+		"onView:login_model",
+		"onView:upload_model",
+		"onCommand:resource_view.refreshEntry",
+		"onCommand:model_view.refreshEntry",
+		"onCommand:apps_view.refreshEntry",
+		"onCommand:task_view.refreshEntry",
+		"onCommand:user_view.refreshEntry",
+		"onCommand:resource_view.resOverview",
+		"onCommand:model_view.modelOverview",
+		"onCommand:apps_view.appsOverview",
+		"onCommand:task_view.taskOverview",
+		"onCommand:user_view.appsOverview",
 		"*"
 	],
 	"main": "./out/extension.js",
@@ -163,17 +171,68 @@
 			]
 		},
 		"menus": {
-			"view/title": [
-				
-			],
+			"view/title": [],
 			"view/item/context": [
-				
+				{
+					"command": "resource_view.refreshEntry",
+					"when": "viewItem == 资源视图",
+					"group": "inline"
+				},
+				{
+					"command": "resource_view.resOverview",
+					"when": "viewItem == 资源视图",
+					"group": "inline"
+				},
+				{
+					"command": "model_view.refreshEntry",
+					"when": "viewItem == 模型视图",
+					"group": "inline"
+				},
+				{
+					"command": "model_view.modelOverview",
+					"when": "viewItem == 模型视图",
+					"group": "inline"
+				},
+				{
+					"command": "apps_view.refreshEntry",
+					"when": "viewItem == 应用视图",
+					"group": "inline"
+				},
+				{
+					"command": "apps_view.appsOverview",
+					"when": "viewItem == 应用视图",
+					"group": "inline"
+				},
+				{
+					"command": "user_view.refreshEntry",
+					"when": "viewItem == 用户视图",
+					"group": "inline"
+				},
+				{
+					"command": "user_view.appsOverview",
+					"when": "viewItem == 用户视图",
+					"group": "inline"
+				},
+				{
+					"command": "task_view.refreshEntry",
+					"when": "viewItem == 任务视图",
+					"group": "inline"
+				},
+				{
+					"command": "task_view.taskOverview",
+					"when": "viewItem == 任务视图",
+					"group": "inline"
+				}
 			]
 		},
 		"viewsWelcome": [
 			{
 				"view": "login-treeView",
 				"contents": "欢迎使用达尔文类脑计算机系统\n请先登录"
+			},
+			{
+				"view": "upload_model_view",
+				"contents": "欢迎使用达尔文类脑计算机系统\n上传模型文件"
 			}
 		]
 	},

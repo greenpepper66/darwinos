@@ -26,6 +26,15 @@ function callbacks(data, cb) {
     console.log("call vscode to get userApps list information", data.command, data.cbid);
 }
 
+function regist() {
+    let name = document.getElementById("login_username").value;
+    let pwd = document.getElementById("login_password").value;
+    console.log("regist user.", name, pwd);
+    vscode.postMessage({
+        command: 'registUser',
+        text: [name, pwd]
+    });
+}
 
 function login() {
     console.log("login success.");

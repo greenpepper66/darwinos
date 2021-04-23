@@ -9,9 +9,10 @@ export class ModelProvider implements vscode.TreeDataProvider<Model> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Model | undefined | void> = new vscode.EventEmitter<Model | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<Model | undefined | void> = this._onDidChangeTreeData.event;
 
-	private models: Model[];
+	public models: Model[];
 
 	constructor(private workspaceRoot: string) {
+		this.models = [];
 	}
 
 	refresh(): void {

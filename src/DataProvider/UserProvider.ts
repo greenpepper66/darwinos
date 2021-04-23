@@ -74,7 +74,7 @@ export class UserProvider implements vscode.TreeDataProvider<UserAppKind> {
 
 
     static getIconUriForLabel(name: string): vscode.Uri {
-        return vscode.Uri.file(path.join(__filename, "..", "..", "..", "media", "light", name));
+        return vscode.Uri.file(path.join(__filename, "..", "..", "..", "src", "static", "images", name));
     }
 
     // public getUserAppsList() {

@@ -4,6 +4,7 @@ import * as path from 'path';
 import get_slave_boards from '../os/get_slave_boards';
 
 import { testquery } from '../testaxios';
+import { getCiphers } from 'crypto';
 
 
 
@@ -29,6 +30,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
 
   getChildren(element?: Node): Thenable<Node[]> {
     if (element) {
+      console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
       return Promise.resolve(this.getChips(element));
     }
     else {
@@ -54,7 +56,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
         i,
         node.usedNeureNums[i],
         {
-          command: 'extension.openPage',
+          command: 'extension.openHttpPage',
           title: '',
           arguments: ["节点" + node.nodeID + "芯片" + i + "详情",
             5001,
@@ -84,7 +86,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
         chips,
         usedNeureNums,
         {
-          command: 'extension.openPage',
+          command: 'extension.openHttpPage',
           title: '',
           arguments: ["节点" + id + "详情",
             5001,
@@ -93,13 +95,15 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
       );
 
       this.nodes.push(node);
-
+      node.children = this.getChips(node);
     }
   }
 }
 
 
 export class Node extends vscode.TreeItem {
+  public children?: Chip[];
+
   constructor(
     public readonly label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
