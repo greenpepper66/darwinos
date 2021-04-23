@@ -37,10 +37,12 @@ function regist() {
 }
 
 function login() {
-    console.log("login success.");
+    let name = document.getElementById("login_username").value;
+    let pwd = document.getElementById("login_password").value;
+    console.log("regist user.", name, pwd);
     vscode.postMessage({
         command: 'loginSystem',
-        text: '登录系统'
+        text: [name, pwd]
     });
 }
 
@@ -54,6 +56,10 @@ window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
 
+    if (message.loginSystemErrorRet != undefined) {
+        console.log("login error: ", message.loginSystemErrorRet);
+        document.getElementById('login_alert_result').style.display = 'block';
+    }
 
 
 
@@ -68,12 +74,16 @@ new Vue({
     },
 
     mounted() {
-        
+
     },
     watch: {
 
     },
     methods: {
-        
-    } 
+
+    }
 });
+
+function closeLoginAlertBox() {
+    document.getElementById('login_alert_result').style.display = 'none';
+}

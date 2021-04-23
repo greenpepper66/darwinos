@@ -16,7 +16,7 @@ import { startHttpServer } from './os/server';
 import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
 import { openImgAppRunTaskPage, openImgAppTasksPage } from "./pages/ImgAppHome";
 import { OpenLoginPage } from "./pages/UserLogin";
-
+import { UserInfoData } from "./DataProvider/UserInfoJsonDataProvider";
 import { SystemTreeViewProvider } from "./DataProvider/SystemProvider";
 import { UserProvider } from './DataProvider/UserProvider';
 import { UserAppHomePageProvide, openOneKindUserAppPage } from './pages/UserAppHome';
@@ -24,6 +24,7 @@ import { UserAppHomePageProvide, openOneKindUserAppPage } from './pages/UserAppH
 // 全局变量，保存用户登录信息
 export module LoginInfo {
 	export let test: boolean;
+	export let currentUser: UserInfoData;
 }
 
 
@@ -61,6 +62,30 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 
+// 只打开用户视图： 面向普通用户
+export function openOnlyUserTreeView(context) {
+	// 创建所有DataProvider
+	let systemDataProvider = SystemTreeViewProvider.initTreeViewItem("system-treeView");
+	// 打开所有导航栏
+	systemDataProvider.getOnlyUserTreeView();
+	let allDTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: systemDataProvider });
+	allDTreeView.reveal(null);
+	allDTreeView.onDidChangeVisibility((evt) => {
+		if (evt.visible) {
+			UserAppHomePageProvide(context);
+		}
+	});
+
+	vscode.commands.registerCommand('user_view.appsOverview', () => {
+		UserAppHomePageProvide(context);
+	});
+	vscode.commands.registerCommand('extension.gotoOneKindUserAppPage', (name, num) => {
+		openOneKindUserAppPage(context, num);
+	});
+	vscode.commands.registerCommand('user_view.refreshEntry', () => systemDataProvider.providers[3].refresh());
+
+
+}
 
 // 打开全部导航栏和页面：面向系统管理员和开发者
 export function openAllTreeViews(context) {

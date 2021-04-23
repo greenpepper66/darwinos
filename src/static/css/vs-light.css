@@ -3,8 +3,7 @@
 ** 0. common style
 **********************************************************************************************/
 
-table,
-td {
+table, td {
   border-collapse: collapse;
   /** 合并单元格边框 */
 }
@@ -47,15 +46,12 @@ table.imgAppHome_page_table-search tr {
   height: 70px;
 }
 
-table.imgAppHome_page_table-search tr td:nth-child(1),
-table.imgAppHome_page_table-search tr td:nth-child(3) {
+table.imgAppHome_page_table-search tr td:nth-child(1), table.imgAppHome_page_table-search tr td:nth-child(3) {
   text-align: right;
   padding-right: 20px;
 }
 
-table.imgAppHome_page_table-search tr td:nth-child(2),
-table.imgAppHome_page_table-search tr td:nth-child(4),
-table.imgAppHome_page_table-search tr td:nth-child(5) {
+table.imgAppHome_page_table-search tr td:nth-child(2), table.imgAppHome_page_table-search tr td:nth-child(4), table.imgAppHome_page_table-search tr td:nth-child(5) {
   text-align: left;
 }
 
@@ -117,8 +113,7 @@ table.imgAppHome_page_table-search tr td:nth-child(5) {
   margin-bottom: 30px;
 }
 
-.imgAppHome_detail_btn,
-.imgAppHome_runApp_btn {
+.imgAppHome_detail_btn, .imgAppHome_runApp_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 2px;
   background-color: Transparent;
@@ -243,15 +238,12 @@ table.imgAppTasks_page_table-search tr {
   height: 70px;
 }
 
-table.imgAppTasks_page_table-search tr td:nth-child(1),
-table.imgAppTasks_page_table-search tr td:nth-child(3) {
+table.imgAppTasks_page_table-search tr td:nth-child(1), table.imgAppTasks_page_table-search tr td:nth-child(3) {
   text-align: right;
   padding-right: 20px;
 }
 
-table.imgAppTasks_page_table-search tr td:nth-child(2),
-table.imgAppTasks_page_table-search tr td:nth-child(4),
-table.imgAppTasks_page_table-search tr td:nth-child(5) {
+table.imgAppTasks_page_table-search tr td:nth-child(2), table.imgAppTasks_page_table-search tr td:nth-child(4), table.imgAppTasks_page_table-search tr td:nth-child(5) {
   text-align: left;
 }
 
@@ -515,14 +507,7 @@ table.newImgApp_table td {
   padding: 8px;
 }
 
-.newImgApp_app_name,
-.newImgApp_imgSrc_type,
-.newImgApp_configSrc_type,
-.newImgApp_remoteIP_addr,
-.newImgApp_select_model,
-.newImgApp_select_encodeMethod,
-.newImgApp_select_retShow_way,
-.newImgApp_remoteIP_forRet {
+.newImgApp_app_name, .newImgApp_imgSrc_type, .newImgApp_configSrc_type, .newImgApp_remoteIP_addr, .newImgApp_select_model, .newImgApp_select_encodeMethod, .newImgApp_select_retShow_way, .newImgApp_remoteIP_forRet {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -547,9 +532,7 @@ table.newImgApp_table td {
   border-style: none;
 }
 
-.newImgApp_ImgSrc_dir,
-.newImgApp_configFile,
-.newImgApp_output_dir {
+.newImgApp_ImgSrc_dir, .newImgApp_configFile, .newImgApp_output_dir {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -674,8 +657,7 @@ table.newImgApp_table td {
   text-align: center;
 }
 
-.imgAppRunTask_probar_title,
-.imgAppRunTask_ret_title {
+.imgAppRunTask_probar_title, .imgAppRunTask_ret_title {
   font-size: 20px;
   color: #333333;
   letter-spacing: 1.14px;
@@ -690,9 +672,7 @@ table.newImgApp_table td {
   font-family: "Material Icons";
   font-style: normal;
   font-weight: 400;
-  src: local("Material Icons"), local("MaterialIcons-Regular"),
-    url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2)
-      format("woff2");
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2) format("woff2");
 }
 
 .material-icons {
@@ -1230,24 +1210,29 @@ table.userMnistOneApp_recRetAnaTable td {
 /****************************************************************************
   **** 8. 登录页面
   ****************************************************************************/
+
 .login_top {
   margin-top: 100px;
 }
+
 .login_title {
   font-size: 30px;
   letter-spacing: 2.0px;
   vertical-align: middle;
 }
+
 .login_zhijiang_logo {
   vertical-align: middle;
   margin-right: 80px;
   height: 68px;
   width: 235px;
 }
+
 .login_zheda_logo {
   vertical-align: middle;
   margin-left: 80px;
 }
+
 .login_box {
   position: fixed;
   left: 50%;
@@ -1265,10 +1250,12 @@ table.userMnistOneApp_recRetAnaTable td {
   display: inline-block;
   margin-top: 100px;
 }
+
 .login_desc {
   vertical-align: middle;
   font-size: 20px;
 }
+
 .login_input {
   display: inline-block;
   width: 200px;
@@ -1279,6 +1266,7 @@ table.userMnistOneApp_recRetAnaTable td {
   border-radius: 10px;
   vertical-align: middle;
 }
+
 .login_btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
   border-radius: 2px;
@@ -1290,4 +1278,46 @@ table.userMnistOneApp_recRetAnaTable td {
   background-color: Transparent;
   /** 使得button没有边框 **/
   border-style: none;
+}
+
+/** 弹出框样式 **/
+
+.login_alert-box {
+  background-color: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 30%;
+  width: 40%;
+  height: 30%;
+  padding: 10px;
+  z-index: 1002;
+  overflow: auto;
+  text-align: center;
+}
+
+.login_alert-txt {
+  font-size: 22px;
+  color: #333333;
+  letter-spacing: 1.6px;
+  margin-top: 5%;
+}
+
+.login_alert-btn {
+  background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
+  border-radius: 2px;
+  font-size: 20px;
+  color: #ffffff;
+  letter-spacing: 1.14px;
+  height: 47px;
+  width: 20%;
+  background-color: Transparent;
+  /** 使得button没有边框 **/
+  border-style: none;
+  margin-top: 10%;
 }

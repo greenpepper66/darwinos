@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { LoginInfo, openAllTreeViews } from "../extension";
-import { UserInfoData, addOneUser } from "../DataProvider/UserInfoJsonDataProvider";
+import { LoginInfo, openAllTreeViews, openOnlyUserTreeView } from "../extension";
+import { UserInfoData, addOneUser, searchUserInfoByName } from "../DataProvider/UserInfoJsonDataProvider";
+import { glob } from 'glob';
 
 
 // html文件路径
@@ -44,13 +45,18 @@ const loginMessageHandler = {
     loginSystem(global, message) {
         console.log(message);
         // todo：校验用户信息
+        let user = searchUserInfoByName(global.context, message.text[0]);
+        if (user == "none" || user.password != message.text[1]) {
+            global.panel.webview.postMessage({ loginSystemErrorRet: "error" });
+            return
+        }
 
         // 根据用户角色更新导航栏和页面
-        LoginInfo.test = true;
-
-        if (LoginInfo.test == true) {
+        if (user.userRole == 0 || user.userRole == 1) {
             // 打开全部导航栏
             openAllTreeViews(global.context);
+        } else if (user.userRole == 2) {
+            openOnlyUserTreeView(global.context);
         }
 
     },

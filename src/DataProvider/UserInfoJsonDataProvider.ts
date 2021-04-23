@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { timeStamp } from 'console';
 
 
 const userInfoFile = "src/static/cache/userInfo.json";
