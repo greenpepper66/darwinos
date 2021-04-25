@@ -48,6 +48,22 @@ export function activate(context: vscode.ExtensionContext) {
 	changeIndexHtmlCss(context, _vscodeThemeKind);
 
 	//自动弹出导航栏
+	openLoginTreeView(context);
+
+}
+
+
+
+
+
+
+/**
+ * *******************************************************************************************************************
+ * 弹出登录导航栏
+ * @param context 
+ * *******************************************************************************************************************
+ */
+export function openLoginTreeView(context) {
 	let welcomeDataProvider = new EmptyDataProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('login-treeView', welcomeDataProvider);
 	let welcomeTreeView = vscode.window.createTreeView('login-treeView', { treeDataProvider: welcomeDataProvider });
@@ -58,36 +74,67 @@ export function activate(context: vscode.ExtensionContext) {
 			OpenLoginPage(context);
 		}
 	});
-
 }
 
 
-// 只打开用户视图： 面向普通用户
+
+
+
+/**
+ * *******************************************************************************************************************
+ * 只打开用户视图： 面向普通用户
+ * @param context 
+ * *******************************************************************************************************************
+ */
 export function openOnlyUserTreeView(context) {
+
 	// 创建所有DataProvider
-	let systemDataProvider = SystemTreeViewProvider.initTreeViewItem("system-treeView");
+	let userDataProvider = SystemTreeViewProvider.initTreeViewItem("system-treeView");
 	// 打开所有导航栏
-	systemDataProvider.getOnlyUserTreeView();
-	let allDTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: systemDataProvider });
-	allDTreeView.reveal(null);
-	allDTreeView.onDidChangeVisibility((evt) => {
+	userDataProvider.getOnlyUserTreeView();
+	let userTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: userDataProvider });
+
+	userTreeView.reveal(null);
+	userTreeView.onDidChangeVisibility((evt) => {
 		if (evt.visible) {
 			UserAppHomePageProvide(context);
 		}
 	});
 
-	vscode.commands.registerCommand('user_view.appsOverview', () => {
-		UserAppHomePageProvide(context);
-	});
+	console.log("$$$$$", vscode.commands.getCommands());
+
+	// 注册命令
 	vscode.commands.registerCommand('extension.gotoOneKindUserAppPage', (name, num) => {
 		openOneKindUserAppPage(context, num);
 	});
-	vscode.commands.registerCommand('user_view.refreshEntry', () => systemDataProvider.providers[3].refresh());
+	vscode.commands.registerCommand('user_view.appsOverview', () => {
+		UserAppHomePageProvide(context);
+	});
+	vscode.commands.registerCommand('user_view.refreshEntry', () => userDataProvider.providers[3].refresh());
+	// 关闭导航栏的命令
+	vscode.commands.registerCommand('extension.userTreeViewClose', () => {
+		console.log("关闭用户导航栏");
+		// 清空数据
+		userDataProvider.clearTreeViewData();
+		userTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: userDataProvider });
+		userTreeView.reveal(null);
+	});
 
+	console.log("^^^^^^^^^^^^^^^^");
 
 }
 
-// 打开全部导航栏和页面：面向系统管理员和开发者
+
+
+
+
+
+/**
+ * *******************************************************************************************************************
+ * 打开全部导航栏和页面：面向系统管理员和开发者
+ * @param context 
+ * *******************************************************************************************************************
+ */
 export function openAllTreeViews(context) {
 	//启动一个terminal，运行网页服务端
 	const resourcePath = path.join(context.extensionPath, 'src/resources');
@@ -106,25 +153,27 @@ export function openAllTreeViews(context) {
 	let allDTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: systemDataProvider });
 	allDTreeView.reveal(null);
 	allDTreeView.onDidChangeVisibility((evt) => {
-		if (evt.visible) {
+		if (evt.visible && LoginInfo.currentUser.name != '' && (LoginInfo.currentUser.userRole == 0 || LoginInfo.currentUser.userRole == 1)) {
+			console.log("打开Home页面");
 			//打开home页
 			PageProvideByPort("类脑计算机", 5001, "")
+		} else {
+			console.log("导航栏无数据");  // 隐藏导航栏的时候执行
 		}
 	});
 
 	//上传模型视图
-	vscode.commands.registerCommand('model_view.uploadModel', () => {
-		PageProvideByPort("上传模型", 5001, "UploadModel");
-		vscode.window.showInformationMessage(`Successfully called upload model.`);
-	});
 	let uploadModelDataProvider = new EmptyDataProvider(vscode.workspace.rootPath);
 	vscode.window.registerTreeDataProvider('upload_model_view', uploadModelDataProvider);
 	let uploadModelTreeView = vscode.window.createTreeView('upload_model_view', { treeDataProvider: uploadModelDataProvider });
 	uploadModelTreeView.onDidChangeVisibility((evt) => {
-		if (evt.visible) {
-			vscode.commands.executeCommand('model_view.uploadModel');
+		if (evt.visible && LoginInfo.currentUser.name != '' && (LoginInfo.currentUser.userRole == 0 || LoginInfo.currentUser.userRole == 1)) {
+			console.log("打开upload页面");
+			PageProvideByPort("上传模型", 5001, "UploadModel");
 		}
 	});
+
+	console.log("##########", vscode.commands.getCommands());
 
 	// 注册导航栏单击命令： 
 	// 节点和芯片页面
@@ -143,7 +192,16 @@ export function openAllTreeViews(context) {
 	vscode.commands.registerCommand('extension.gotoOneKindUserAppPage', (name, num) => {
 		openOneKindUserAppPage(context, num);
 	});
+	// 关闭导航栏的命令
+	vscode.commands.registerCommand('extension.allTreeViewClose', () => {
+		console.log("关闭全部导航栏");
+		// 清空数据
+		systemDataProvider.clearTreeViewData();
+		allDTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: systemDataProvider });
+		allDTreeView.reveal(null);
+	});
 
+	console.log("!!!!!!!", vscode.commands.getCommands());
 	// 注册刷新按钮
 	vscode.commands.registerCommand('resource_view.refreshEntry', () => systemDataProvider.providers[0].refresh());
 	vscode.commands.registerCommand('model_view.refreshEntry', () => systemDataProvider.providers[1].refresh());
@@ -167,6 +225,7 @@ export function openAllTreeViews(context) {
 	vscode.commands.registerCommand('user_view.appsOverview', () => {
 		UserAppHomePageProvide(context);
 	});
+
 
 
 	//定时自动刷新导航栏，显示信息

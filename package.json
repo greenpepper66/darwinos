@@ -228,7 +228,7 @@
 		"viewsWelcome": [
 			{
 				"view": "login-treeView",
-				"contents": "欢迎使用达尔文类脑计算机系统\n请先登录"
+				"contents": "欢迎使用达尔文类脑计算机系统\n登录系统"
 			},
 			{
 				"view": "upload_model_view",

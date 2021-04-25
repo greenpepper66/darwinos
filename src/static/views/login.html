@@ -34,17 +34,46 @@
             <span class="login_title">达尔文类脑计算机系统</span>
             <img src="../images/zheda-logo.png" alt="zhejiang university" class="login_zheda_logo" />
         </div>
-        <div class="login_box">
-            <form class="login_form">
-                <span class="login_desc">用户名：</span>
-                <input type="text" name="username" class="login_input" id="login_username">
-                <br><br><br>
-                <span class="login_desc">密&nbsp;&nbsp;&nbsp;&nbsp;码：</span>
-                <input type="password" name="password" class="login_input" id="login_password">
-                <br><br><br>
-                <button type="button" class="login_btn" onclick="login()">登录</button>
-            </form>
-        </div>
+
+        <template v-if="userInfo == ''">
+            <div class="login_box" id="login_input_box">
+                <form class="login_form">
+                    <span class="login_desc">用户名：</span>
+                    <input type="text" name="username" class="login_input" id="login_username">
+                    <br><br><br>
+                    <span class="login_desc">密&nbsp;&nbsp;&nbsp;&nbsp;码：</span>
+                    <input type="password" name="password" class="login_input" id="login_password">
+                    <br><br><br>
+                    <button type="button" class="login_btn" onclick="login()">登录</button>
+                </form>
+            </div>
+        </template>
+
+        <template v-else>
+            <div class="login_box" id="login_already_box">
+                <form class="login_form">
+                    <span class="login_desc">用户名：{{ userInfo.name }}</span>
+                    <br><br><br>
+                    <span class="login_desc">角&nbsp;&nbsp;色：
+                    <template v-if="userInfo.userRole == 0">
+                        系统管理员
+                    </template>
+                    <template v-else-if="userInfo.userRole == 1">
+                        开发者用户
+                    </template>
+                    <template v-else-if="userInfo.userRole == 2">
+                        普通用户
+                    </template>
+                    </span>
+                    <br><br><br>
+                    <button type="button" class="login_btn" onclick="logout()">退出登录</button>
+                </form>
+            </div>
+
+        </template>
+
+
+
     </div>
 
 

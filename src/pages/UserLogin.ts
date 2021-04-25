@@ -4,7 +4,6 @@ import * as fs from 'fs';
 
 import { LoginInfo, openAllTreeViews, openOnlyUserTreeView } from "../extension";
 import { UserInfoData, addOneUser, searchUserInfoByName } from "../DataProvider/UserInfoJsonDataProvider";
-import { glob } from 'glob';
 
 
 // html文件路径
@@ -43,12 +42,18 @@ const loginMessageHandler = {
 
     // 点击了登录按钮
     loginSystem(global, message) {
-        console.log(message);
-        // todo：校验用户信息
+        console.log(message, LoginInfo.currentUser);
+        // 校验用户信息
         let user = searchUserInfoByName(global.context, message.text[0]);
         if (user == "none" || user.password != message.text[1]) {
             global.panel.webview.postMessage({ loginSystemErrorRet: "error" });
             return
+        } else {
+            // 登录成功
+            global.panel.webview.postMessage({ loginSystemSuccess: user });
+            // 更新全局变量
+            LoginInfo.currentUser = user;
+            console.log("登录成功：", LoginInfo.currentUser);
         }
 
         // 根据用户角色更新导航栏和页面
@@ -59,6 +64,32 @@ const loginMessageHandler = {
             openOnlyUserTreeView(global.context);
         }
 
+    },
+
+    // 获取登录用户信息
+    getCurrentUserInfo(global, message) {
+        console.log(message);
+        global.panel.webview.postMessage({ cmd: 'getCurrentUserInfoRet', cbid: message.cbid, data: LoginInfo.currentUser });
+    },
+
+    // 点击了退出登录按钮
+    logoutSystem(global, message) {
+        console.log(message);
+        let role = LoginInfo.currentUser.userRole;
+        // 清空全局变量
+        LoginInfo.currentUser = undefined;
+        // 发送消息
+        global.panel.webview.postMessage({ logoutSystemSuccess: "success" });
+       
+        // 关闭导航栏
+        if (role == 2) {
+            vscode.commands.executeCommand('extension.userTreeViewClose');
+        } else {
+            vscode.commands.executeCommand('extension.allTreeViewClose');
+        }
+         // 关闭登录页面 重新打开
+         global.panel.dispose(); 
+         OpenLoginPage(global.context);
     },
 }
 
@@ -72,7 +103,8 @@ export function OpenLoginPage(context) {
         vscode.ViewColumn.One,
         {
             // Enable scripts in the webview
-            enableScripts: true
+            enableScripts: true,
+            // retainContextWhenHidden: true  // 隐藏时保留上下文
         } // Webview options. More on these later.
     );
     panel.webview.html = getWebViewContent(context, userLoginHtmlFilePath);
