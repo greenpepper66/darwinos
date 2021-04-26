@@ -108,7 +108,8 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
 
     public getOnlyUserTreeView() {
         let userTreeView = new SystemTreeItem("用户视图", SystemTreeViewProvider.getIconUriForLabel("用户视图.png"), this.providers[3].userAppKinds);
-        this.data.push(userTreeView);
+        let tasksTreeView = new SystemTreeItem("任务视图", SystemTreeViewProvider.getIconUriForLabel("任务视图.png"), this.providers[4].tasks);
+        this.data.push(userTreeView, tasksTreeView);
         console.log("getOnlyUserTreeView", this.data);
     }
 

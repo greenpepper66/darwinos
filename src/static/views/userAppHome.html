@@ -5,8 +5,24 @@
     <meta charset="utf-8">
     <title>应用视图</title>
     <link href="../css/vs-light.css" rel="stylesheet" />
-    <style>
+    <style type="text/css">
+        .appMain_body_bg {
+            text-align: center;
+        }
 
+        .appMain_body_bg::after {
+            content: "";
+            background: url("../images/zhijiang.JPG");
+            opacity: 0.3;
+            top: 25px;
+            left: 25px;
+            bottom: 25px;
+            right: 25px;
+            position: absolute;
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
     </style>
 
     <script>
@@ -25,7 +41,7 @@
 <body>
     <div class="appMain_page">
 
-        <table class="appMain_page_tab">
+        <table class="appMain_page_tab appMain_body_bg">
             <tr>
                 <td align="center" valign="middle">
                     <div class="imgApp_logo_outBox" onclick="gotoAppPage(1)">

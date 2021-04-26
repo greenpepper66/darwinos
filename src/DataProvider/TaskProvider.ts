@@ -15,8 +15,9 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 	}
 
 	refresh(): void {
-		console.log("fire!!!");
+		console.log("fire!!!", this.tasks);
 		this.getTasksList();
+		console.log("after!!!", this.tasks);
 		this._onDidChangeTreeData.fire();
 	}
 

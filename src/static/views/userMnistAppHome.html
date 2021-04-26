@@ -22,23 +22,36 @@
         .thewrap {
             box-sizing: border-box;
         }
+
+        .userAppHome_body_bg {
+            text-align: center;
+        }
+
+        .userAppHome_body_bg::after {
+            content: "";
+            background: url("../images/zhijiang.JPG");
+            opacity: 0.3;
+            top: 25px;
+            left: 25px;
+            bottom: 25px;
+            right: 25px;
+            position: absolute;
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
     </style>
 
 </head>
 
 <body>
-    <div id="userAppHome" class="userAppHome_page">
-        <div class="clearfix thewrap userAppHome_top">
-            <div class="row">
-                <div class="userAppHome_title">可使用的应用: {{ userAppsList.length}}个</div>
-            </div>
-        </div>
+    <div id="userAppHome" class="userAppHome_page userAppHome_body_bg">
 
 
         <div class="clearfix thewrap userAppHome_middle">
 
             <template v-for="i in appsRowsCount">
-              
+
                 <div class="row">
                     <template v-if=" userAppsList.length > ((i-1) * 3) ">
                         <div class="col-md-2"></div>
@@ -53,7 +66,8 @@
                     <template v-if=" userAppsList.length > ((i-1) * 3 + 1)">
                         <div class="col-md-1"></div>
                         <div class="col-md-2">
-                            <div class="userAppHome_app_btn" @click="gotoOneMnistUserAppPage(userAppsList[(i-1)*3+1].id)">
+                            <div class="userAppHome_app_btn"
+                                @click="gotoOneMnistUserAppPage(userAppsList[(i-1)*3+1].id)">
                                 <span class="userAppHome_app_logo">{{ userAppsList[(i-1)*3+1].name }}</span>
                                 <span class="userAppHome_app_logo">手写体数字图像识别</span>
                             </div>
@@ -63,7 +77,8 @@
                     <template v-if=" userAppsList.length > ((i-1) * 3 + 2)">
                         <div class="col-md-1"></div>
                         <div class="col-md-2">
-                            <div class="userAppHome_app_btn" @click="gotoOneMnistUserAppPage(userAppsList[(i-1)*3+2].id)">
+                            <div class="userAppHome_app_btn"
+                                @click="gotoOneMnistUserAppPage(userAppsList[(i-1)*3+2].id)">
                                 <span class="userAppHome_app_logo">{{ userAppsList[(i-1)*3+2].name }}</span>
                                 <span class="userAppHome_app_logo">手写体数字图像识别</span>
                             </div>

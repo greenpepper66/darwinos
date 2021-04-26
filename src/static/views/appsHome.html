@@ -6,7 +6,23 @@
     <title>应用视图</title>
     <link href="../css/vs-light.css" rel="stylesheet" />
     <style>
+        .appHome_body_bg {
+            text-align: center;
+        }
 
+        .appHome_body_bg::after {
+            content: "";
+            background: url("../images/zhijiang.JPG");
+            opacity: 0.3;
+            top: 25px;
+            left: 25px;
+            bottom: 25px;
+            right: 25px;
+            position: absolute;
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
     </style>
 
     <script>
@@ -23,7 +39,7 @@
 </head>
 
 <body>
-    <div class="appMain_page">
+    <div class="appMain_page appHome_body_bg">
 
         <table class="appMain_page_tab">
             <tr>

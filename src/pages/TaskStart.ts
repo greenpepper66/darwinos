@@ -32,14 +32,18 @@ export function getTaskInputHtml(context, templatePath) {
         return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
     });
 
-    
-	// 任务输入执行页面样式
+    // 替换登录页面中 style 中 background img 
+    html = html.replace(/(.+?)(url\(")(.+?)"/g, (m, $1, $2, $3) => {
+        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
+
+    // 任务输入执行页面样式
     let vscodeColorTheme = vscode.window.activeColorTheme.kind;
-	if (vscodeColorTheme == 2) {
-		html = html.replace(/taskstyle-light.css/, "taskstyle-dark.css");
-	} else if(vscodeColorTheme == 1) {
-		html = html.replace(/taskstyle-dark.css/, "taskstyle-light.css");
-	}
+    if (vscodeColorTheme == 2) {
+        html = html.replace(/taskstyle-light.css/, "taskstyle-dark.css");
+    } else if (vscodeColorTheme == 1) {
+        html = html.replace(/taskstyle-dark.css/, "taskstyle-light.css");
+    }
 
     return html;
 }
@@ -179,21 +183,21 @@ const messageHandler = {
         // let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "test.py");
         // let command_str = "python " + scriptPath ;
         console.log("执行命令为", command_str);
-        let scriptProcess = exec(command_str,{});
+        let scriptProcess = exec(command_str, {});
 
         // 发送启动成功的消息
         global.panel.webview.postMessage({ doStartTaskSuccess: "start task success!" });
 
-        scriptProcess.stdout?.on("data", function(data){
+        scriptProcess.stdout?.on("data", function (data) {
             console.log(data);
             // 发送任务输出的全部结果
             global.panel.webview.postMessage({ doStartTaskRet: data });
         });
-        scriptProcess.stderr?.on("data", function(data){
+        scriptProcess.stderr?.on("data", function (data) {
             console.log(data);
             global.panel.webview.postMessage({ doStartTaskFailed: data });
         });
-        scriptProcess.on("exit",function(){
+        scriptProcess.on("exit", function () {
             console.log("game over!!");
             global.panel.webview.postMessage({ doStartTaskFinish: "run task success!" });
         });

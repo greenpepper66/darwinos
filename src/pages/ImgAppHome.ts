@@ -63,7 +63,7 @@ const imgAppMessageHandler = {
 // message.text: [appName, modelFileID, encodeMethodID, encodeConfDir, outputDir]
 function writeImgAppInfoToJson(global, message) {
     if (message.text.length != 5 || message.text[0] == "" || message.text[1] == "" || message.text[2] == ""
-        || message.text[3] == "" || message.text[4] == "" ) {
+        || message.text[3] == "" || message.text[4] == "") {
         return "error: save failed, please check your input!";
     } else {
         // 检查名字是否重复
@@ -255,6 +255,10 @@ export function getAppsHomeHtml(context, templatePath) {
         return $1 + vscode.Uri.file(path.resolve(dirPath, $2)).with({ scheme: 'vscode-resource' }).toString() + '"';
     });
 
+    // 替换登录页面中 style 中 background img 
+    html = html.replace(/(.+?)(url\(")(.+?)"/g, (m, $1, $2, $3) => {
+        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
 
     // 任务输入执行页面样式
     let vscodeColorTheme = vscode.window.activeColorTheme.kind;

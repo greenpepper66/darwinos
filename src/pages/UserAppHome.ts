@@ -232,6 +232,10 @@ export function getHtmlContent(context, templatePath) {
     html = html.replace(/(<link.+?href="|<script.+?src="|<img.+?src=")(.+?)"/g, (m, $1, $2) => {
         return $1 + vscode.Uri.file(path.resolve(dirPath, $2)).with({ scheme: 'vscode-resource' }).toString() + '"';
     });
+    // 替换登录页面中 style 中 background img 
+    html = html.replace(/(.+?)(url\(")(.+?)"/g, (m, $1, $2, $3) => {
+        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
 
     // 任务输入执行页面样式
     let vscodeColorTheme = vscode.window.activeColorTheme.kind;
