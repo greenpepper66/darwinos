@@ -67,7 +67,7 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
     // 自动弹出，但是我们要对内容做修改
     // 给每一项都创建一个 TreeItemNode
     getChildren(element?: SystemTreeItem | undefined): import("vscode").ProviderResult<SystemTreeItem[]> {
-        console.log(this.data);
+        console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&", element, this.data);
         if (element === undefined) {
             return this.data;
         } else {

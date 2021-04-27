@@ -119,33 +119,6 @@ export function openOnlyUserTreeView(context: vscode.ExtensionContext) {
 			});
 			context.subscriptions.push(gotoDisposable);
 		}
-
-		if (allCommands.indexOf("user_view.appsOverview") == -1) {
-			let viewDisposable = vscode.commands.registerCommand('user_view.appsOverview', () => {
-				UserAppHomePageProvide(context);
-			});
-			context.subscriptions.push(viewDisposable);
-		}
-
-		if (allCommands.indexOf("user_view.refreshEntry") == -1) {
-			let refDisposable = vscode.commands.registerCommand('user_view.refreshEntry', () => {
-				userDataProvider.providers[3].refresh()
-			});
-			context.subscriptions.push(refDisposable);
-		}
-
-		if (allCommands.indexOf("extension.userTreeViewClose") == -1) {
-			// 关闭导航栏的命令
-			let closeDisposable = vscode.commands.registerCommand('extension.userTreeViewClose', () => {
-				console.log("关闭用户导航栏");
-				// 清空数据
-				userDataProvider.clearTreeViewData();
-				userTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: userDataProvider });
-				userTreeView.reveal(null);
-			});
-			context.subscriptions.push(closeDisposable);
-		}
-
 		// 任务视图相关命令
 		if (allCommands.indexOf("extension.gotoImgAppTaskPage") == -1) {
 			// 任务视图导航栏子选项单击命令
@@ -154,19 +127,60 @@ export function openOnlyUserTreeView(context: vscode.ExtensionContext) {
 			});
 			context.subscriptions.push(taskDisposable);
 		}
+
+		// 普通用户和管理员用户 都能使用的命令，退出登录后需要清除命令，否则切换用户登录后命令不再重新注册，数据还是上个用户的
+		if (allCommands.indexOf("user_view.appsOverview") == -1) {
+			var userOvDisposable = vscode.commands.registerCommand('user_view.appsOverview', () => {
+				UserAppHomePageProvide(context);
+			});
+			context.subscriptions.push(userOvDisposable);
+		}
+		if (allCommands.indexOf("user_view.refreshEntry") == -1) {
+			var refDisposable = vscode.commands.registerCommand('user_view.refreshEntry', () => {
+				// userDataProvider.providers[3].refresh()
+				console.log("普通用户 刷新按钮: user_view.refreshEntry");
+			});
+			context.subscriptions.push(refDisposable);
+		}
 		if (allCommands.indexOf("task_view.refreshEntry") == -1) {
-			let taskRefDisposable = vscode.commands.registerCommand('task_view.refreshEntry', () => {
+			var taskRefDisposable = vscode.commands.registerCommand('task_view.refreshEntry', () => {
 				userDataProvider.providers[4].refresh();  // 更新tasks
-				userDataProvider.data[4].children = userDataProvider.providers[4].tasks;  // 更新导航栏子列表
+				userDataProvider.data[1].children = userDataProvider.providers[4].tasks;  // 更新导航栏子列表
 				userDataProvider.refresh(); // 更新导航栏
 			});
 			context.subscriptions.push(taskRefDisposable);
 		}
 		if (allCommands.indexOf("task_view.taskOverview") == -1) {
-			let taskOvDisposable = vscode.commands.registerCommand('task_view.taskOverview', () => {
+			var taskOvDisposable = vscode.commands.registerCommand('task_view.taskOverview', () => {
 				openImgAppTasksPage(context);
 			});
 			context.subscriptions.push(taskOvDisposable);
+		}
+
+
+		if (allCommands.indexOf("extension.userTreeViewClose") == -1) {
+			// 关闭导航栏的命令
+			let closeDisposable = vscode.commands.registerCommand('extension.userTreeViewClose', () => {
+				console.log("关闭用户导航栏");
+				// 删除注册过的命令,否则切换登录用户后会混淆
+				if (taskRefDisposable != undefined) {
+					taskRefDisposable.dispose();
+				}
+				if (taskOvDisposable != undefined) {
+					taskOvDisposable.dispose();
+				}
+				if (refDisposable != undefined) {
+					refDisposable.dispose();
+				}
+				if (userOvDisposable != undefined) {
+					userOvDisposable.dispose();
+				}
+				// 清空数据
+				userDataProvider.clearTreeViewData();
+				userTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: userDataProvider });
+				userTreeView.reveal(null);
+			});
+			context.subscriptions.push(closeDisposable);
 		}
 	});
 }
@@ -253,21 +267,10 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 			context.subscriptions.push(userDisposable);
 		}
 
-		if (allCommands.indexOf("extension.allTreeViewClose") == -1) {
-			// 关闭导航栏的命令
-			let closeAllDisposable = vscode.commands.registerCommand('extension.allTreeViewClose', () => {
-				console.log("关闭全部导航栏");
-				// 清空数据
-				systemDataProvider.clearTreeViewData();
-				allDTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: systemDataProvider });
-				allDTreeView.reveal(null);
-			});
-			context.subscriptions.push(closeAllDisposable);
-		}
 
 		// 注册刷新按钮
 		if (allCommands.indexOf("resource_view.refreshEntry") == -1) {
-			let resRefDisposable = vscode.commands.registerCommand('resource_view.refreshEntry', () => {
+			var resRefDisposable = vscode.commands.registerCommand('resource_view.refreshEntry', () => {
 				systemDataProvider.providers[0].refresh();  // 更新
 				systemDataProvider.data[0].children = systemDataProvider.providers[0].nodes;  // 更新导航栏子列表
 				systemDataProvider.refresh(); // 更新导航栏
@@ -275,7 +278,7 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 			context.subscriptions.push(resRefDisposable);
 		}
 		if (allCommands.indexOf("model_view.refreshEntry") == -1) {
-			let modRefDisposable = vscode.commands.registerCommand('model_view.refreshEntry', () => {
+			var modRefDisposable = vscode.commands.registerCommand('model_view.refreshEntry', () => {
 				systemDataProvider.providers[1].refresh();
 				systemDataProvider.data[1].children = systemDataProvider.providers[1].models;  // 更新导航栏子列表
 				systemDataProvider.refresh(); // 更新导航栏
@@ -283,24 +286,11 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 			context.subscriptions.push(modRefDisposable);
 		}
 		if (allCommands.indexOf("apps_view.refreshEntry") == -1) {
-			let appRefDisposable = vscode.commands.registerCommand('apps_view.refreshEntry', () => {
-				systemDataProvider.providers[2].refresh();
+			var appRefDisposable = vscode.commands.registerCommand('apps_view.refreshEntry', () => {
+				// systemDataProvider.providers[2].refresh();
+				console.log("管理员用户：刷新按钮：apps_view.refreshEntry")
 			});
 			context.subscriptions.push(appRefDisposable);
-		}
-		if (allCommands.indexOf("user_view.refreshEntry") == -1) {
-			let userFerDisposable = vscode.commands.registerCommand('user_view.refreshEntry', () => {
-				systemDataProvider.providers[3].refresh();
-			});
-			context.subscriptions.push(userFerDisposable);
-		}
-		if (allCommands.indexOf("task_view.refreshEntry") == -1) {
-			let taskRefDisposable = vscode.commands.registerCommand('task_view.refreshEntry', () => {
-				systemDataProvider.providers[4].refresh();  // 更新tasks
-				systemDataProvider.data[4].children = systemDataProvider.providers[4].tasks;  // 更新导航栏子列表
-				systemDataProvider.refresh(); // 更新导航栏
-			});
-			context.subscriptions.push(taskRefDisposable);
 		}
 
 
@@ -323,17 +313,74 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 			});
 			context.subscriptions.push(appOvDisposable);
 		}
-		if (allCommands.indexOf("task_view.taskOverview") == -1) {
-			let taskOvDisposable = vscode.commands.registerCommand('task_view.taskOverview', () => {
+
+
+		// 共有命令
+		if (allCommands.indexOf("user_view.refreshEntry") == -1) {
+			var allUserRefDisposable = vscode.commands.registerCommand('user_view.refreshEntry', () => {
+				// systemDataProvider.providers[3].refresh();
+				console.log("管理员用户：刷新按钮：user_view.refreshEntry")
+			});
+			context.subscriptions.push(allUserRefDisposable);
+		}
+		if (allCommands.indexOf("task_view.refreshEntry") == -1) {
+			var allTaskRefDisposable = vscode.commands.registerCommand('task_view.refreshEntry', () => {
+				systemDataProvider.providers[4].refresh();  // 更新tasks
+				systemDataProvider.data[4].children = systemDataProvider.providers[4].tasks;  // 更新导航栏子列表
+				systemDataProvider.refresh(); // 更新导航栏
+			});
+			context.subscriptions.push(allTaskRefDisposable);
+		}
+		if (allCommands.
+			indexOf("task_view.taskOverview") == -1) {
+			var allTaskOvDisposable = vscode.commands.registerCommand('task_view.taskOverview', () => {
 				openImgAppTasksPage(context);
 			});
-			context.subscriptions.push(taskOvDisposable);
+			context.subscriptions.push(allTaskOvDisposable);
 		}
 		if (allCommands.indexOf("user_view.appsOverview") == -1) {
-			let userOvDisposable = vscode.commands.registerCommand('user_view.appsOverview', () => {
+			var allUserOvDisposable = vscode.commands.registerCommand('user_view.appsOverview', () => {
 				UserAppHomePageProvide(context);
 			});
-			context.subscriptions.push(userOvDisposable);
+			context.subscriptions.push(allUserOvDisposable);
+		}
+
+
+
+		if (allCommands.indexOf("extension.allTreeViewClose") == -1) {
+			// 关闭导航栏的命令
+			let closeAllDisposable = vscode.commands.registerCommand('extension.allTreeViewClose', () => {
+				console.log("关闭全部导航栏");
+				// 取消命令注册
+				if (allUserRefDisposable != undefined) {
+					allUserRefDisposable.dispose();
+				}
+				if (allTaskRefDisposable != undefined) {
+					allTaskRefDisposable.dispose();
+				}
+				if (allTaskOvDisposable != undefined) {
+					allTaskOvDisposable.dispose();
+				}
+				if (allUserOvDisposable != undefined) {
+					allUserOvDisposable.dispose();
+				}
+
+				if (resRefDisposable != undefined) {
+					resRefDisposable.dispose();
+				}
+				if (modRefDisposable != undefined) {
+					modRefDisposable.dispose();
+				}
+				if (appRefDisposable != undefined) {
+					appRefDisposable.dispose();
+				}
+				// 清空数据
+				systemDataProvider.clearTreeViewData();
+				allDTreeView = vscode.window.createTreeView('system-treeView', { treeDataProvider: systemDataProvider });
+				allDTreeView.reveal(null);
+
+			});
+			context.subscriptions.push(closeAllDisposable);
 		}
 	});
 
