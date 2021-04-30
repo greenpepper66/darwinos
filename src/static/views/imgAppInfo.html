@@ -4,25 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>数字图像识别</title>
-    <style>
-        .imgAppInfo_body_bg {
-            text-align: center;
-        }
 
-        .imgAppInfo_body_bg::after {
-            content: "";
-            background: url("../images/zhijiang.JPG");
-            opacity: 0.3;
-            top: 25px;
-            left: 25px;
-            bottom: 25px;
-            right: 25px;
-            position: absolute;
-            z-index: -1;
-            background-repeat: no-repeat;
-            background-size: 100% 100%;
-        }
-    </style>
     <script>
         // <tr onmouseover="test2(this)" onmouseout="test(this)">
         function test(tr) {
@@ -35,7 +17,7 @@
 </head>
 
 <body>
-    <div id="imgAppInfo" class="imgAppInfo_page imgAppInfo_body_bg">
+    <div id="imgAppInfo" class="imgAppInfo_page">
         <div class="imgAppInfo_title">
             {{ imgAppInformation.name }}应用详情
         </div>
