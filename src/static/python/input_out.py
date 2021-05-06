@@ -6,6 +6,7 @@ import re
 import os
 import sys
 import datetime
+import shutil
 
 # 用户指定目录
 oriOutputDir = sys.argv[1]                             # 用户选择的输出文件目录
@@ -20,8 +21,10 @@ print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] The pickle 
 # 转化的input.txt和row.txt所在文件夹
 outputDir = os.path.join(oriOutputDir, "textDir")
 isExists = os.path.exists(outputDir)
-if not isExists:
-    os.mkdir(outputDir)
+if isExists:
+    print("output dir textDir exists, delete dir first!")
+    shutil.rmtree(outputDir)
+os.mkdir(outputDir)
 print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] MakeDir output dir is: ", outputDir, ". ", flush=True)
 
 

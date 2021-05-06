@@ -192,13 +192,13 @@
                             <td>应用名称</td>
                             <td>{{userAppInfo.name}}</td>
                             <td>图像数量</td>
-                            <td id="userAppInfo_imgNum">{{userAppInfo.imgNum}}幅</td>
+                            <td id="userMnistOneApp_imgNum"></td>
                         </tr>
                         <tr>
                             <td>应用ID</td>
                             <td>{{userAppInfo.id}}</td>
                             <td>应用运行总耗时</td>
-                            <td>2分钟</td>
+                            <td id="userMnistOneApp_runtime"></td>
                         </tr>
                         <tr>
                             <td>应用详情</td>
@@ -206,17 +206,14 @@
                                 <button type="button" class="userMnistOneApp_detail_btn"
                                     @click="userAppGotoImgAppInfoPage(userAppInfo.id)">应用详情</button>
                             </td>
-                            <td>识别单幅图像耗时</td>
-                            <td>50ms</td>
-                        </tr>
-                        <tr>
+                            
+                        
                             <td>任务详情</td>
                             <td>
                                 <button type="button" class="userMnistOneApp_detail_btn"
                                     @click="userAppGotoImgAppTaskPage(userAppInfo.id)">任务详情</button>
                             </td>
-                            <td>识别准确率</td>
-                            <td>100%</td>
+                           
                         </tr>
                     </table>
                 </div>

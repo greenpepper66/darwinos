@@ -72,6 +72,10 @@ const oneUserAppMessageHandler = {
         let ret = updateImgAppInfo(global.context, global.appInfo.id, message.text[0], message.text[1], totalImgNum);
         console.log("updateImgAppInfo ret: ", ret);
 
+        // 更新global中的应用信息
+        global.appInfo = searchImgAppByID(global.context, global.appInfo.id);
+        console.log("更新global中应用信息：", global.appInfo);
+
         if (ret == "success") {
             global.panel.webview.postMessage({ userAppStartRunReturnImgNum: totalImgNum });
             // 开始运行应用, 先解包配置文件
@@ -257,7 +261,18 @@ function getImgFileNum(path: string) {
     return files.length;
 }
 
-
+// 计算时间差
+function getAppRuntime(global) {
+    let start = global.startTime;
+    let end = global.endTime;
+    let timeDiff = end.getTime() - start.getTime();//时间差的毫秒数
+    let minutes = Math.floor(timeDiff / (60 * 1000))//计算相差分钟数
+    let leave1 = timeDiff % (60 * 1000)      //计算分钟数后剩余的毫秒数
+    let seconds = Math.floor(leave1 / 1000) //计算秒数
+    let leave2 = leave1 % 1000; // 剩余毫秒数
+    let runtime = minutes + "分钟" + seconds + "秒" + leave2 + "毫秒";
+    return runtime;
+}
 
 
 
@@ -272,6 +287,11 @@ function getImgFileNum(path: string) {
 // 0. 解包配置文件
 function unpackConfigFiles(global) {
     console.log("start unpack config files for app: ", global.appInfo.name);
+    // 获取应用运行的起始时间
+    let startTime = new Date();//获取当前时间 
+    global["startTime"] = startTime;
+    console.log("应用运行起始时间为：", global.startTime);
+
     // 脚本位置
     let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "pack_bin_files.py");
 
@@ -329,7 +349,7 @@ function runImgConvertScript(global) {
     let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹pickleDir
     let configDir = path.join(outputDir, "unpack_target");                            // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
 
-    let totalImgNum = global.appInfo.imgNum;                 // 获取图像数量
+    let totalImgNum = getImgFileNum(global.appInfo.imgSrcDir);                 // 获取图像数量
     let imgNum = 0;
 
     let command_str = "python3 " + scriptPath + " " + imgSrcDir + " " + configDir + " " + outputDir;
@@ -477,7 +497,15 @@ function runMnistSendInputScript(global) {
     scriptProcess.on("exit", function () {
         console.log("done!!");
         let str = "This image recognition task is all finished！";
-        global.panel.webview.postMessage({ recognitionProcessFinish: str });
+
+        // 获取应用运行的结束时间
+        let endTime = new Date();//获取当前时间 
+        global["endTime"] = endTime;
+        console.log("应用运行结束时间为：", global.endTime);
+        global["totalRuntime"] = getAppRuntime(global);
+        console.log("应用运行耗时为：", global.totalRuntime);
+        global.panel.webview.postMessage({ recognitionProcessFinish: global.totalRuntime });
     });
 
 }
+

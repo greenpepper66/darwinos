@@ -45,7 +45,7 @@
                             </td>
                             <td>
                                 <div class="">
-                                    <input type="text" id="searchByName" class="imgAppHome_inputBox"
+                                    <input type="text" id="searchByAppName" class="imgAppHome_inputBox"
                                         placeholder="请输入应用名称" />
                                 </div>
                             </td>
@@ -54,8 +54,8 @@
                             </td>
                             <td>
                                 <div>
-                                    <input type="text" id="searchByType" class="imgAppHome_inputBox"
-                                        placeholder="请输入模型名称" />
+                                    <input type="text" id="searchByModelID" class="imgAppHome_inputBox"
+                                        placeholder="请输入模型ID" />
                                 </div>
                             </td>
                             <td>
@@ -97,26 +97,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template v-if="appsConfigList.length == 0">
+                        <template v-if="appsShowedList.length == 0">
                             <tr>
-                                <template v-for="j in 7">
+                                <template v-for="j in 8">
                                     <td :key="j">-</td>
                                 </template>
                             </tr>
                         </template>
                         <template>
-                            <tr v-for="(item, index) in appsConfigList" :key="item.id" >
+                            <tr v-for="(item, index) in appsShowedList" :key="item.id">
                                 <td>{{ index + 1 }}</td>
                                 <td>{{ item.id }}</td>
                                 <td>{{ item.name }}</td>
                                 <td>数字图像识别</td>
                                 <td>{{ item.modeFileID }}</td>
-                                <template v-if="item.encodeMethodID == 0">
-                                    <td>频率编码</td>
-                                </template>
-                                <template v-else-if="item.encodeMethodID == 1">
-                                    <td>泊松编码</td>
-                                </template>
+                                <td>
+                                    <template v-if="item.encodeMethodID == 0">
+                                        频率编码
+                                    </template>
+                                    <template v-else-if="item.encodeMethodID == 1">
+                                        泊松编码
+                                    </template>
+                                </td>
+
+
                                 <td>{{ item.createTime }}</td>
                                 <td>
                                     <button type="button" class="imgAppHome_detail_btn"

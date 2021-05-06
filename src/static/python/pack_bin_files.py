@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import datetime
+import shutil
 
 ## 解包配置文件
 
@@ -32,8 +33,11 @@ def pack_files(input_files: list, target_save_name):
 
 
 def unpack_files(src_file: str, target_save_dir: str):
-    if not path.exists(target_save_dir):
-        os.mkdir(target_save_dir)
+    # 存在目录的话 先删除
+    if path.exists(target_save_dir):
+        print("output dir unpack_target exists, delete dir first!")
+        shutil.rmtree(target_save_dir)
+    os.mkdir(target_save_dir)
     with open(src_file, "rb") as f:
         all_content = pickle.load(f)
 

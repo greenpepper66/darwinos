@@ -116,8 +116,8 @@ window.addEventListener('message', event => {
 
     // 获取图像数量
     if (message.userAppStartRunReturnImgNum != undefined) {
-        console.log('---------------------------message：get img num', userAppStartRunReturnImgNum);
-        document.getElementById("userAppInfo_imgNum").innerHTML = message.userAppStartRunReturnImgNum;
+        console.log('---------------------------message：get img num', message.userAppStartRunReturnImgNum);
+        document.getElementById("userMnistOneApp_imgNum").innerHTML = message.userAppStartRunReturnImgNum;
     }
 
 
@@ -216,9 +216,11 @@ window.addEventListener('message', event => {
         console.log("run mnist err: ", message.recognitionProcessErrorLog);
     }
 
+    // 获取应用运行时间
     if (message.recognitionProcessFinish != undefined) {
-        console.log("run mnist over!", message.recognitionProcessFinish);
+        console.log("run mnist over and runtime is：", message.recognitionProcessFinish);
         document.getElementById("recognition_task_progress_div").style.width = "100%";
+        document.getElementById("userMnistOneApp_runtime").innerHTML = message.recognitionProcessFinish;
     }
 
     if (message.recognitionOneResult != undefined) {
