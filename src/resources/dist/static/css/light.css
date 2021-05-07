@@ -479,7 +479,7 @@ table.model_page_table-total td {
   font-size: 22px;
   color: #333333;
   letter-spacing: 1.6px;
-  margin-top: 5%;
+  margin-top: 15%;
 }
 .model_deploy_alert-btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
@@ -613,7 +613,7 @@ table.uploadModel_page_table tr td:nth-child(3) {
   font-size: 22px;
   color: #333333;
   letter-spacing: 1.6px;
-  margin-top: 5%;
+  margin-top: 15%;
 }
 .uploadModel_alert-btn {
   background-image: linear-gradient(180deg, #afd1ff 0%, #77a4ff 100%);
@@ -635,14 +635,6 @@ table.uploadModel_page_table tr td:nth-child(3) {
   background-color: #f5f5f5;
   text-align: center;
   height: 1500px;
-}
-.taskDetail_total_title {
-  font-size: 20px;
-  color: #333333;
-  letter-spacing: 1.14px;
-  height: 70px;
-  padding-top: 20px;
-  background: #eeeeee;
 }
 .taskDetail_info_title {
   font-size: 20px;
