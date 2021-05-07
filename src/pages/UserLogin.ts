@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 import { LoginInfo, openAllTreeViews, openOnlyUserTreeView } from "../extension";
 import { UserInfoData, addOneUser, searchUserInfoByName } from "../DataProvider/UserInfoJsonDataProvider";
-
+import {IDEPanels} from "../extension";
 
 // html文件路径
 const userLoginHtmlFilePath = "src/static/views/login.html";
@@ -46,11 +46,11 @@ const loginMessageHandler = {
         // 校验用户信息
         let user = searchUserInfoByName(global.context, message.text[0]);
         if (user == "none" || user.password != message.text[1]) {
-            global.panel.webview.postMessage({ loginSystemErrorRet: "error" });
+            IDEPanels.loginPanel.webview.postMessage({ loginSystemErrorRet: "error" });
             return
         } else {
             // 登录成功
-            global.panel.webview.postMessage({ loginSystemSuccess: user });
+            IDEPanels.loginPanel.webview.postMessage({ loginSystemSuccess: user });
             // 更新全局变量
             LoginInfo.currentUser = user;
             console.log("登录成功：", LoginInfo.currentUser);
@@ -69,7 +69,7 @@ const loginMessageHandler = {
     // 获取登录用户信息
     getCurrentUserInfo(global, message) {
         console.log(message);
-        global.panel.webview.postMessage({ cmd: 'getCurrentUserInfoRet', cbid: message.cbid, data: LoginInfo.currentUser });
+        IDEPanels.loginPanel.webview.postMessage({ cmd: 'getCurrentUserInfoRet', cbid: message.cbid, data: LoginInfo.currentUser });
     },
 
     // 点击了退出登录按钮
@@ -79,17 +79,20 @@ const loginMessageHandler = {
         // 清空全局变量
         LoginInfo.currentUser = undefined;
         // 发送消息
-        global.panel.webview.postMessage({ logoutSystemSuccess: "success" });
-       
+        IDEPanels.loginPanel.webview.postMessage({ logoutSystemSuccess: "success" });
+
         // 关闭导航栏
         if (role == 2) {
             vscode.commands.executeCommand('extension.userTreeViewClose');
         } else {
             vscode.commands.executeCommand('extension.allTreeViewClose');
         }
-         // 关闭登录页面 重新打开
-         global.panel.dispose(); 
-         OpenLoginPage(global.context);
+        // 关闭登录页面
+        IDEPanels.loginPanel.dispose();
+        // 关闭其他tab页
+        vscode.commands.executeCommand("workbench.action.closeOtherEditors");  
+        //  重新打开
+        OpenLoginPage(global.context);
     },
 }
 
@@ -97,25 +100,41 @@ const loginMessageHandler = {
 
 // 打开登录页面
 export function OpenLoginPage(context) {
-    const panel = vscode.window.createWebviewPanel(
-        "登录页面",
-        "登录页面",
-        vscode.ViewColumn.One,
-        {
-            // Enable scripts in the webview
-            enableScripts: true,
-            // retainContextWhenHidden: true  // 隐藏时保留上下文
-        } // Webview options. More on these later.
-    );
-    panel.webview.html = getWebViewContent(context, userLoginHtmlFilePath);
-    let global = { panel, context };
-    panel.webview.onDidReceiveMessage(message => {
-        if (loginMessageHandler[message.command]) {
-            loginMessageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+    console.log("IDE!!!!!!!!!!", IDEPanels);
+    if (IDEPanels.loginPanel) {
+        console.log("$$$$$$$$$$", IDEPanels.loginPanel.visible);
+        IDEPanels.loginPanel.reveal();
+    } else {
+        IDEPanels.loginPanel = vscode.window.createWebviewPanel(
+            "登录页面",
+            "登录页面",
+            vscode.ViewColumn.One,
+            {
+                // Enable scripts in the webview
+                enableScripts: true,
+                // retainContextWhenHidden: true  // 隐藏时保留上下文
+            } // Webview options. More on these later.
+        );
+        IDEPanels.loginPanel.webview.html = getWebViewContent(context, userLoginHtmlFilePath);
+        let global = { context };
+        IDEPanels.loginPanel.webview.onDidReceiveMessage(message => {
+            if (loginMessageHandler[message.command]) {
+                loginMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+        console.log("IDE2!!!!!!!!!!", IDEPanels);
+
+         // 面板被关闭后重置
+        IDEPanels.loginPanel.onDidDispose(
+            () => {
+                IDEPanels.loginPanel = undefined;
+            },
+            null,
+            context.subscriptions
+          );
+    }
 }
 
 

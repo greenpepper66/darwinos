@@ -5,7 +5,7 @@ import pickle
 import datetime
 import numpy as np
 from PIL import Image
-
+import shutil
 
 
 ################################
@@ -36,8 +36,10 @@ print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] ImgSrc dir 
  # 输出文件所在目录
 outputDir = os.path.join(outputDir, "pickleDir")
 isExists = os.path.exists(outputDir)
-if not isExists:
-    os.mkdir(outputDir)
+if isExists:
+    print("output dir pickleDir exists, delete dir first!")
+    shutil.rmtree(outputDir)
+os.mkdir(outputDir)
 print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] MakeDir output dir is: ", outputDir, ". ", flush=True)
 
 for root,dirs,files in os.walk(imgSrcDir):

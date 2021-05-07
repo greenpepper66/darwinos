@@ -27,8 +27,14 @@ export module LoginInfo {
 	export let currentUser: UserInfoData;
 }
 
-
 const PORT = 5001;
+
+export module IDEPanels {
+	export let loginPanel:vscode.WebviewPanel | undefined = undefined;
+}
+
+
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
