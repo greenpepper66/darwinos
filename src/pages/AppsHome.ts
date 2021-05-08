@@ -17,7 +17,6 @@ const messageHandler = {
         openCertainAppHomePage(global.context, message.text);
 
     },
-
 };
 
 

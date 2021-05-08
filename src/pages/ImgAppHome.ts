@@ -277,7 +277,7 @@ export function getAppsHomeHtml(context, templatePath) {
 export function openImgAppHomePage(context) {
     const panel = vscode.window.createWebviewPanel(
         'ImgAppWelcome',
-        "图像识别应用",
+        "数字图像识别",
         vscode.ViewColumn.One,
         {
             enableScripts: true,

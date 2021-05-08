@@ -303,7 +303,7 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 		// 注册overView按钮
 		if (allCommands.indexOf("resource_view.resOverview") == -1) {
 			let resOvDisposable = vscode.commands.registerCommand('resource_view.resOverview', () => {
-				PageProvideByPort("资源视图", 5001, "")
+				PageProvideByPort("类脑计算机", 5001, "")
 			});
 			context.subscriptions.push(resOvDisposable);
 		}

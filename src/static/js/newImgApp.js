@@ -110,6 +110,10 @@ function gotoImgAppRunTaskPageByName() {
 // 弹出框 相关
 function closeNewImgAppAlertBox() {
     document.getElementById('newImgApp_alert_result').style.display = 'none';
+
+    // 保存成功的话，关闭当前新建应用页面，跳转到应用列表页面
+    //todo
+    
 }
 
 

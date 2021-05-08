@@ -158,7 +158,7 @@ export function openOneKindUserAppPage(context, num) {
 export function openMnistUserAppHomePage(context) {
     const panel = vscode.window.createWebviewPanel(
         'userMnistApp',
-        "手写体应用",
+        "数字图像识别",
         vscode.ViewColumn.One,
         {
             enableScripts: true,
