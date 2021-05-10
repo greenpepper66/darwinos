@@ -46,9 +46,9 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 			AppsProvider.getIconUriForLabel("语音识别.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
-				command: 'extension.gotoAppPage',
+				command: '',
 				title: '',
-				arguments: ["voiceApp", 2]
+				arguments: []
 			}
 		);
 		this.appKinds.push(voiceApp);
@@ -57,9 +57,9 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 			AppsProvider.getIconUriForLabel("脑电模拟.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
-				command: 'extension.gotoAppPage',
+				command: '',
 				title: '',
-				arguments: ["brainApp", 3]
+				arguments: []
 			}
 		);
 		this.appKinds.push(brainApp);
@@ -68,9 +68,9 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 			AppsProvider.getIconUriForLabel("其它应用.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
-				command: 'extension.gotoAppPage',
+				command: '',
 				title: '',
-				arguments: ["otherApp", 4]
+				arguments: []
 			}
 		);
 		this.appKinds.push(otherApp);

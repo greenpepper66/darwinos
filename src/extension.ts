@@ -10,7 +10,7 @@ import { Task, TaskProvider } from "./DataProvider/TaskProvider";
 import { ResProvider } from "./DataProvider/ResProvider";
 import { AppsProvider } from "./DataProvider/AppsProvider";
 import { EmptyDataProvider } from "./DataProvider/EmptyDataProvider";
-import { PageProvideByPort, changeIndexHtmlCss } from "./PageProvider";
+import { PageProvideByPort, changeIndexHtmlCss, uploadModelPageProvideByPort, modelHomePageProvideByPort, resourceHomePageProvideByPort, nodePageProvideByPort, chipPageProvideByPort } from "./PageProvider";
 import { task_stop, task_reset, task_deploy, task_delete } from "./os/task_operations"
 import { startHttpServer } from './os/server';
 import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
@@ -29,8 +29,22 @@ export module LoginInfo {
 
 const PORT = 5001;
 
+// 以下panel要保持唯一性
 export module IDEPanels {
-	export let loginPanel:vscode.WebviewPanel | undefined = undefined;
+	export let loginPanel: vscode.WebviewPanel | undefined = undefined;
+	// 模型视图
+	export let uploadModelPanel: vscode.WebviewPanel | undefined = undefined;
+	export let modelHomePanel: vscode.WebviewPanel | undefined = undefined;
+	// 资源视图
+	export let resourceHomePanel: vscode.WebviewPanel | undefined = undefined;
+	export let nodePagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map();  // map类型, key值为panel的title
+	export let chipPagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map(); 
+	// 应用视图
+	export let appHomePanel: vscode.WebviewPanel | undefined = undefined;
+	export let imgAppListPanel: vscode.WebviewPanel | undefined = undefined;
+	export let newImgAppPanel: vscode.WebviewPanel | undefined = undefined;
+	export let imgAppInfoPagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map();
+
 }
 
 
@@ -217,7 +231,7 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 		if (evt.visible && LoginInfo.currentUser.name != '' && (LoginInfo.currentUser.userRole == 0 || LoginInfo.currentUser.userRole == 1)) {
 			console.log("打开Home页面");
 			//打开home页
-			PageProvideByPort("类脑计算机", 5001, "")
+			resourceHomePageProvideByPort(context);
 		} else {
 			console.log("导航栏无数据");  // 隐藏导航栏的时候执行
 		}
@@ -230,7 +244,7 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 	uploadModelTreeView.onDidChangeVisibility((evt) => {
 		if (evt.visible && LoginInfo.currentUser.name != '' && (LoginInfo.currentUser.userRole == 0 || LoginInfo.currentUser.userRole == 1)) {
 			console.log("打开upload页面");
-			PageProvideByPort("上传模型", 5001, "UploadModel");
+			uploadModelPageProvideByPort(context);
 		}
 	});
 
@@ -240,12 +254,20 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 	vscode.commands.getCommands(true).then(allCommands => {
 		console.log('all所有命令：', allCommands);
 
-		if (allCommands.indexOf("extension.openHttpPage") == -1) {
-			// 节点和芯片页面
-			let httpDisposable = vscode.commands.registerCommand('extension.openHttpPage', (name, port, route) => {
-				PageProvideByPort(name, port, route)
+		if (allCommands.indexOf("extension.openChipHttpPage") == -1) {
+			// 芯片详情页面
+			let chipHttpDisposable = vscode.commands.registerCommand('extension.openChipHttpPage', (name, port, route) => {
+				chipPageProvideByPort(context, name, port, route);
 			});
-			context.subscriptions.push(httpDisposable);
+			context.subscriptions.push(chipHttpDisposable);
+		}
+
+		if (allCommands.indexOf("extension.openNodeHttpPage") == -1) {
+			// 节点详情页面
+			let nodeHttpDisposable = vscode.commands.registerCommand('extension.openNodeHttpPage', (name, port, route) => {
+				nodePageProvideByPort(context, name, port, route);
+			});
+			context.subscriptions.push(nodeHttpDisposable);
 		}
 
 		if (allCommands.indexOf("extension.gotoAppPage") == -1) {
@@ -255,7 +277,6 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 			});
 			context.subscriptions.push(appDisposable);
 		}
-
 
 		if (allCommands.indexOf("extension.gotoImgAppTaskPage") == -1) {
 			// 任务视图导航栏子选项单击命令
@@ -303,13 +324,13 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 		// 注册overView按钮
 		if (allCommands.indexOf("resource_view.resOverview") == -1) {
 			let resOvDisposable = vscode.commands.registerCommand('resource_view.resOverview', () => {
-				PageProvideByPort("类脑计算机", 5001, "")
+				resourceHomePageProvideByPort(context);
 			});
 			context.subscriptions.push(resOvDisposable);
 		}
 		if (allCommands.indexOf("model_view.modelOverview") == -1) {
 			let modOvDisposable = vscode.commands.registerCommand('model_view.modelOverview', () => {
-				PageProvideByPort("模型视图", 5001, "model")
+				modelHomePageProvideByPort(context);
 			});
 			context.subscriptions.push(modOvDisposable);
 		}

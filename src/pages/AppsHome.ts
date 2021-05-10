@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { openImgAppHomePage } from "./ImgAppHome";
+import { IDEPanels } from "../extension";
+
 
 const appsHomeHtmlFilePath = "src/static/views/appsHome.html";
 const otherAppHomeHtmlFilePath = "src/static/views/otherAppHome.html";
@@ -48,27 +50,47 @@ export function getAppsHomeHtml(context, templatePath) {
     return html;
 }
 
-// overView按钮单击后显示应用视图首页
+// overView按钮单击后显示应用视图首页， 4个框图的页面
 export function AppsHomePageProvide(context) {
-    const panel = vscode.window.createWebviewPanel(
-        'appsWelcome',
-        "应用视图",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
-    let global = { panel, context };
-    panel.webview.html = getAppsHomeHtml(context, appsHomeHtmlFilePath);
-    panel.webview.onDidReceiveMessage(message => {
-        if (messageHandler[message.command]) {
-            messageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+    console.log("IDE AppsHomePageProvide!", IDEPanels.appHomePanel);
+    if (IDEPanels.appHomePanel) {
+        console.log("打开应用视图首页：", IDEPanels.appHomePanel.visible);
+        IDEPanels.appHomePanel.reveal();
+    } else {
+        console.log("新建应用视图首页");
+        IDEPanels.appHomePanel = vscode.window.createWebviewPanel(
+            'appsHomePage',
+            "应用视图",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
+        IDEPanels.appHomePanel.webview.html = getAppsHomeHtml(context, appsHomeHtmlFilePath);
 
+        let panel = IDEPanels.appHomePanel;
+        let global = { panel, context };
+
+        IDEPanels.appHomePanel.webview.onDidReceiveMessage(message => {
+            if (messageHandler[message.command]) {
+                messageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE AppsHomePageProvide 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.appHomePanel.onDidDispose(
+            () => {
+                IDEPanels.appHomePanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
 }
 
 

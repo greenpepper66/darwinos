@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { exec } from "child_process";
+import { IDEPanels } from "../extension";
 
 import { allData } from '../os/server';
 import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToTask, updateImgAppStatusToApp, checkImgAppExist, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
@@ -273,55 +274,93 @@ export function getAppsHomeHtml(context, templatePath) {
 
 
 
-// 1. webview: 打开首页
+// 1. webview: 打开数字图像识别应用首页, 最近应用列表页面
 export function openImgAppHomePage(context) {
-    const panel = vscode.window.createWebviewPanel(
-        'ImgAppWelcome',
-        "数字图像识别",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
+    console.log("IDE openImgAppHomePage!", IDEPanels.imgAppListPanel);
+    if (IDEPanels.imgAppListPanel) {
+        console.log("打开图像识别应用列表页面：", IDEPanels.imgAppListPanel.visible);
+        IDEPanels.imgAppListPanel.reveal();
+    } else {
+        console.log("新建图像识别应用列表页面");
+        IDEPanels.imgAppListPanel = vscode.window.createWebviewPanel(
+            'imgAppListPage',
+            "数字图像识别",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
 
-    let global = { panel, context };
-    panel.webview.html = getAppsHomeHtml(context, imgAppHomeHtmlFilePath);
-    panel.webview.onDidReceiveMessage(message => {
-        if (imgAppMessageHandler[message.command]) {
-            imgAppMessageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+        let panel = IDEPanels.imgAppListPanel;
+        let global = { panel, context };
 
+        IDEPanels.imgAppListPanel.webview.html = getAppsHomeHtml(context, imgAppHomeHtmlFilePath);
+        IDEPanels.imgAppListPanel.webview.onDidReceiveMessage(message => {
+            if (imgAppMessageHandler[message.command]) {
+                imgAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openImgAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.imgAppListPanel.onDidDispose(
+            () => {
+                IDEPanels.imgAppListPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
 }
 
 
 // 2. 打开新建页面
 export function openNewImgAppPage(context) {
-    const panel = vscode.window.createWebviewPanel(
-        'NewImgApp',
-        "新建应用",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
+    console.log("IDE openNewImgAppPage!", IDEPanels.newImgAppPanel);
+    if (IDEPanels.newImgAppPanel) {
+        console.log("打开新建图像识别应用页面：", IDEPanels.newImgAppPanel.visible);
+        IDEPanels.newImgAppPanel.reveal();
+    } else {
+        console.log("新建 新建图像识别应用页面");
 
-    let global = { panel, context };
-    panel.webview.html = getAppsHomeHtml(context, newImgAppHtmlFilePath);
-    // 发送消息 弹出模态框
-    global.panel.webview.postMessage({ createImgApplictaion: "yes" });
+        IDEPanels.newImgAppPanel = vscode.window.createWebviewPanel(
+            'newImgAppPage',
+            "新建应用",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
+        let panel = IDEPanels.newImgAppPanel;
+        let global = { panel, context };
+        IDEPanels.newImgAppPanel.webview.html = getAppsHomeHtml(context, newImgAppHtmlFilePath);
+        // 发送消息 弹出模态框
+        global.panel.webview.postMessage({ createImgApplictaion: "yes" });
 
-    panel.webview.onDidReceiveMessage(message => {
-        if (newImgAppMessageHandler[message.command]) {
-            newImgAppMessageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+        IDEPanels.newImgAppPanel.webview.onDidReceiveMessage(message => {
+            if (newImgAppMessageHandler[message.command]) {
+                newImgAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openNewImgAppPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.newImgAppPanel.onDidDispose(
+            () => {
+                IDEPanels.newImgAppPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
 }
 
 

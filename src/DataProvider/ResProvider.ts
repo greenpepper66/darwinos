@@ -56,7 +56,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
         i,
         node.usedNeureNums[i],
         {
-          command: 'extension.openHttpPage',
+          command: 'extension.openChipHttpPage',
           title: '',
           arguments: ["节点" + node.nodeID + "芯片" + i + "详情",
             5001,
@@ -86,7 +86,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
         chips,
         usedNeureNums,
         {
-          command: 'extension.openHttpPage',
+          command: 'extension.openNodeHttpPage',
           title: '',
           arguments: ["节点" + id + "详情",
             5001,
