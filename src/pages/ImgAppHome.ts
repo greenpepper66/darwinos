@@ -1,11 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { exec } from "child_process";
 import { IDEPanels } from "../extension";
-
 import { allData } from '../os/server';
-import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToTask, updateImgAppStatusToApp, checkImgAppExist, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
+import { searchAllJson, deleteJson, searchImgAppByName, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToApp, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
 
 
 const imgAppHomeHtmlFilePath = "src/static/views/imgAppHome.html";
@@ -52,11 +50,6 @@ const imgAppMessageHandler = {
         openImgAppInfoPage(global.context, message.text);
     },
 
-    // 2.5 运行应用， 应用列表页面的“启动”按钮 触发
-    gotoImgAppRunTaskPageByID(global, message) {
-        console.log(message);
-        openImgAppRunTaskPage(global.context, "byID", message.text);
-    },
 
 };
 
@@ -141,7 +134,13 @@ const newImgAppMessageHandler = {
         global.panel.webview.postMessage({ saveImgAppConfigRet: saveRet });
     },
 
-    // 3.4 选择启动任务所需的各个配置文件 - 打包成一个了
+    // 3.4 应用保存成功后，弹出框显示“保存成功！”, 页面跳转到应用列表页面
+    newAppSaveSuccGotoListPage(global, message) {
+        console.log(message);
+        openImgAppHomePage(global.context);
+    },
+
+    // 3.5 选择启动任务所需的各个配置文件 - 打包成一个了
     selectEncodeConfFile(global, message) {
         console.log(message);
         const options: vscode.OpenDialogOptions = {
@@ -155,7 +154,7 @@ const newImgAppMessageHandler = {
         });
     },
 
-    //3.5 选择编码过程中输出文件所在的文件夹
+    //3.6 选择编码过程中输出文件所在的文件夹
     selectOutputDir(global, message) {
         console.log(message);
         const options: vscode.OpenDialogOptions = {
@@ -169,20 +168,9 @@ const newImgAppMessageHandler = {
         });
     },
 
-    //3.6 跳转到应用运行界面 - 新建应用页面的“启动应用”按钮触发
-    gotoImgAppRunTaskPageByName(global, message) {
-        console.log(message);
-        // 先检查应用是否已经保存，必须先保存再启动
-        let isExist = checkImgAppExist(global.context, message);
-        if (isExist.indexOf("error") != -1) {
-            // app不存在 报错
-            global.panel.webview.postMessage({ gotoImgAppRunTaskPageByNameRet: isExist });
-        } else {
-            console.log("gotoImgAppRunTaskPageByName: the app is saved and can go to the task page!")
-            // 保存成功 - 跳转到任务页面
-            openImgAppRunTaskPage(global.context, "byName", message.text[0]);
-        }
-    }
+    
+
+
 };
 
 // 4. 与应用详情页面的交互
@@ -218,16 +206,10 @@ const imgAppTasksMessageHandler = {
         global.panel.webview.postMessage({ cmd: 'getImgAppTasksListRet', cbid: message.cbid, data: allImgTasks });
     },
 
-    // 跳转到新建任务页面，也就是应用列表页面
-    gotoNewImgAppTaskPage(global, message) {
-        console.log(message);
-        openImgAppHomePage(global.context);
-    },
-
     // 跳转到任务详情页面
     gotoImgAppTaskPage(global, message) {
         console.log(message);
-        openImgAppRunTaskPage(global.context, "byID", message.text);
+        openImgAppRunTaskPage(global.context, message.text);
     },
 
     // 删除一个任务，也就是将json文件中应用的status恢复为默认值0 
@@ -288,7 +270,6 @@ export function openImgAppHomePage(context) {
             vscode.ViewColumn.One,
             {
                 enableScripts: true,
-                retainContextWhenHidden: true,
             }
         );
 
@@ -333,7 +314,6 @@ export function openNewImgAppPage(context) {
             vscode.ViewColumn.One,
             {
                 enableScripts: true,
-                retainContextWhenHidden: true,
             }
         );
         let panel = IDEPanels.newImgAppPanel;
@@ -366,89 +346,147 @@ export function openNewImgAppPage(context) {
 
 // 3. 打开应用详情页面
 export function openImgAppInfoPage(context, appID) {
-    const panel = vscode.window.createWebviewPanel(
-        'ImgAppInfo',
-        "应用详情",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
 
-    // 保存应用ID
-    let global = { panel, context, appID };
-    panel.webview.html = getAppsHomeHtml(context, imgAppInfoHtmlFilePath);
+    console.log("IDE openImgAppInfoPage!", IDEPanels.imgAppInfoPagePanelsMap);
+    if (IDEPanels.imgAppInfoPagePanelsMap.has(appID)) {
+        console.log("打开应用详情页面：", IDEPanels.imgAppInfoPagePanelsMap.get(appID).visible);
+        IDEPanels.imgAppInfoPagePanelsMap.get(appID).reveal();
+    } else {
+        console.log("新建应用详情页面");
+        let panel = vscode.window.createWebviewPanel(
+            'imgAppInfoPage',
+            "应用详情",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        panel.webview.html = getAppsHomeHtml(context, imgAppInfoHtmlFilePath);
 
-    panel.webview.onDidReceiveMessage(message => {
-        if (imgAppInfoMessageHandler[message.command]) {
-            imgAppInfoMessageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+        // 保存应用ID
+        let global = { panel, context, appID };
+        IDEPanels.imgAppInfoPagePanelsMap.set(appID, panel);
+
+        panel.webview.onDidReceiveMessage(message => {
+            if (imgAppInfoMessageHandler[message.command]) {
+                imgAppInfoMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openImgAppInfoPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        panel.onDidDispose(
+            () => {
+                panel = undefined;
+                IDEPanels.imgAppInfoPagePanelsMap.delete(appID);
+            },
+            null,
+            context.subscriptions
+        );
+    }
 }
 
 
-// 4. 打开运行应用页面 
-export function openImgAppRunTaskPage(context, kind, val) {
+// 4. 打开任务详情页面 —— 显示板子芯片信息 
+export function openImgAppRunTaskPage(context, appID) {
     // 查询应用信息
-    if (kind == "byID") {
-        var appInfo = searchImgAppByID(context, val);
-    } else if (kind == "byName") {
-        var appInfo = searchImgAppByName(context, val);
-    }
+    let appInfo = searchImgAppByID(context, appID);
     if (appInfo == "none") {
-        console.error("can not found the app: ", val);
+        console.error("can not found the app: ", appID);
     }
-    // 应用成为一条任务
-    updateImgAppStatusToTask(context, appInfo.id);
-    console.log("become one task: ", appInfo.id);
+    // // 应用成为一条任务
+    // updateImgAppStatusToTask(context, appInfo.id);
+    // console.log("become one task: ", appInfo.id);
 
-    const panel = vscode.window.createWebviewPanel(
-        'runImgApp',
-        "任务详情",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
 
-    let global = { panel, context, appInfo };
-    panel.webview.html = getAppsHomeHtml(context, imgAppRunTaskHtmlFilePath);
+    console.log("IDE openOneMnistUserAppPageByID!", IDEPanels.taskInfoImgAppPagePanelsMap);
+    if (IDEPanels.taskInfoImgAppPagePanelsMap.has(appID)) {
+        console.log("打开任务详情页面：", IDEPanels.taskInfoImgAppPagePanelsMap.get(appID).visible);
+        IDEPanels.taskInfoImgAppPagePanelsMap.get(appID).reveal();
+    } else {
+        console.log("新建任务详情页面");
 
-    panel.webview.onDidReceiveMessage(message => {
-        if (imgAppRunTaskMessageHandler[message.command]) {
-            imgAppRunTaskMessageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+        let panel = vscode.window.createWebviewPanel(
+            'runImgAppChipInfoPage',
+            "任务详情",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        panel.webview.html = getAppsHomeHtml(context, imgAppRunTaskHtmlFilePath);
+
+        let global = { panel, context, appInfo };
+        IDEPanels.taskInfoImgAppPagePanelsMap.set(appID, panel);
+
+        panel.webview.onDidReceiveMessage(message => {
+            if (imgAppRunTaskMessageHandler[message.command]) {
+                imgAppRunTaskMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openOneMnistUserAppPageByID 2!", global.panel);
+
+        // 面板被关闭后重置
+        panel.onDidDispose(
+            () => {
+                panel = undefined;
+                IDEPanels.taskInfoImgAppPagePanelsMap.delete(appID);
+            },
+            null,
+            context.subscriptions
+        );
+    }
 }
 
-// 5. 打开任务列表首页
-// 以后有多种任务了，可以移到外面，新建一个文件
-export function openImgAppTasksPage(context) {
-    const panel = vscode.window.createWebviewPanel(
-        'ImgAppTasks',
-        "图像识别任务",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
 
-    let global = { panel, context };
-    panel.webview.html = getAppsHomeHtml(context, imgAppTasksHtmlFilePath);
-    panel.webview.onDidReceiveMessage(message => {
-        if (imgAppTasksMessageHandler[message.command]) {
-            imgAppTasksMessageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+
+// 5. 打开任务视图首页 - 任务列表页面
+export function openImgAppTasksPage(context) {
+    console.log("IDE openImgAppTasksPage!", IDEPanels.taskHomeImgAppListPanel);
+    if (IDEPanels.taskHomeImgAppListPanel) {
+        console.log("打开任务视图首页：", IDEPanels.taskHomeImgAppListPanel.visible);
+        IDEPanels.taskHomeImgAppListPanel.reveal();
+    } else {
+        console.log("新建任务视图首页");
+
+        IDEPanels.taskHomeImgAppListPanel = vscode.window.createWebviewPanel(
+            'imgAppTasksHomePage',
+            "任务视图",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        IDEPanels.taskHomeImgAppListPanel.webview.html = getAppsHomeHtml(context, imgAppTasksHtmlFilePath);
+
+        let panel = IDEPanels.taskHomeImgAppListPanel;
+        let global = { panel, context };
+
+        IDEPanels.taskHomeImgAppListPanel.webview.onDidReceiveMessage(message => {
+            if (imgAppTasksMessageHandler[message.command]) {
+                imgAppTasksMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openImgAppTasksPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.taskHomeImgAppListPanel.onDidDispose(
+            () => {
+                IDEPanels.taskHomeImgAppListPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
 }
 
 

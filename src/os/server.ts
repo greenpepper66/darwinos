@@ -65,7 +65,6 @@ export function startHttpServer(ResDataProvider: ResProvider,
 			res.setHeader("Access-Control-Allow-Origin", "*");
 			res.end('goto success');
 
-			// TODO
 			console.log("请求体数据：", req);
 			let JSONdata = JSON.parse(req.msg);
 			let nodeID = JSONdata.nodeID;  // number类型
@@ -84,7 +83,6 @@ export function startHttpServer(ResDataProvider: ResProvider,
 			res.setHeader("Access-Control-Allow-Origin", "*");
 			res.end('goto success');
 
-			// TODO
 			console.log("请求体数据：", req);
 			let JSONdata = JSON.parse(req.msg);
 			let nodeID = JSONdata.nodeID.replace(/^\s*|\s*$/g, "");  //string类型

@@ -64,7 +64,6 @@ export function AppsHomePageProvide(context) {
             vscode.ViewColumn.One,
             {
                 enableScripts: true,
-                retainContextWhenHidden: true,
             }
         );
         IDEPanels.appHomePanel.webview.html = getAppsHomeHtml(context, appsHomeHtmlFilePath);
@@ -113,7 +112,7 @@ export function openOtherAppHomePage(context) {
         vscode.ViewColumn.One,
         {
             enableScripts: true,
-            retainContextWhenHidden: true,
+            // retainContextWhenHidden: true, // 内存占用较高
         }
     );
     panel.webview.html = getAppsHomeHtml(context, otherAppHomeHtmlFilePath);

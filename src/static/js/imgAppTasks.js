@@ -84,15 +84,6 @@ new Vue({
 
     },
     methods: {
-        gotoNewImgAppTaskPage() {
-            console.log("go to new img app task page!");
-            // 给插件发送消息 跳转到应用列表页面
-            vscode.postMessage({
-                command: 'gotoNewImgAppTaskPage',
-                text: "跳转到应用列表页面",
-            });
-        },
-
         gotoImgAppTaskPage(imgAppID) {
             console.log("run app: ", imgAppID);
             // 给插件发送消息 跳转到任务页面

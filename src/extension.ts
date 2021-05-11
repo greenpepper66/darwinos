@@ -2,23 +2,14 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as path from 'path';
-//import * as fs from 'fs';
-//import * as http from 'http';
-//import * as handler from 'serve-handler';
-import { Model, ModelProvider } from "./DataProvider/ModelProvider";
-import { Task, TaskProvider } from "./DataProvider/TaskProvider";
-import { ResProvider } from "./DataProvider/ResProvider";
-import { AppsProvider } from "./DataProvider/AppsProvider";
 import { EmptyDataProvider } from "./DataProvider/EmptyDataProvider";
-import { PageProvideByPort, changeIndexHtmlCss, uploadModelPageProvideByPort, modelHomePageProvideByPort, resourceHomePageProvideByPort, nodePageProvideByPort, chipPageProvideByPort } from "./PageProvider";
-import { task_stop, task_reset, task_deploy, task_delete } from "./os/task_operations"
+import { changeIndexHtmlCss, uploadModelPageProvideByPort, modelHomePageProvideByPort, resourceHomePageProvideByPort, nodePageProvideByPort, chipPageProvideByPort } from "./PageProvider";
 import { startHttpServer } from './os/server';
 import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
 import { openImgAppRunTaskPage, openImgAppTasksPage } from "./pages/ImgAppHome";
 import { OpenLoginPage } from "./pages/UserLogin";
 import { UserInfoData } from "./DataProvider/UserInfoJsonDataProvider";
 import { SystemTreeViewProvider } from "./DataProvider/SystemProvider";
-import { UserProvider } from './DataProvider/UserProvider';
 import { UserAppHomePageProvide, openOneKindUserAppPage } from './pages/UserAppHome';
 
 // 全局变量，保存用户登录信息
@@ -38,13 +29,19 @@ export module IDEPanels {
 	// 资源视图
 	export let resourceHomePanel: vscode.WebviewPanel | undefined = undefined;
 	export let nodePagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map();  // map类型, key值为panel的title
-	export let chipPagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map(); 
+	export let chipPagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map();
 	// 应用视图
 	export let appHomePanel: vscode.WebviewPanel | undefined = undefined;
 	export let imgAppListPanel: vscode.WebviewPanel | undefined = undefined;
 	export let newImgAppPanel: vscode.WebviewPanel | undefined = undefined;
-	export let imgAppInfoPagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map();
-
+	export let imgAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	// 用户视图
+	export let userHomePanel: vscode.WebviewPanel | undefined = undefined;
+	export let userImgAppSquarePanel: vscode.WebviewPanel | undefined = undefined;
+	export let userImgAppRunPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	// 任务视图
+	export let taskHomeImgAppListPanel: vscode.WebviewPanel | undefined = undefined;
+	export let taskInfoImgAppPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为任务的id
 }
 
 
@@ -129,8 +126,6 @@ export function openOnlyUserTreeView(context: vscode.ExtensionContext) {
 	// 获取所有命令
 	vscode.commands.getCommands(true).then(allCommands => {
 		console.log('所有命令：', allCommands);
-		// console.log(allCommands.indexOf("extension.userTreeViewClose")); // 命令已存在 返回编号
-		// console.log(allCommands.indexOf("extension.userTreeViewCloserrrrrrrrrr")); // 命令不存在 返回-1
 
 		// 命令不存在的时候再注册, 重复注册会err
 		if (allCommands.indexOf("extension.gotoOneKindUserAppPage") == -1) {
@@ -143,7 +138,7 @@ export function openOnlyUserTreeView(context: vscode.ExtensionContext) {
 		if (allCommands.indexOf("extension.gotoImgAppTaskPage") == -1) {
 			// 任务视图导航栏子选项单击命令
 			let taskDisposable = vscode.commands.registerCommand('extension.gotoImgAppTaskPage', (name, id, type) => {
-				openImgAppRunTaskPage(context, "byID", id);
+				openImgAppRunTaskPage(context, id);
 			});
 			context.subscriptions.push(taskDisposable);
 		}
@@ -281,7 +276,7 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 		if (allCommands.indexOf("extension.gotoImgAppTaskPage") == -1) {
 			// 任务视图导航栏子选项单击命令
 			let taskDisposable = vscode.commands.registerCommand('extension.gotoImgAppTaskPage', (name, id, type) => {
-				openImgAppRunTaskPage(context, "byID", id);
+				openImgAppRunTaskPage(context, id);
 			});
 			context.subscriptions.push(taskDisposable);
 		}
@@ -358,8 +353,7 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 			});
 			context.subscriptions.push(allTaskRefDisposable);
 		}
-		if (allCommands.
-			indexOf("task_view.taskOverview") == -1) {
+		if (allCommands.indexOf("task_view.taskOverview") == -1) {
 			var allTaskOvDisposable = vscode.commands.registerCommand('task_view.taskOverview', () => {
 				openImgAppTasksPage(context);
 			});
@@ -420,172 +414,6 @@ export function openAllTreeViews(context: vscode.ExtensionContext) {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/** 原来为区分用户角色的功能 */
-export function startSystemForAdmin(context) {
-
-	//启动一个terminal，运行网页服务端
-	const resourcePath = path.join(context.extensionPath, 'src/resources');
-	const terminal1 = vscode.window.createTerminal('webServer')
-	terminal1.sendText("cd " + resourcePath);
-	terminal1.sendText("serve -s dist -l 5001");
-
-	//打开home页
-	PageProvideByPort("类脑计算机", 5001, "")
-
-	const ResDataProvider = new ResProvider(vscode.workspace.rootPath);
-	vscode.window.registerTreeDataProvider('resource_view', ResDataProvider);
-
-	const ModelDataProvider = new ModelProvider(vscode.workspace.rootPath);
-	vscode.window.registerTreeDataProvider('model_view', ModelDataProvider);
-
-	const TaskDataProvider = new TaskProvider(vscode.workspace.rootPath);
-	vscode.window.registerTreeDataProvider('task_view', TaskDataProvider);
-
-	const AppsDataProvider = new AppsProvider(vscode.workspace.rootPath);
-	vscode.window.registerTreeDataProvider('apps_view', AppsDataProvider);
-
-	const UserDataProvider = new UserProvider(vscode.workspace.rootPath);
-	vscode.window.registerTreeDataProvider('user_view', UserDataProvider);
-
-
-
-
-	//自动弹出导航栏
-	let ResTreeView = vscode.window.createTreeView('resource_view', { treeDataProvider: ResDataProvider });
-	ResTreeView.reveal(ResDataProvider.nodes[0]);
-
-
-	//上传模型
-	vscode.commands.registerCommand('model_view.uploadModel', () => {
-		PageProvideByPort("上传模型", 5001, "UploadModel");
-		vscode.window.showInformationMessage(`Successfully called upload model.`);
-	});
-
-	const uploadModelDataProvider = new EmptyDataProvider(vscode.workspace.rootPath);
-	vscode.window.registerTreeDataProvider('upload_model_view', uploadModelDataProvider);
-	let uploadModelTreeView = vscode.window.createTreeView('upload_model_view', { treeDataProvider: uploadModelDataProvider });
-	uploadModelTreeView.onDidChangeVisibility((evt) => {
-		if (evt.visible) {
-			vscode.commands.executeCommand('model_view.uploadModel');
-		}
-	});
-
-
-
-	// 刷新
-	vscode.commands.registerCommand('resource_view.refreshEntry', () => ResDataProvider.refresh());
-	vscode.commands.registerCommand('model_view.refreshEntry', () => ModelDataProvider.refresh());
-	vscode.commands.registerCommand('apps_view.refreshEntry', () => AppsDataProvider.refresh());
-	vscode.commands.registerCommand('user_view.refreshEntry', () => UserDataProvider.refresh());
-	vscode.commands.registerCommand('task_view.refreshEntry', () => TaskDataProvider.refresh());
-
-	vscode.commands.registerCommand('extension.openHttpPage', (name, port, route) => {
-		PageProvideByPort(name, port, route)
-	});
-
-
-	// OverView
-	vscode.commands.registerCommand('resource_view.resOverview', () => {
-		PageProvideByPort("资源视图", 5001, "")
-	});
-	vscode.commands.registerCommand('model_view.modelOverview', () => {
-		PageProvideByPort("模型视图", 5001, "model")
-	});
-	vscode.commands.registerCommand('apps_view.appsOverview', () => {
-		AppsHomePageProvide(context);  // overview按钮打开应用视图首页
-	});
-	vscode.commands.registerCommand('task_view.taskOverview', () => {
-		openImgAppTasksPage(context);
-	});
-	vscode.commands.registerCommand('user_view.appsOverview', () => {
-		UserAppHomePageProvide(context);
-	});
-
-
-	// 应用视图
-	// 应用视图导航栏子选项单击命令
-	vscode.commands.registerCommand('extension.gotoAppPage', (name, num) => {
-		openCertainAppHomePage(context, num);
-	});
-	// 任务视图导航栏子选项单击命令
-	vscode.commands.registerCommand('extension.gotoImgAppTaskPage', (name, id, type) => {
-		openImgAppRunTaskPage(context, "byID", id);
-	});
-
-	// 用户视图导航栏子选项单击命令
-	vscode.commands.registerCommand('extension.gotoOneKindUserAppPage', (name, num) => {
-		openOneKindUserAppPage(context, num);
-	});
-
-
-	//定时自动刷新导航栏，显示信息
-	setTimeout(function refreshEntrys() {
-		vscode.commands.executeCommand('resource_view.refreshEntry');
-		vscode.commands.executeCommand('model_view.refreshEntry');
-		vscode.commands.executeCommand('user_view.refreshEntry');
-		vscode.commands.executeCommand('task_view.refreshEntry');
-	}, 500);
-
-
-	//model view  
-	vscode.commands.registerCommand('model_view.deployTask', (model: Model) => {
-		task_deploy(model.nodeIp, model.modelId);
-		vscode.window.showInformationMessage(`Successfully called deploy task.`);
-		ModelDataProvider.refresh();
-	});
-
-	vscode.commands.registerCommand('model_view.deleteTask', (model: Model) => {
-		task_delete(model.nodeIp, model.modelId);
-		vscode.window.showInformationMessage(`Successfully called delete task.`);
-		ModelDataProvider.refresh();
-	});
-
-
-
-	//task view
-	// 启动任务
-	// vscode.commands.registerCommand('task_view.startTask', (task: Task) => {
-	// 	task_start(task.nodeIp,task.modelId);		
-	// 	vscode.window.showInformationMessage(`Successfully called start task.`);
-	// });
-
-	require('./pages/TaskStart')(context); // 
-
-	vscode.commands.registerCommand('task_view.stopTask', (task: Task) => {
-		task_stop(task.nodeIp, task.modelId);
-		vscode.window.showInformationMessage(`Successfully called stop task.`);
-	});
-
-	vscode.commands.registerCommand('task_view.resetTask', (task: Task) => {
-		task_reset(task.nodeIp, task.modelId);
-		vscode.window.showInformationMessage(`Successfully called reset task.`);
-	});
-}
 
 
 

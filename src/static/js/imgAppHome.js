@@ -125,14 +125,6 @@ new Vue({
                 text: imgAppID,
             });
         },
-        gotoImgAppRunTaskPageByID(imgAppID) {
-            console.log("run app: ", imgAppID);
-            // 给插件发送消息 跳转到任务页面
-            vscode.postMessage({
-                command: 'gotoImgAppRunTaskPageByID',
-                text: imgAppID,
-            });
-        },
 
         deleteAppConfig(appID) {
             console.log("delete app: ", appID);

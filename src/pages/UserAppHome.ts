@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { exec } from "child_process";
-import { searchAllJson, deleteJson, searchImgAppByName, updateImgAppInfo, searchImgAppByID, writeJson, ImgAppConfigData, updateImgAppStatusToTask, updateImgAppStatusToApp, checkImgAppExist, searchAllImgAppTasks } from '../DataProvider/ImgAppJsonDataProvider';
+import { searchAllJson, updateImgAppInfo, searchImgAppByID } from '../DataProvider/ImgAppJsonDataProvider';
 import { openImgAppInfoPage, openImgAppRunTaskPage } from './ImgAppHome';
+import { IDEPanels } from "../extension";
 
 // 日志输出
 const log_output_channel = vscode.window.createOutputChannel("darwinos output");
@@ -53,6 +54,7 @@ const oneUserAppMessageHandler = {
         global.panel.webview.postMessage({ cmd: 'getOneMnistUserAppInfoRet', cbid: message.cbid, data: global.appInfo });
     },
 
+    // 选择图像
     userAppSelectImgDir(global, message) {
         console.log(message);
         const options: vscode.OpenDialogOptions = {
@@ -65,6 +67,7 @@ const oneUserAppMessageHandler = {
         });
     },
 
+    // 点击“启动应用”按钮，执行图像识别，应用成为一条任务
     userAppStartRun(global, message) {
         // 保存图像源信息, 获取图像数量，修改状态 0-1，成为一条任务
         let totalImgNum = getImgFileNum(message.text[1]);                 // 获取图像数量
@@ -103,8 +106,6 @@ const oneUserAppMessageHandler = {
     },
 
 
-
-
     // 查询应用  显示详情页
     userAppGotoImgAppInfoPage(global, message) {
         console.log(message);
@@ -113,7 +114,7 @@ const oneUserAppMessageHandler = {
     // 跳转到任务详情页面
     userAppGotoImgAppTaskPage(global, message) {
         console.log(message);
-        openImgAppRunTaskPage(global.context, "byID", message.text);
+        openImgAppRunTaskPage(global.context, message.text);
     },
 };
 
@@ -123,26 +124,48 @@ const oneUserAppMessageHandler = {
 /********************************************************************************************
  * 打开页面
  ********************************************************************************************/
-// 1.overView按钮单击后显示应用视图首页
+// 1.overView按钮单击后显示应用视图首页 - 4个类型框图
 export function UserAppHomePageProvide(context) {
-    const panel = vscode.window.createWebviewPanel(
-        'userWelcome',
-        "用户视图",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
-    let global = { panel, context };
-    panel.webview.html = getHtmlContent(context, userAppHomeHtmlFilePath);
-    panel.webview.onDidReceiveMessage(message => {
-        if (messageHandler[message.command]) {
-            messageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+    console.log("IDE UserAppHomePageProvide!", IDEPanels.userHomePanel);
+    if (IDEPanels.userHomePanel) {
+        console.log("打开用户视图首页：", IDEPanels.userHomePanel.visible);
+        IDEPanels.userHomePanel.reveal();
+    } else {
+        console.log("新建用户视图首页");
+
+        IDEPanels.userHomePanel = vscode.window.createWebviewPanel(
+            'userHomePage',
+            "用户视图",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+
+        IDEPanels.userHomePanel.webview.html = getHtmlContent(context, userAppHomeHtmlFilePath);
+
+        let panel = IDEPanels.userHomePanel;
+        let global = { panel, context };
+
+        IDEPanels.userHomePanel.webview.onDidReceiveMessage(message => {
+            if (messageHandler[message.command]) {
+                messageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE UserAppHomePageProvide 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userHomePanel.onDidDispose(
+            () => {
+                IDEPanels.userHomePanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
 }
 
 // 2. 单击导航栏的分类，进入相应类别页面
@@ -154,26 +177,47 @@ export function openOneKindUserAppPage(context, num) {
     }
 }
 
-// 2.1 手写体九宫格
+// 2.1 打开用户视图 数字图像识别首页 - 手写体九宫格
 export function openMnistUserAppHomePage(context) {
-    const panel = vscode.window.createWebviewPanel(
-        'userMnistApp',
-        "数字图像识别",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
-    let global = { panel, context };
-    panel.webview.html = getHtmlContent(context, userMnistAppHomeHtmlFilePath);
-    panel.webview.onDidReceiveMessage(message => {
-        if (mnistMessageHandler[message.command]) {
-            mnistMessageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
+    console.log("IDE openMnistUserAppHomePage!", IDEPanels.userImgAppSquarePanel);
+    if (IDEPanels.userImgAppSquarePanel) {
+        console.log("打开用户视图数字图像识别九宫格首页：", IDEPanels.userImgAppSquarePanel.visible);
+        IDEPanels.userImgAppSquarePanel.reveal();
+    } else {
+        console.log("新建用户视图数字图像识别九宫格首页");
+
+        IDEPanels.userImgAppSquarePanel = vscode.window.createWebviewPanel(
+            'userMnistAppPage',
+            "数字图像识别",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        IDEPanels.userImgAppSquarePanel.webview.html = getHtmlContent(context, userMnistAppHomeHtmlFilePath);
+
+        let panel = IDEPanels.userImgAppSquarePanel;
+        let global = { panel, context };
+
+        IDEPanels.userImgAppSquarePanel.webview.onDidReceiveMessage(message => {
+            if (mnistMessageHandler[message.command]) {
+                mnistMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openMnistUserAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userImgAppSquarePanel.onDidDispose(
+            () => {
+                IDEPanels.userImgAppSquarePanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
 }
 
 // 2.2 其他应用
@@ -184,7 +228,6 @@ export function openOtherUserAppHomePage(context) {
         vscode.ViewColumn.One,
         {
             enableScripts: true,
-            retainContextWhenHidden: true,
         }
     );
     panel.webview.html = getHtmlContent(context, otherAppHomeHtmlFilePath);
@@ -195,30 +238,53 @@ export function openOtherUserAppHomePage(context) {
 
 // 3. 单击用户图像识别应用首页九宫格中的按钮，进入某个应用运行页面
 export function openOneMnistUserAppPageByID(context, id) {
-    const panel = vscode.window.createWebviewPanel(
-        'userWelcome',
-        "用户应用",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-        }
-    );
+    console.log("IDE openOneMnistUserAppPageByID!", IDEPanels.userImgAppRunPagePanelsMap);
+    if (IDEPanels.userImgAppRunPagePanelsMap.has(id)) {
+        console.log("打开用户视图图像识别应用运行页面：", IDEPanels.userImgAppRunPagePanelsMap.get(id).visible);
+        IDEPanels.userImgAppRunPagePanelsMap.get(id).reveal();
+    } else {
+        console.log("新建用户视图图像识别应用运行页面");
 
-    var appInfo = searchImgAppByID(context, id);
-    if (appInfo == "none") {
-        console.error("can not found the app: ", id);
+        let panel = vscode.window.createWebviewPanel(
+            'userImgAppRunPage',
+            "用户应用",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
+        panel.webview.html = getHtmlContent(context, userMnistOneAppHtmlFilePath);
+
+        var appInfo = searchImgAppByID(context, id);
+        if (appInfo == "none") {
+            console.error("can not found the app: ", id);
+        }
+
+        let global = { panel, context, appInfo };
+        IDEPanels.userImgAppRunPagePanelsMap.set(id, panel);
+
+        panel.webview.onDidReceiveMessage(message => {
+            if (oneUserAppMessageHandler[message.command]) {
+                oneUserAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openOneMnistUserAppPageByID 2!", global.panel);
+
+        // 面板被关闭后重置
+        panel.onDidDispose(
+            () => {
+                panel = undefined;
+                IDEPanels.userImgAppRunPagePanelsMap.delete(id);
+            },
+            null,
+            context.subscriptions
+        );
     }
 
-    let global = { panel, context, appInfo };
-    panel.webview.html = getHtmlContent(context, userMnistOneAppHtmlFilePath);
-    panel.webview.onDidReceiveMessage(message => {
-        if (oneUserAppMessageHandler[message.command]) {
-            oneUserAppMessageHandler[message.command](global, message);
-        } else {
-            vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-        }
-    }, undefined, context.subscriptions);
 }
 
 
