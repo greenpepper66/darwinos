@@ -16,6 +16,7 @@ const userAppHomeHtmlFilePath = "src/static/views/userAppHome.html";
 const userMnistAppHomeHtmlFilePath = "src/static/views/userMnistAppHome.html";
 const userMnistOneAppHtmlFilePath = "src/static/views/userMnistOneApp.html";
 const otherAppHomeHtmlFilePath = "src/static/views/otherAppHome.html";
+const userFatigueDrivingAppHtmlPath = "src/static/views/fatigueDrivingApp.html";
 
 
 
@@ -46,7 +47,7 @@ const mnistMessageHandler = {
 
 }
 
-// 2. 单个应用页面
+// 3. 单个应用页面
 const oneUserAppMessageHandler = {
     // 返回单个应用信息
     getOneMnistUserAppInfo(global, message) {
@@ -118,7 +119,16 @@ const oneUserAppMessageHandler = {
     },
 };
 
+// 4. 疲劳检测页面
+const fatigueDrivingMessageHandler = {
+    // 开始启动服务 推流
+    startFfmpegEncodeVideo(global, message) {
+        console.log(message);
+        //启动一个server，通过ffmpeg拉流
+        startFfmpegSerger(global)
+    },
 
+}
 
 
 /********************************************************************************************
@@ -172,7 +182,10 @@ export function UserAppHomePageProvide(context) {
 export function openOneKindUserAppPage(context, num) {
     if (num == 1) {  // 数字图像识别应用
         openMnistUserAppHomePage(context);
-    } else {
+    } else if (num == 4) {
+        openFatigueDrivingAppPage(context);
+    }
+    else {
         openOtherUserAppHomePage(context);
     }
 }
@@ -288,6 +301,49 @@ export function openOneMnistUserAppPageByID(context, id) {
 }
 
 
+
+// 4. 打开疲劳检测摄像头应用页面
+function openFatigueDrivingAppPage(context) {
+    console.log("IDE openMnistUserAppHomePage!", IDEPanels.userFatigueDrivingAppPanel);
+    if (IDEPanels.userFatigueDrivingAppPanel) {
+        console.log("打开疲劳检测页面：", IDEPanels.userFatigueDrivingAppPanel.visible);
+        IDEPanels.userFatigueDrivingAppPanel.reveal();
+    } else {
+        console.log("新建疲劳检测页面");
+
+        IDEPanels.userFatigueDrivingAppPanel = vscode.window.createWebviewPanel(
+            'fatigueDrivingAppPage',
+            "疲劳检测",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        IDEPanels.userFatigueDrivingAppPanel.webview.html = getHtmlContent(context, userFatigueDrivingAppHtmlPath);
+
+        let panel = IDEPanels.userFatigueDrivingAppPanel;
+        let global = { panel, context };
+
+        IDEPanels.userFatigueDrivingAppPanel.webview.onDidReceiveMessage(message => {
+            if (fatigueDrivingMessageHandler[message.command]) {
+                fatigueDrivingMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openMnistUserAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userFatigueDrivingAppPanel.onDidDispose(
+            () => {
+                IDEPanels.userFatigueDrivingAppPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
 
 
 /********************************************************************************************
@@ -503,7 +559,7 @@ function runMnistSendInputScript(global) {
     console.log("start mnist image recognition: ", global.appInfo.name);
 
     // 脚本位置 mnist_send_input_back.py
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "test.py");
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "mnist_send_input_back.py");
     let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
@@ -575,3 +631,39 @@ function runMnistSendInputScript(global) {
 
 }
 
+
+
+
+/**
+ * ******************************************************************************************************
+ * 运行摄像头应用
+ * ******************************************************************************************************
+ */
+
+// 1. 启动server  ffmpeg推流
+function startFfmpegSerger(global) {
+    console.log("启动ffmpeg server  ");
+
+    // 脚本位置
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "js", "fatigueDrivingAppServer.js");
+
+    let command_str = "node " + scriptPath;
+    console.log("执行命令为", command_str);
+    let scriptProcess = exec(command_str, {});
+
+    scriptProcess.stdout?.on("data", function (data) {
+        // log_output_channel.append(data);
+        // console.log(data);
+        global.panel.webview.postMessage({ startFfmpegEncodeVideoRet: "success" });
+    });
+
+    scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+    });
+
+    scriptProcess.on("exit", function () {
+        console.log("done!!");
+    });
+
+}

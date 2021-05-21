@@ -690,6 +690,7 @@ table.taskDetail_table tr {
   height: 45px;
 }
 .taskDetail_echart_box {
+  min-width: 400px;
   min-height: 400px;
   margin-top: 20px;
   margin-bottom: 20px;

@@ -1,0 +1,64 @@
+<html>
+
+<body>
+	<div class="fatigueDrivingApp_page" id="fatigueDrivingApp">
+
+
+		<div class="row">
+
+			<div class="col-md-5 fatigueDrivingApp_buts">
+				<div class="row">
+					<button type="button" onclick="checkCameraStatus()" class="fatigueDrivingApp_btn">
+						检测摄像头
+					</button>
+					<span id="checkCameraStatusRet" class="fatigueDrivingApp_descs"></span>
+				</div>
+				<div class="row">
+					<button type="button" onclick="startFfmpegEncodeVideo()" class="fatigueDrivingApp_btn">
+						开启推流
+					</button>
+					<span id="startFfmpegEncodeVideoRet" class="fatigueDrivingApp_descs"></span>
+				</div>
+				<div class="row">
+					<button type="button" onclick="" class="fatigueDrivingApp_btn">
+						疲劳检测
+					</button>
+				</div>
+				<div class="row">
+					<button type="button" onclick="" class="fatigueDrivingApp_btn">
+						停止推流
+					</button>
+				</div>
+			</div>
+
+
+
+			<div class="fatigueDrivingApp_camera_show col-md-7">
+				<canvas id="canvas" style="height: 600px; width: 600px;"></canvas>
+			</div>
+
+		</div>
+	</div>
+
+
+
+
+	<link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../css/vs-light.css" rel="stylesheet" />
+	<script src="../lib/jquery/jquery.min.js"></script>
+	<script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+	<script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/fatigueDrivingApp.js"></script>
+	<script>Vue.config.ProductionTip = false</script>
+
+</body>
+
+<script type="text/javascript" src="../lib/jsmpeg-master/jsmpeg.min.js"></script>
+<script type="text/javascript">
+	player = new JSMpeg.Player('ws://localhost:9999', {  //该9999端口接收前面server.js中发送来的数据帧
+		canvas: document.getElementById('canvas') // Canvas should be a canvas DOM element
+	})
+	player.play();
+</script>
+
+</html>

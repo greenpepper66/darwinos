@@ -3,7 +3,8 @@
 ** 0. common style
 **********************************************************************************************/
 
-table, td {
+table,
+td {
   border-collapse: collapse;
   /** 合并单元格边框 */
 }
@@ -46,12 +47,15 @@ table.imgAppHome_page_table-search tr {
   height: 70px;
 }
 
-table.imgAppHome_page_table-search tr td:nth-child(1), table.imgAppHome_page_table-search tr td:nth-child(3) {
+table.imgAppHome_page_table-search tr td:nth-child(1),
+table.imgAppHome_page_table-search tr td:nth-child(3) {
   text-align: right;
   padding-right: 20px;
 }
 
-table.imgAppHome_page_table-search tr td:nth-child(2), table.imgAppHome_page_table-search tr td:nth-child(4), table.imgAppHome_page_table-search tr td:nth-child(5) {
+table.imgAppHome_page_table-search tr td:nth-child(2),
+table.imgAppHome_page_table-search tr td:nth-child(4),
+table.imgAppHome_page_table-search tr td:nth-child(5) {
   text-align: left;
 }
 
@@ -113,7 +117,8 @@ table.imgAppHome_page_table-search tr td:nth-child(2), table.imgAppHome_page_tab
   margin-bottom: 30px;
 }
 
-.imgAppHome_detail_btn, .imgAppHome_runApp_btn {
+.imgAppHome_detail_btn,
+.imgAppHome_runApp_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 2px;
   background-color: Transparent;
@@ -238,12 +243,15 @@ table.imgAppTasks_page_table-search tr {
   height: 70px;
 }
 
-table.imgAppTasks_page_table-search tr td:nth-child(1), table.imgAppTasks_page_table-search tr td:nth-child(3) {
+table.imgAppTasks_page_table-search tr td:nth-child(1),
+table.imgAppTasks_page_table-search tr td:nth-child(3) {
   text-align: right;
   padding-right: 20px;
 }
 
-table.imgAppTasks_page_table-search tr td:nth-child(2), table.imgAppTasks_page_table-search tr td:nth-child(4), table.imgAppTasks_page_table-search tr td:nth-child(5) {
+table.imgAppTasks_page_table-search tr td:nth-child(2),
+table.imgAppTasks_page_table-search tr td:nth-child(4),
+table.imgAppTasks_page_table-search tr td:nth-child(5) {
   text-align: left;
 }
 
@@ -507,7 +515,14 @@ table.newImgApp_table td {
   padding: 8px;
 }
 
-.newImgApp_app_name, .newImgApp_imgSrc_type, .newImgApp_configSrc_type, .newImgApp_remoteIP_addr, .newImgApp_select_model, .newImgApp_select_encodeMethod, .newImgApp_select_retShow_way, .newImgApp_remoteIP_forRet {
+.newImgApp_app_name,
+.newImgApp_imgSrc_type,
+.newImgApp_configSrc_type,
+.newImgApp_remoteIP_addr,
+.newImgApp_select_model,
+.newImgApp_select_encodeMethod,
+.newImgApp_select_retShow_way,
+.newImgApp_remoteIP_forRet {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -532,7 +547,9 @@ table.newImgApp_table td {
   border-style: none;
 }
 
-.newImgApp_ImgSrc_dir, .newImgApp_configFile, .newImgApp_output_dir {
+.newImgApp_ImgSrc_dir,
+.newImgApp_configFile,
+.newImgApp_output_dir {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -657,7 +674,8 @@ table.newImgApp_table td {
   text-align: center;
 }
 
-.imgAppRunTask_probar_title, .imgAppRunTask_ret_title {
+.imgAppRunTask_probar_title,
+.imgAppRunTask_ret_title {
   font-size: 20px;
   color: #333333;
   letter-spacing: 1.14px;
@@ -672,7 +690,9 @@ table.newImgApp_table td {
   font-family: "Material Icons";
   font-style: normal;
   font-weight: 400;
-  src: local("Material Icons"), local("MaterialIcons-Regular"), url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2) format("woff2");
+  src: local("Material Icons"), local("MaterialIcons-Regular"),
+    url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2)
+      format("woff2");
 }
 
 .material-icons {
@@ -1216,7 +1236,7 @@ table.userMnistOneApp_recRetAnaTable td {
 
 .login_title {
   font-size: 30px;
-  letter-spacing: 2.0px;
+  letter-spacing: 2px;
   vertical-align: middle;
 }
 
@@ -1319,4 +1339,44 @@ table.userMnistOneApp_recRetAnaTable td {
   /** 使得button没有边框 **/
   border-style: none;
   margin-top: 10%;
+}
+
+/****************************************************************************
+  **** 9. 摄像头页面
+  ****************************************************************************/
+
+.fatigueDrivingApp_page {
+  margin: 25px;
+  text-align: center;
+}
+.fatigueDrivingApp_camera_show {
+  margin: 0 auto;
+  margin-top: 100px;
+  width: 600px;
+  height: 600px;
+}
+.fatigueDrivingApp_btn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 2px;
+  background-color: Transparent;
+  /** 使得button没有边框 **/
+  border-style: none;
+  height: 45px;
+  width: 220px;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.91px;
+  float: left;
+  margin-left: 100px;
+  margin-bottom: 80px;
+}
+.fatigueDrivingApp_buts {
+  margin-top: 150px;
+}
+.fatigueDrivingApp_descs {
+  vertical-align: middle;
+  float: left;
+  margin-top: 10px;
+  margin-left: 20px;
+  font-size: 20px;
 }

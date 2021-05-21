@@ -40,6 +40,9 @@ function userAppStartRun() {
     document.getElementById("recognition_task_progress_div").style.width = "0%";
 
     // 清空结果
+    document.getElementById("userMnistOneApp_imgNum").innerHTML = "";
+    document.getElementById("userMnistOneApp_runtime").innerHTML = "";
+    DeleteAllColumnExceptFirst("recognition_ret_tab");
 
 
     // 保存图像源信息
@@ -296,4 +299,17 @@ function selectImgSrcKind() {
 // 弹出框 相关
 function closeUserOneAppAlertBox() {
     document.getElementById('userMnistOneApp_alert_result').style.display = 'none';
+}
+
+// 删除表格列
+function DeleteAllColumnExceptFirst(eleID) {
+    var tab = document.getElementById(eleID);
+    var columnLength = tab.rows[1].cells.length;
+    console.log("删除表格列：", columnLength);
+
+    //删除指定单元格 
+    for (var i = columnLength - 1; i > 0; i--) {
+        tab.rows[0].deleteCell(i);
+        tab.rows[1].deleteCell(i);
+    }
 }

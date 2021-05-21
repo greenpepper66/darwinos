@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from 'path';
-import { Chip, Node } from "./ResProvider"
-import get_slave_boards from "../os/get_slave_boards";
+import { allData } from '../os/server';
 
 
 export class ModelProvider implements vscode.TreeDataProvider<Model> {
@@ -16,6 +14,7 @@ export class ModelProvider implements vscode.TreeDataProvider<Model> {
 	}
 
 	refresh(): void {
+		this.updateModels(allData.modelFileList);
 		this._onDidChangeTreeData.fire();
 	}
 
@@ -32,7 +31,9 @@ export class ModelProvider implements vscode.TreeDataProvider<Model> {
 
 
 	public updateModels(models) {
-		console.log("updateModels!!");
+		if (models == undefined) {
+			return;
+		}
 		this.models = [];
 		for (var i = 0; i < models.length; i++) {
 			var name = models[i].name;
@@ -49,6 +50,7 @@ export class ModelProvider implements vscode.TreeDataProvider<Model> {
 			)
 			this.models.push(model);
 		}
+		console.log("更新模型", this.models.length);
 	}
 }
 

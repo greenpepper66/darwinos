@@ -5,18 +5,16 @@ var url = require('url');
 import { ResProvider } from "../DataProvider/ResProvider";
 import { ModelProvider, Model } from "../DataProvider/ModelProvider";
 import { uploadModelPageProvideByPort, modelHomePageProvideByPort, nodePageProvideByPort, chipPageProvideByPort } from "../PageProvider";
-
+import { LocalHttpServer } from "../extension";
 // 定义全局变量，供外部文件调用
 export module allData {
+	export let nodeList: any[];
 	export let modelFileList: any[];
 	export let deployedModelList: any[]; // 部署后的模型列表，可以用来运行任务
 }
 
 
-
-export function startHttpServer(ResDataProvider: ResProvider,
-	ModelDataProvider: ModelProvider,
-	context) {
+export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider: ModelProvider, context) {
 	var routes = {
 		'/post': function (req, res) {
 			var obj = {};
@@ -31,6 +29,7 @@ export function startHttpServer(ResDataProvider: ResProvider,
 			var tasks = JSONdata.tasks;
 
 			// 保存在全局变量中
+			allData.nodeList = nodes;
 			allData.modelFileList = models;
 			allData.deployedModelList = tasks;
 
@@ -97,7 +96,7 @@ export function startHttpServer(ResDataProvider: ResProvider,
 
 	}
 
-	var server = http.createServer(function (req, res) {
+	LocalHttpServer.server = http.createServer(function (req, res) {
 		var pathObj = url.parse(req.url, true);
 		//新添处理路由的代码
 		var handleFn = routes[pathObj.pathname];
@@ -114,34 +113,34 @@ export function startHttpServer(ResDataProvider: ResProvider,
 			res.end('<h1>404 Not Found!</h1>');
 		}
 	});
-	server.listen(5002);
+	LocalHttpServer.server.listen(5002);
 
 
-	// test for newApp page
-	let model_dep = {
-		id: 11,
-		name: "model_name",
-		nodeID: 1,
-		nodeIP: "192.168.1.1"
-	}
-	allData.deployedModelList = [model_dep];
+	// // test for newApp page
+	// let model_dep = {
+	// 	id: 11,
+	// 	name: "model_name",
+	// 	nodeID: 1,
+	// 	nodeIP: "192.168.1.1"
+	// }
+	// allData.deployedModelList = [model_dep];
 
-	// test for 导航栏
-	let model = {
-		id: 11,
-		name: "model_name",
-		nodeID: 1,
-		nodeIP: "192.168.1.1"
-	}
-	ModelDataProvider.updateModels([model]);
+	// // test for 导航栏
+	// let model = {
+	// 	id: 11,
+	// 	name: "model_name",
+	// 	nodeID: 1,
+	// 	nodeIP: "192.168.1.1"
+	// }
+	// ModelDataProvider.updateModels([model]);
 
-	let node = {
-		id: 1,
-		name: "node-test",
-		chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		usedNeureNums: [],
-	}
-	ResDataProvider.updateNodes([node]);
+	// let node = {
+	// 	id: 1,
+	// 	name: "node-test",
+	// 	chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	// 	usedNeureNums: [],
+	// }
+	// ResDataProvider.updateNodes([node]);
 }
 
 

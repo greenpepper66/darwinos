@@ -1,12 +1,6 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from 'path';
-import get_slave_boards from '../os/get_slave_boards';
-
-import { testquery } from '../testaxios';
-import { getCiphers } from 'crypto';
-
-
+import { allData } from '../os/server';
 
 
 export class ResProvider implements vscode.TreeDataProvider<Node> {
@@ -21,6 +15,7 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
   }
 
   refresh(): void {
+    this.updateNodes(allData.nodeList);
     this._onDidChangeTreeData.fire();
   }
 
@@ -30,7 +25,6 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
 
   getChildren(element?: Node): Thenable<Node[]> {
     if (element) {
-      console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
       return Promise.resolve(this.getChips(element));
     }
     else {
@@ -69,6 +63,10 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
   }
 
   public updateNodes(nodes) {
+    if (nodes == undefined) {
+      return;
+    }
+    console.log("更新节点");
     this.nodes = [];
     for (var i = 0; i < nodes.length; i++) {
       var id = nodes[i].id;

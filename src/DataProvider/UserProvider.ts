@@ -52,9 +52,9 @@ export class UserProvider implements vscode.TreeDataProvider<UserAppKind> {
 			UserProvider.getIconUriForLabel("其它应用.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
-				command: '',
+				command: 'extension.gotoOneKindUserAppPage',
 				title: '',
-				arguments: []
+				arguments: ["videoApp", 4]
 			}
 		);
 		this.userAppKinds.push(otherApp);

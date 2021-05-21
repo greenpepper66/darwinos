@@ -250,8 +250,10 @@
 		"child_process": "^1.0.2",
 		"jquery": "^3.5.1",
 		"jsdom": "^16.4.0",
+		"node-rtsp-stream": "0.0.9",
 		"serve": "^11.3.2",
-		"tsc": "^1.20150623.0"
+		"tsc": "^1.20150623.0",
+		"ws": "^7.4.5"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.52.0",

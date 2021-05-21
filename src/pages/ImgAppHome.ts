@@ -418,6 +418,7 @@ export function openImgAppRunTaskPage(context, appID) {
             }
         );
         panel.webview.html = getAppsHomeHtml(context, imgAppRunTaskHtmlFilePath);
+        
 
         let global = { panel, context, appInfo };
         IDEPanels.taskInfoImgAppPagePanelsMap.set(appID, panel);

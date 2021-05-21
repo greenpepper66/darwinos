@@ -82,11 +82,7 @@ const loginMessageHandler = {
         global.panel.webview.postMessage({ logoutSystemSuccess: "success" });
 
         // 关闭导航栏
-        if (role == 2) {
-            vscode.commands.executeCommand('extension.userTreeViewClose');
-        } else {
-            vscode.commands.executeCommand('extension.allTreeViewClose');
-        }
+        vscode.commands.executeCommand('extension.logoutCloseSystemTreeView');
         // 关闭登录页面
         global.panel.dispose();
         // 关闭其他tab页
@@ -127,7 +123,7 @@ export function OpenLoginPage(context) {
                 vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
             }
         }, undefined, context.subscriptions);
-        
+
         console.log("IDE OpenLoginPage 2!", global.panel);
 
         // 面板被关闭后重置

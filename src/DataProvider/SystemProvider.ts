@@ -38,6 +38,8 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
 
     public data: any[];
     public providers: any[];
+    public adminTreeViews: any[];
+    public userTreeViews: any[];
 
     constructor() {
         this.providers = [];
@@ -47,6 +49,17 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
         let userDataProvider = new UserProvider(vscode.workspace.rootPath);
         let taskDataProvider = new TaskProvider(vscode.workspace.rootPath);
         this.providers.push(resDataProvider, modelDataProvider, appsDataProvider, userDataProvider, taskDataProvider);
+
+        this.adminTreeViews = [];
+        let resTreeView = new SystemTreeItem("资源视图", SystemTreeViewProvider.getIconUriForLabel("资源视图.png"), this.providers[0].nodes);
+        let modelTreeView = new SystemTreeItem("模型视图", SystemTreeViewProvider.getIconUriForLabel("模型视图.png"), this.providers[1].models);
+        let appsTreeView = new SystemTreeItem("应用视图", SystemTreeViewProvider.getIconUriForLabel("应用视图.png"), this.providers[2].appKinds);
+        let userTreeView = new SystemTreeItem("用户视图", SystemTreeViewProvider.getIconUriForLabel("用户视图.png"), this.providers[3].userAppKinds);
+        let tasksTreeView = new SystemTreeItem("任务视图", SystemTreeViewProvider.getIconUriForLabel("任务视图.png"), this.providers[4].tasks);
+        this.adminTreeViews.push(resTreeView, modelTreeView, appsTreeView, userTreeView, tasksTreeView);
+
+        this.userTreeViews = [];
+        this.userTreeViews.push(null, null, null, userTreeView, tasksTreeView);
 
         this.data = [];
     };
@@ -83,7 +96,7 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
     public static initTreeViewItem(target_view: string): SystemTreeViewProvider {
 
         // 实例化 TreeViewProvider
-        const treeViewProvider = new SystemTreeViewProvider();
+        let treeViewProvider = new SystemTreeViewProvider();
 
         // registerTreeDataProvider：注册树视图
         // 你可以类比 registerCommand(上面注册 Hello World)
@@ -96,25 +109,13 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
     }
 
     public getAllTreeViews() {
-        let resTreeView = new SystemTreeItem("资源视图", SystemTreeViewProvider.getIconUriForLabel("资源视图.png"), this.providers[0].nodes);
-        let modelTreeView = new SystemTreeItem("模型视图", SystemTreeViewProvider.getIconUriForLabel("模型视图.png"), this.providers[1].models);
-        let appsTreeView = new SystemTreeItem("应用视图", SystemTreeViewProvider.getIconUriForLabel("应用视图.png"), this.providers[2].appKinds);
-        let userTreeView = new SystemTreeItem("用户视图", SystemTreeViewProvider.getIconUriForLabel("用户视图.png"), this.providers[3].userAppKinds);
-        let tasksTreeView = new SystemTreeItem("任务视图", SystemTreeViewProvider.getIconUriForLabel("任务视图.png"), this.providers[4].tasks);
-
-        this.data.push(resTreeView, modelTreeView, appsTreeView, userTreeView, tasksTreeView);
+        this.data = this.adminTreeViews;
         console.log("getAllTreeViews", this.data);
     }
 
     public getOnlyUserTreeView() {
-        let userTreeView = new SystemTreeItem("用户视图", SystemTreeViewProvider.getIconUriForLabel("用户视图.png"), this.providers[3].userAppKinds);
-        let tasksTreeView = new SystemTreeItem("任务视图", SystemTreeViewProvider.getIconUriForLabel("任务视图.png"), this.providers[4].tasks);
-        this.data.push(userTreeView, tasksTreeView);
+        this.data = this.userTreeViews;
         console.log("getOnlyUserTreeView", this.data);
     }
 
-    public clearTreeViewData() {
-        this.data = [];
-        console.log("clearTreeViewData", this.data);
-    }
 }
