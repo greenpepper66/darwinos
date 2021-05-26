@@ -15,6 +15,9 @@ stream = new Stream({
     '-b': 700000,
     '-max_delay': 100,
     '-qscale': 1,
-    '-max_muxing_queue_size': 1024
+    '-max_muxing_queue_size': 1024,
+    '-q': 0,
+    '-f': 'mpegts',
+    '-codec:v': 'mpeg1video'
   }
 })

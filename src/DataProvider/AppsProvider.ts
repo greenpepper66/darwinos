@@ -21,7 +21,6 @@ export class AppKind extends vscode.TreeItem {
 
 }
 
-
 export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 	private _onDidChangeTreeData: vscode.EventEmitter<AppKind | undefined | void> = new vscode.EventEmitter<AppKind | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<AppKind | undefined | void> = this._onDidChangeTreeData.event;
@@ -97,8 +96,6 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 		return vscode.Uri.file(path.join(__filename, "..", "..", "..", "src", "static", "images", name));
 	}
 }
-
-
 
 
 

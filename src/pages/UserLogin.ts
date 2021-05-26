@@ -9,8 +9,6 @@ import { IDEPanels } from "../extension";
 // html文件路径
 const userLoginHtmlFilePath = "src/static/views/login.html";
 
-
-
 /** 
  * **************************************************************************************
  * 登录相关
@@ -92,8 +90,6 @@ const loginMessageHandler = {
     },
 }
 
-
-
 // 打开登录页面
 export function OpenLoginPage(context) {
     console.log("IDE OpenLoginPage!", IDEPanels.loginPanel);
@@ -136,10 +132,6 @@ export function OpenLoginPage(context) {
         );
     }
 }
-
-
-
-
 
 /**
  * 从某个HTML文件读取能被Webview加载的HTML内容

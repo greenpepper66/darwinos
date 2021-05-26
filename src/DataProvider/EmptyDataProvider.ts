@@ -4,9 +4,6 @@ import * as path from 'path';
 import { Chip, Node } from "./ResProvider"
 import get_slave_boards from "../os/get_slave_boards";
 
-
-
-
 export class EmptyDataProvider implements vscode.TreeDataProvider<EmptyData> {
 	private _onDidChangeTreeData: vscode.EventEmitter<EmptyData | undefined | void> = new vscode.EventEmitter<EmptyData | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<EmptyData | undefined | void> = this._onDidChangeTreeData.event;
@@ -33,8 +30,6 @@ export class EmptyDataProvider implements vscode.TreeDataProvider<EmptyData> {
 		return undefined;
 	}
 }
-
-
 
 export class EmptyData extends vscode.TreeItem {
 

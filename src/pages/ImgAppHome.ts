@@ -167,10 +167,6 @@ const newImgAppMessageHandler = {
             global.panel.webview.postMessage({ selectedOutputDir: fileUri[0].fsPath });
         });
     },
-
-    
-
-
 };
 
 // 4. 与应用详情页面的交互
@@ -182,7 +178,6 @@ const imgAppInfoMessageHandler = {
     },
 };
 
-
 // 5. 应用运行页面交互
 const imgAppRunTaskMessageHandler = {
     // 发送应用基本信息
@@ -190,10 +185,6 @@ const imgAppRunTaskMessageHandler = {
         console.log(message);
         global.panel.webview.postMessage({ cmd: 'getImgAppInfosRet', cbid: message.cbid, data: global.appInfo });
     },
-
-
-
-
 };
 
 
@@ -219,7 +210,6 @@ const imgAppTasksMessageHandler = {
         console.log("deleteAppConfig ret: ", ret);
         global.panel.webview.postMessage({ deleteImgAppTaskRet: message.text });
     }
-
 }
 
 /**
@@ -253,8 +243,6 @@ export function getAppsHomeHtml(context, templatePath) {
 
     return html;
 }
-
-
 
 // 1. webview: 打开数字图像识别应用首页, 最近应用列表页面
 export function openImgAppHomePage(context) {
@@ -400,8 +388,6 @@ export function openImgAppRunTaskPage(context, appID) {
     // // 应用成为一条任务
     // updateImgAppStatusToTask(context, appInfo.id);
     // console.log("become one task: ", appInfo.id);
-
-
     console.log("IDE openOneMnistUserAppPageByID!", IDEPanels.taskInfoImgAppPagePanelsMap);
     if (IDEPanels.taskInfoImgAppPagePanelsMap.has(appID)) {
         console.log("打开任务详情页面：", IDEPanels.taskInfoImgAppPagePanelsMap.get(appID).visible);
@@ -444,8 +430,6 @@ export function openImgAppRunTaskPage(context, appID) {
         );
     }
 }
-
-
 
 // 5. 打开任务视图首页 - 任务列表页面
 export function openImgAppTasksPage(context) {
@@ -490,8 +474,6 @@ export function openImgAppTasksPage(context) {
     }
 }
 
-
-
 /**
  * ******************************************************************************************************
  * 运行任务相关函数，执行python脚本
@@ -512,17 +494,7 @@ function imgAppRunTaskAllProcess(global) {
 
     // 3. 运行任务，识别图像
 
-
 }
-
-
-
-
-
-
-
-
-
 
 /**
  * ******************************************************************************************************

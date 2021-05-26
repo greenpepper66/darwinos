@@ -10,8 +10,6 @@ import { IDEPanels } from "../extension";
 const appsHomeHtmlFilePath = "src/static/views/appsHome.html";
 const otherAppHomeHtmlFilePath = "src/static/views/otherAppHome.html";
 
-
-
 // 1. 与应用视图首页webview的交互
 const messageHandler = {
     // 单击首页图片，跳转到对应的应用类型首页
@@ -20,8 +18,6 @@ const messageHandler = {
 
     },
 };
-
-
 
 // html页面处理
 export function getAppsHomeHtml(context, templatePath) {
@@ -92,7 +88,6 @@ export function AppsHomePageProvide(context) {
     }
 }
 
-
 // 单击页面图片打开对应的应用主页
 export function openCertainAppHomePage(context, num) {
     if (num == 1) {  // 数字图像识别应用
@@ -101,8 +96,6 @@ export function openCertainAppHomePage(context, num) {
         openOtherAppHomePage(context);
     }
 }
-
-
 
 // 打开其他应用页面
 export function openOtherAppHomePage(context) {

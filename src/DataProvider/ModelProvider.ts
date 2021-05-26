@@ -27,9 +27,6 @@ export class ModelProvider implements vscode.TreeDataProvider<Model> {
 
 	}
 
-
-
-
 	public updateModels(models) {
 		if (models == undefined) {
 			return;
@@ -53,8 +50,6 @@ export class ModelProvider implements vscode.TreeDataProvider<Model> {
 		console.log("更新模型", this.models.length);
 	}
 }
-
-
 
 export class Model extends vscode.TreeItem {
 

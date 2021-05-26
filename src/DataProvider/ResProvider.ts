@@ -2,11 +2,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { allData } from '../os/server';
 
-
 export class ResProvider implements vscode.TreeDataProvider<Node> {
   private _onDidChangeTreeData: vscode.EventEmitter<Node | undefined | void> = new vscode.EventEmitter<Node | undefined | void>();
   readonly onDidChangeTreeData: vscode.Event<Node | undefined | void> = this._onDidChangeTreeData.event;
-
 
   public nodes: Node[];
 
@@ -36,8 +34,6 @@ export class ResProvider implements vscode.TreeDataProvider<Node> {
   getParent(element?: Node | undefined): import("vscode").ProviderResult<Node> {
     return undefined;
   }
-
-
 
   private getChips(node: Node): Chip[] {
     var _chip_list = node.chips;

@@ -57,10 +57,6 @@ export function PageProvideByPort(name, port, route) {
 
 }
 
-
-
-
-
 const uploadModelMessageHandler = {
 	testDistGotoPage(global, message) {
 		console.log("上传模型视图消息传递！！！！！！！！！！！！！！！！！！！", message);
@@ -125,8 +121,6 @@ export function uploadModelPageProvideByPort(context) {
 	}
 }
 
-
-
 // 2. 模型视图首页
 export function modelHomePageProvideByPort(context) {
 	console.log("IDE modelHomePageProvideByPort!", IDEPanels);
@@ -180,8 +174,6 @@ export function modelHomePageProvideByPort(context) {
 		);
 	}
 }
-
-
 
 // 3. 资源视图首页
 export function resourceHomePageProvideByPort(context) {
@@ -296,7 +288,6 @@ export function nodePageProvideByPort(context, name, port, route) {
 		);
 	}
 }
-
 
 // 5. 芯片详情页面
 export function chipPageProvideByPort(context, name, port, route) {

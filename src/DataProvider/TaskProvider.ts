@@ -29,8 +29,6 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 		return Promise.resolve(this.tasks);
 	}
 
-
-
 	// 原来从web页面获取部署的模型列表作为任务，现在改为应用名字
 	// public updateTasks(tasks) {
 	// 	this.tasks = [];
@@ -93,8 +91,6 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 		}
 	}
 }
-
-
 
 export class Task extends vscode.TreeItem {
 

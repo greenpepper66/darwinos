@@ -30,7 +30,6 @@ export class SystemTreeItem extends vscode.TreeItem {
 
 }
 
-
 export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTreeItem>{
 
     private _onDidChangeTreeData: vscode.EventEmitter<SystemTreeItem | undefined | void> = new vscode.EventEmitter<SystemTreeItem | undefined | void>();
@@ -64,12 +63,9 @@ export class SystemTreeViewProvider implements vscode.TreeDataProvider<SystemTre
         this.data = [];
     };
 
-
-
     refresh(): void {
         this._onDidChangeTreeData.fire();
     }
-
 
     // 自动弹出
     // 获取树视图中的每一项 item,所以要返回 element
