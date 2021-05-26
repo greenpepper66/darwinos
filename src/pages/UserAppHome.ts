@@ -121,11 +121,19 @@ const oneUserAppMessageHandler = {
 
 // 4. 疲劳检测页面
 const fatigueDrivingMessageHandler = {
-    // 开始启动服务 推流
+    // 开始启动服务 推流 -- 已废弃
     startFfmpegEncodeVideo(global, message) {
         console.log(message);
         //启动一个server，通过ffmpeg拉流
-        startFfmpegSerger(global)
+    },
+
+
+    // 开始疲劳检测
+    startFatigueDriving(global, message) {
+        console.log(message);
+
+
+
     },
 
 }
@@ -636,7 +644,7 @@ function runMnistSendInputScript(global) {
 
 /**
  * ******************************************************************************************************
- * 运行摄像头应用
+ * 运行摄像头应用 —— 疲劳检测
  * ******************************************************************************************************
  */
 
@@ -665,5 +673,32 @@ function startFfmpegSerger(global) {
     scriptProcess.on("exit", function () {
         console.log("done!!");
     });
+
+}
+
+
+// 疲劳检测处理流程
+// 参考方案：https://blog.csdn.net/zhuzheqing/article/details/109819702?spm=1001.2014.3001.5501
+function fatigueDrivingProcess() {
+    // 1. 启动WebSocket服务器
+
+    // 2. 启动李畅的疲劳检测脚本，获取摄像头，取帧，特征处理
+    // 3. 每个帧的特征向量进行脉冲编码 —— 2秒取1帧？
+    // 4. 脉冲文件打包
+    // 5. input数据发送给芯片
+    // 6. 接收芯片处理结果
+
+    // 7. 检测到疲劳时前端界面上显示warning告警
+
+
+}
+
+
+// 结束检测
+function finishDrivingProcess() {
+
+    // process.kill();
+
+
 
 }

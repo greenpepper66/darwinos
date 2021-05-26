@@ -20,13 +20,14 @@
 					<span id="startFfmpegEncodeVideoRet" class="fatigueDrivingApp_descs"></span>
 				</div> -->
 				<div class="row">
-					<button type="button" onclick="" class="fatigueDrivingApp_btn">
+					<button type="button" onclick="startFatigueDriving()" class="fatigueDrivingApp_btn">
 						疲劳检测
 					</button>
+					<span id="startFatigueDrivingRet" class="fatigueDrivingApp_descs"></span>
 				</div>
 				<div class="row">
 					<button type="button" onclick="" class="fatigueDrivingApp_btn">
-						停止推流
+						停止检测
 					</button>
 				</div>
 			</div>
@@ -34,7 +35,8 @@
 
 
 			<div class="fatigueDrivingApp_camera_show col-md-7">
-				<canvas id="canvas" style="height: 600px; width: 600px;"></canvas>
+				<!-- <canvas id="canvas" style="height: 600px; width: 600px;"></canvas> -->
+				<img id="resImg" src="" />
 			</div>
 
 		</div>
@@ -51,14 +53,31 @@
 	<script src="../js/fatigueDrivingApp.js"></script>
 	<script>Vue.config.ProductionTip = false</script>
 
+	<script>
+		let ws = new WebSocket("ws://127.0.0.1:8188/");
+		ws.onopen = function (evt) {
+			console.log("Connection open ...");
+			ws.send("Hello WebSockets!");
+		};
+
+		ws.onmessage = function (evt) {
+			$("#resImg").attr("src", evt.data);
+			console.log("Received Message: " + evt.data);
+			// ws.close();
+		};
+
+		ws.onclose = function (evt) {
+			console.log("Connection closed.");
+		};
+	</script>
 </body>
 
-<script type="text/javascript" src="../lib/jsmpeg-master/jsmpeg.min.js"></script>
+<!-- <script type="text/javascript" src="../lib/jsmpeg-master/jsmpeg.min.js"></script>
 <script type="text/javascript">
 	player = new JSMpeg.Player('ws://localhost:9999', {  //该9999端口接收前面server.js中发送来的数据帧
 		canvas: document.getElementById('canvas') // Canvas should be a canvas DOM element
 	})
 	player.play();
-</script>
+</script> -->
 
 </html>

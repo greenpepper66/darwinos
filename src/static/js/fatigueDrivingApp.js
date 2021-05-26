@@ -34,7 +34,7 @@ function callVscode(data, cb) {
 window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
-    
+
     // switch (message.cmd) {
     //     case 'getImgAppInfosRet':
     //         console.log(message.data);
@@ -72,6 +72,21 @@ function startFfmpegEncodeVideo() {
     });
 }
 
+// 开始疲劳检测
+function startFatigueDriving() {
+    let pingRet = document.getElementById("checkCameraStatusRet").innerHTML;
+    console.log("ip通不通：", pingRet);
+    if (pingRet.indexOf("success") == -1) {
+        document.getElementById("startFatigueDrivingRet").innerHTML = "找不到摄像头！"
+        return
+    }
+
+    console.log("start 疲劳检测.");
+    vscode.postMessage({
+        command: 'startFatigueDriving',
+        text: '开始疲劳检测'
+    });
+}
 
 
 
@@ -97,61 +112,61 @@ function startFfmpegEncodeVideo() {
  * 工具函数
  * ************************************************************************************
  */
- function checkCameraStatus() {
-        ping("192.168.1.108");
-    }
+function checkCameraStatus() {
+    ping("192.168.1.108");
+}
 function ping(ip) {
-        var img = new Image();
-        var start = new Date().getTime();
-        var flag = false;
-        var isCloseWifi = true;
-        var hasFinish = false;
-        img.onload = function () {
-            if (!hasFinish) {
+    var img = new Image();
+    var start = new Date().getTime();
+    var flag = false;
+    var isCloseWifi = true;
+    var hasFinish = false;
+    img.onload = function () {
+        if (!hasFinish) {
+            flag = true;
+            hasFinish = true;
+            console.log('Ping ' + ip + ' success. ');
+            // alert("成功" + ip);
+            document.getElementById("checkCameraStatusRet").innerHTML = "Connection " + ip + " success!";
+        }
+    };
+    img.onerror = function () {
+        if (!hasFinish) {
+            if (!isCloseWifi) {
                 flag = true;
-                hasFinish = true;
                 console.log('Ping ' + ip + ' success. ');
                 // alert("成功" + ip);
                 document.getElementById("checkCameraStatusRet").innerHTML = "Connection " + ip + " success!";
+            } else {
+                console.log('network is not working!');
             }
-        };
-        img.onerror = function () {
-            if (!hasFinish) {
-                if (!isCloseWifi) {
-                    flag = true;
-                    console.log('Ping ' + ip + ' success. ');
-                    // alert("成功" + ip);
-                    document.getElementById("checkCameraStatusRet").innerHTML = "Connection " + ip + " success!";
-                } else {
-                    console.log('network is not working!');
-                }
-                hasFinish = true;
-            }
-        };
-        setTimeout(function () {
-            isCloseWifi = false;
-            console.log('network is working, start ping...');
-        }, 2);
-        img.src = 'http://' + ip + '/' + start;
-        var timer = setTimeout(function () {
-            if (!flag) {
-                hasFinish = true;
-                flag = false;
-                console.log('Ping ' + ip + ' fail. ');
-                // alert("失败" + ip);
-                document.getElementById("checkCameraStatusRet").innerHTML = "Connection " + ip + " failed!";
-            }
-        }, 3000);
-    }
+            hasFinish = true;
+        }
+    };
+    setTimeout(function () {
+        isCloseWifi = false;
+        console.log('network is working, start ping...');
+    }, 2);
+    img.src = 'http://' + ip + '/' + start;
+    var timer = setTimeout(function () {
+        if (!flag) {
+            hasFinish = true;
+            flag = false;
+            console.log('Ping ' + ip + ' fail. ');
+            // alert("失败" + ip);
+            document.getElementById("checkCameraStatusRet").innerHTML = "Connection " + ip + " failed!";
+        }
+    }, 3000);
+}
 
 function sleep(numberMillis) {
-        var start = new Date().getTime();
-        while (true) {
-            if (new Date().getTime() - start > numberMillis) {
-                break;
-            }
+    var start = new Date().getTime();
+    while (true) {
+        if (new Date().getTime() - start > numberMillis) {
+            break;
         }
     }
+}
 
 
 
@@ -169,17 +184,17 @@ function sleep(numberMillis) {
 
 
 new Vue({
-        el: '#fatigueDrivingApp',
-        data: {
+    el: '#fatigueDrivingApp',
+    data: {
 
-        },
-        mounted() {
-            // callVscode('getImgAppInfos', imgAppInformation => this.imgAppInformation = imgAppInformation);
-        },
-        watch: {
+    },
+    mounted() {
+        // callVscode('getImgAppInfos', imgAppInformation => this.imgAppInformation = imgAppInformation);
+    },
+    watch: {
 
-        },
-        methods: {
+    },
+    methods: {
 
-        }
-    });
+    }
+});
