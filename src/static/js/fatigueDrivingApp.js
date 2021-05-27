@@ -44,33 +44,20 @@ window.addEventListener('message', event => {
     //     default: break;
     // }
 
-
-    // 点击隐藏的按钮，弹出模态框
-    if (message.startFfmpegEncodeVideoRet == "success") {
-        document.getElementById("startFfmpegEncodeVideoRet").innerHTML = "FFMPEG Working！"
-    } else if (message.startFfmpegEncodeVideoRet == undefined || message.startFfmpegEncodeVideoRet != "success") {
-        document.getElementById("startFfmpegEncodeVideoRet").innerHTML = "Inner Error！"
+    if (message.startFatigueDrivingRet != undefined) {
+        console.log("get startFatigueDrivingRet:", message.startFatigueDrivingRet);
+        document.getElementById("startFatigueDrivingRet").innerHTML = "监测中......"
     }
 
+    // 0-不疲劳，1-疲劳
+    if (message.chipFatigueDrivingResult != undefined) {
+        
+    }
 });
 
 
 
 
-function startFfmpegEncodeVideo() {
-    let pingRet = document.getElementById("checkCameraStatusRet").innerHTML;
-    console.log("ip通不通：", pingRet);
-    if (pingRet.indexOf("success") == -1) {
-        document.getElementById("startFfmpegEncodeVideoRet").innerHTML = "找不到摄像头！"
-        return
-    }
-
-    console.log("start 摄像头推流.");
-    vscode.postMessage({
-        command: 'startFfmpegEncodeVideo',
-        text: '启动服务，开始推流'
-    });
-}
 
 // 开始疲劳检测
 function startFatigueDriving() {
@@ -88,6 +75,14 @@ function startFatigueDriving() {
     });
 }
 
+// 结束疲劳检测
+function finishFatigueDriving() {
+    console.log("finish 疲劳检测.");
+    vscode.postMessage({
+        command: 'finishFatigueDriving',
+        text: '结束疲劳检测'
+    });
+}
 
 
 

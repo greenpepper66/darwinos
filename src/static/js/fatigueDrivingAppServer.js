@@ -38,6 +38,4 @@ wss.on('connection', function (ws) {
   });
 });
 
-wss.clients.forEach(function each(client) {
-  client.send(message);
-});
+

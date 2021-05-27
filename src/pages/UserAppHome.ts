@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { exec } from "child_process";
+import { ChildProcess, exec, spawn } from "child_process";
 import { searchAllJson, updateImgAppInfo, searchImgAppByID } from '../DataProvider/ImgAppJsonDataProvider';
 import { openImgAppInfoPage, openImgAppRunTaskPage } from './ImgAppHome';
 import { IDEPanels } from "../extension";
+var https = require('http');
 
 // 日志输出
 const log_output_channel = vscode.window.createOutputChannel("darwinos output");
@@ -121,19 +122,17 @@ const oneUserAppMessageHandler = {
 
 // 4. 疲劳检测页面
 const fatigueDrivingMessageHandler = {
-    // 开始启动服务 推流 -- 已废弃
-    startFfmpegEncodeVideo(global, message) {
-        console.log(message);
-        //启动一个server，通过ffmpeg拉流
-    },
-
 
     // 开始疲劳检测
     startFatigueDriving(global, message) {
         console.log(message);
+        fatigueDrivingProcess(global)
+    },
 
-
-
+    // 结束疲劳检测
+    finishFatigueDriving(global, message) {
+        console.log(message);
+        finishDrivingProcess();
     },
 
 }
@@ -404,7 +403,15 @@ function getAppRuntime(global) {
     return runtime;
 }
 
-
+// 等待
+function sleep(numberMillis) {
+    var start = new Date().getTime();
+    while (true) {
+        if (new Date().getTime() - start > numberMillis) {
+            break;
+        }
+    }
+}
 
 
 
@@ -647,58 +654,161 @@ function runMnistSendInputScript(global) {
  * 运行摄像头应用 —— 疲劳检测
  * ******************************************************************************************************
  */
+var websocketServerProcess: vscode.Terminal | undefined = undefined;  // 启动 websocket，接收python推送过来的视频数据
+var cameraCaptureProcess: ChildProcess | undefined = undefined;    // 实时视频数据往socket服务器推送
 
-// 1. 启动server  ffmpeg推流
-function startFfmpegSerger(global) {
-    console.log("启动ffmpeg server  ");
+var videoEncodeAndChipSendTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
+var ifNeedEncodeAndChipSendNextFrame: boolean | undefined = true;  // 是否需要编码识别下一幅帧
+
+
+// 1. 启动 WebSocket server, 接收python推送的视频帧数据
+function startWebSocketServer(global) {
+    console.log("启动 WebSocket server  ");
 
     // 脚本位置
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "js", "fatigueDrivingAppServer.js");
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "js");
+    websocketServerProcess = vscode.window.createTerminal('webServer')
+    websocketServerProcess.sendText("cd " + scriptPath);
+    websocketServerProcess.sendText("node fatigueDrivingAppServer.js");
+}
 
-    let command_str = "node " + scriptPath;
+
+// 测试用
+function testPythonPushCameraData(global) {
+    console.log("启动 python 推送视频帧  ");
+
+    // 脚本位置
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "camera_test.py");
+
+    let command_str = "python3 " + scriptPath;
     console.log("执行命令为", command_str);
-    let scriptProcess = exec(command_str, {});
+    cameraCaptureProcess = exec(command_str, {});
 
-    scriptProcess.stdout?.on("data", function (data) {
+    cameraCaptureProcess.stdout?.on("data", function (data) {
         // log_output_channel.append(data);
         // console.log(data);
-        global.panel.webview.postMessage({ startFfmpegEncodeVideoRet: "success" });
     });
 
-    scriptProcess.stderr?.on("data", function (data) {
+    cameraCaptureProcess.stderr?.on("data", function (data) {
         log_output_channel.append(data);
         console.log(data);
     });
 
-    scriptProcess.on("exit", function () {
-        console.log("done!!");
+    cameraCaptureProcess.on("exit", function () {
+        console.log("websocket server exit!!");
     });
-
 }
+
+
+// 2. 运行视频监测脚本：获取摄像头、特征处理、推送数据
+function startPythonPushCameraData(global) {
+    console.log("启动 python 推送视频帧  ");
+
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "fatigue_detect_compile", "main.py");
+    let command_str = "python3 " + scriptPath;
+    console.log("执行命令为", command_str);
+    cameraCaptureProcess = exec(command_str, {});
+
+    cameraCaptureProcess.stdout?.on("data", function (data) {
+        // log_output_channel.append(data);
+        // console.log(data);
+        global.panel.webview.postMessage({ startFatigueDrivingRet: "success" });
+    });
+    cameraCaptureProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+    });
+    cameraCaptureProcess.on("exit", function () {
+        console.log("websocket server exit!!");
+    });
+}
+
+
+// 3. 给上面的python脚本发消息，执行图像编码，生成input.txt和row.txt, 然后发送给芯片
+function callPythonEncodeVideoImg() {
+    ifNeedEncodeAndChipSendNextFrame = false;
+    // 只有请求这个地址 http://127.0.0.1:2345/need_detect    才会对特征编码生成input.txt
+    var uri = "http://127.0.0.1:2345/need_detect"
+    https.get(uri, function (res) {
+        console.log("状态码: " + res.statusCode);
+    })
+    console.log("detect请求已发送！");
+}
+
+
+// 4. 给芯片发送数据
+function sendVideoImgToChip(global) {
+    console.log("给芯片发送数据，执行疲劳检测");
+
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "fatigue_detect_compile", "send_input.py");
+    let command_str = "python3 " + scriptPath;
+    console.log("执行命令为", command_str);
+    cameraCaptureProcess = exec(command_str, {});
+
+    cameraCaptureProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+
+        // 解析识别结果的输出
+        if (data.indexOf("FATIGUEDRIVING RESULT") !== -1) {
+            console.log("疲劳检测结果：", data);
+            // 图像识别结果
+            let ret = data.split("**")[1];
+            global.panel.webview.postMessage({ chipFatigueDrivingResult: ret }); // 0-不疲劳，1-疲劳
+        }
+    });
+    cameraCaptureProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+    });
+    cameraCaptureProcess.on("exit", function () {
+        console.log("chip calculate finished!!");
+        // 执行完一帧图像的识别，接着下一张
+        ifNeedEncodeAndChipSendNextFrame = true;
+    });
+}
+
 
 
 // 疲劳检测处理流程
 // 参考方案：https://blog.csdn.net/zhuzheqing/article/details/109819702?spm=1001.2014.3001.5501
-function fatigueDrivingProcess() {
+function fatigueDrivingProcess(global) {
     // 1. 启动WebSocket服务器
+    startWebSocketServer(global);
 
     // 2. 启动李畅的疲劳检测脚本，获取摄像头，取帧，特征处理
-    // 3. 每个帧的特征向量进行脉冲编码 —— 2秒取1帧？
-    // 4. 脉冲文件打包
+    startPythonPushCameraData(global);
+
+    // 3. 给python发消息，执行编码
+    // 4. 每个帧的特征向量进行脉冲编码、打包
     // 5. input数据发送给芯片
     // 6. 接收芯片处理结果
+    videoEncodeAndChipSendTimer = setTimeout(function encodeAndSendData() {
+        if (ifNeedEncodeAndChipSendNextFrame == true) {
+            console.log("循环");
+            callPythonEncodeVideoImg();
+            sendVideoImgToChip(global);
+        }
+    }, 500);
 
     // 7. 检测到疲劳时前端界面上显示warning告警
-
-
 }
 
 
 // 结束检测
 function finishDrivingProcess() {
-
-    // process.kill();
-
-
-
+    console.log("结束视频检测！")
+    if (websocketServerProcess != undefined) {
+        // 杀进程： 实际上exec会创建两个进程，一个是 shell 进程，另个是 shell 命令里的进程，他们的 PID 相差一。
+        websocketServerProcess.dispose();
+        websocketServerProcess = undefined;
+        console.log("websocket process killed！");
+    }
+    if (cameraCaptureProcess != undefined) {
+        console.log("camera python push process pid: ", cameraCaptureProcess.pid);
+        cameraCaptureProcess.kill('SIGINT');
+        console.log("camera capture process killed! ");
+    }
+    console.log("取消计时器");
+    clearTimeout(videoEncodeAndChipSendTimer);
 }

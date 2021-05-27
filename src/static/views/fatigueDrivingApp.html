@@ -13,12 +13,6 @@
 					</button>
 					<span id="checkCameraStatusRet" class="fatigueDrivingApp_descs"></span>
 				</div>
-				<!-- <div class="row">
-					<button type="button" onclick="startFfmpegEncodeVideo()" class="fatigueDrivingApp_btn">
-						开启推流
-					</button>
-					<span id="startFfmpegEncodeVideoRet" class="fatigueDrivingApp_descs"></span>
-				</div> -->
 				<div class="row">
 					<button type="button" onclick="startFatigueDriving()" class="fatigueDrivingApp_btn">
 						疲劳检测
@@ -26,9 +20,10 @@
 					<span id="startFatigueDrivingRet" class="fatigueDrivingApp_descs"></span>
 				</div>
 				<div class="row">
-					<button type="button" onclick="" class="fatigueDrivingApp_btn">
+					<button type="button" onclick="finishFatigueDriving()" class="fatigueDrivingApp_btn">
 						停止检测
 					</button>
+					<span id="finishFatigueDrivingRet" class="fatigueDrivingApp_descs"></span>
 				</div>
 			</div>
 
@@ -69,6 +64,10 @@
 		ws.onclose = function (evt) {
 			console.log("Connection closed.");
 		};
+	</script>
+
+	<script>
+
 	</script>
 </body>
 
