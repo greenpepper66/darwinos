@@ -4,6 +4,7 @@ import * as fs from 'fs';
 
 
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
+const fatigueDrivingAppsConfigFile = "src/static/cache/fatigueDrivingAppsConfig.json";
 
 /**
  * ******************************************************************************************************
@@ -37,6 +38,8 @@ export class ImgAppConfigData {
     public encodeConfigFile: string; // 编码和运行任务所需的配置文件 - 打包成一个文件packed_bin_files.dat
     public outputDir: string;       // 应用文件保存路径，也是编码过程中间输出文件所在目录
 
+    public appType: number;         // 应用类型： 0-手写体图像识别， 1-疲劳检测
+
     constructor(id: number, name: string) {  // 构造函数 实例化类的时候触发的方法
         this.id = id;
         this.name = name;
@@ -56,7 +59,12 @@ export class ImgAppConfigData {
 //1. 增：写入json文件选项， 最多保存20条, 异步处理，不会等待执行结束
 export function writeJson(context, imgAppConfig) {
     console.log("json writing...");
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    if (imgAppConfig.appType == 0) {
+        var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    } else if (imgAppConfig.appType == 1) {
+        var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }
+
     //现将json文件读出来
     // fs.readFile(resourcePath, function (err, data) {
     //     if (err) {
@@ -147,9 +155,13 @@ export function deleteJson(context, id) {
 }
 
 // 3. 查所有：同步处理
-export function searchAllJson(context) {
+export function searchAllJson(context, appType) {
     console.log("json searching all...");
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    if (appType == 0) {
+        var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    } else if (appType == 1) {
+        var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }
 
     let data = fs.readFileSync(resourcePath, 'utf-8');
 

@@ -7,16 +7,22 @@
 		<div class="row">
 
 			<div class="col-md-5 fatigueDrivingApp_buts">
-				<div class="row">
+				<div class="row" style="margin-top: 100px;">
 					<button type="button" onclick="checkCameraStatus()" class="fatigueDrivingApp_btn">
 						检测摄像头
 					</button>
-					<span id="checkCameraStatusRet" class="fatigueDrivingApp_descs"></span>
 				</div>
+
+				<div class="row fatigueDrivingApp_descs" >
+					<span id="checkCameraStatusRet" class=""></span>
+				</div>
+				
 				<div class="row">
 					<button type="button" onclick="startFatigueDriving()" class="fatigueDrivingApp_btn">
 						疲劳检测
 					</button>
+				</div>
+				<div class="row fatigueDrivingApp_descs" >
 					<span id="startFatigueDrivingRet" class="fatigueDrivingApp_descs"></span>
 				</div>
 				<div class="row">
@@ -31,9 +37,24 @@
 
 			<div class="fatigueDrivingApp_camera_show col-md-7">
 				<!-- <canvas id="canvas" style="height: 600px; width: 600px;"></canvas> -->
-				<img id="resImg" src="" />
+				<div id="fatigueDrivingApp_camera_img">
+					
+				</div>
 			</div>
 
+		</div>
+<br>
+<br>
+<br>
+		<div class="row">
+			<div class="col-md-5">
+				<span id="fdtest">result:</span>
+			</div>
+
+			<div class="fatigueDrivingApp_result_show col-md-7" id="fatigueDrivingApp_result">
+				<!-- <canvas id="canvas" style="height: 600px; width: 600px;"></canvas> -->
+				<span>WARNING!!!!!!!!</span>
+			</div>
 		</div>
 	</div>
 
@@ -49,21 +70,38 @@
 	<script>Vue.config.ProductionTip = false</script>
 
 	<script>
-		let ws = new WebSocket("ws://127.0.0.1:8188/");
-		ws.onopen = function (evt) {
+		try {
+			var ws = new WebSocket("ws://127.0.0.1:8188/");	
+			ws.onopen = function (evt) {
 			console.log("Connection open ...");
 			ws.send("Hello WebSockets!");
 		};
 
 		ws.onmessage = function (evt) {
-			$("#resImg").attr("src", evt.data);
-			console.log("Received Message: " + evt.data);
+			if(document.getElementById("fatigueDrivingApp_camera_img").children.length == 0){
+				let img_tag = document.createElement('img');
+				img_tag.src = evt.data;
+				img_tag.id = "cameraImg";
+				console.log("*********************receive ws message!!!!!!!!!!!!!!!!!");
+				document.getElementById("fatigueDrivingApp_camera_img").appendChild(img_tag);
+			}else{
+				console.log("##################receive ws message again!!!!!!!!!!!!");
+				document.getElementById("cameraImg").src = evt.data;
+			}
+			// $("#resImg").attr("src", evt.data);
+			// <img alt="视频加载中" id="resImg" src="" />
+			console.log("Received Message: " + evt.data );
 			// ws.close();
 		};
 
 		ws.onclose = function (evt) {
 			console.log("Connection closed.");
 		};
+		} catch (error) {
+			console.log("$$$$$$$$$$$$$$$$$$$$$$$4", error);
+		}
+		
+		
 	</script>
 
 	<script>

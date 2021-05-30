@@ -38,8 +38,10 @@ export module IDEPanels {
 	// 应用视图
 	export let appHomePanel: vscode.WebviewPanel | undefined = undefined;
 	export let imgAppListPanel: vscode.WebviewPanel | undefined = undefined;
-	export let newImgAppPanel: vscode.WebviewPanel | undefined = undefined;
+	export let newImgAppPanel: vscode.WebviewPanel | undefined = undefined;  // 手写体应用
 	export let imgAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	export let newFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined;  // 疲劳检测应用 
+	export let fatigueDrivingAppListPanel: vscode.WebviewPanel | undefined = undefined; // 疲劳检测应用列表页
 	// 用户视图
 	export let userHomePanel: vscode.WebviewPanel | undefined = undefined;
 	export let userImgAppSquarePanel: vscode.WebviewPanel | undefined = undefined;
@@ -336,10 +338,10 @@ export function registAllCommands(context: vscode.ExtensionContext) {
 
 
 		//7. 定时自动刷新导航栏，显示信息
-		resourceUpdateTimer = setTimeout(function refreshEntrys() {
+		resourceUpdateTimer = setInterval(function refreshEntrys() {
 			vscode.commands.executeCommand('resource_view.refreshEntry');
 			vscode.commands.executeCommand('model_view.refreshEntry');
-		}, 500);
+		}, 60000);
 	});
 }
 
@@ -357,7 +359,7 @@ export function sleep(numberMillis: any) {
 // this method is called when your extension is deactivated
 export function deactivate() {
 	// 取消计时器
-	clearTimeout(resourceUpdateTimer);
+	clearInterval(resourceUpdateTimer);
 	// 关闭server
 	LocalHttpServer.server.close();
 }

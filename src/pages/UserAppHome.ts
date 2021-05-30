@@ -36,7 +36,7 @@ const mnistMessageHandler = {
     // 查询所有图像识别应用列表
     getUserAppsList(global, message) {
         console.log(message);
-        let allImgTasks = searchAllJson(global.context);
+        let allImgTasks = searchAllJson(global.context, 0);
         global.panel.webview.postMessage({ cmd: 'getUserAppsListRet', cbid: message.cbid, data: allImgTasks });
     },
 
@@ -324,6 +324,7 @@ function openFatigueDrivingAppPage(context) {
             vscode.ViewColumn.One,
             {
                 enableScripts: true,
+                retainContextWhenHidden: true,
             }
         );
         IDEPanels.userFatigueDrivingAppPanel.webview.html = getHtmlContent(context, userFatigueDrivingAppHtmlPath);
@@ -655,7 +656,7 @@ function runMnistSendInputScript(global) {
  * ******************************************************************************************************
  */
 var websocketServerProcess: vscode.Terminal | undefined = undefined;  // 启动 websocket，接收python推送过来的视频数据
-var cameraCaptureProcess: ChildProcess | undefined = undefined;    // 实时视频数据往socket服务器推送
+var cameraCaptureProcess: vscode.Terminal | undefined = undefined;    // 实时视频数据往socket服务器推送
 
 var videoEncodeAndChipSendTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
 var ifNeedEncodeAndChipSendNextFrame: boolean | undefined = true;  // 是否需要编码识别下一幅帧
@@ -673,54 +674,36 @@ function startWebSocketServer(global) {
 }
 
 
-// 测试用
-function testPythonPushCameraData(global) {
-    console.log("启动 python 推送视频帧  ");
-
-    // 脚本位置
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "camera_test.py");
-
-    let command_str = "python3 " + scriptPath;
-    console.log("执行命令为", command_str);
-    cameraCaptureProcess = exec(command_str, {});
-
-    cameraCaptureProcess.stdout?.on("data", function (data) {
-        // log_output_channel.append(data);
-        // console.log(data);
-    });
-
-    cameraCaptureProcess.stderr?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-    });
-
-    cameraCaptureProcess.on("exit", function () {
-        console.log("websocket server exit!!");
-    });
-}
-
-
 // 2. 运行视频监测脚本：获取摄像头、特征处理、推送数据
 function startPythonPushCameraData(global) {
     console.log("启动 python 推送视频帧  ");
 
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "fatigue_detect_compile", "main.py");
-    let command_str = "python3 " + scriptPath;
-    console.log("执行命令为", command_str);
-    cameraCaptureProcess = exec(command_str, {});
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "fatigue_detect_compile");
+   
+    // let command_str = "python3 " + scriptPath;
+    // console.log("执行命令为", command_str);
+    // cameraCaptureProcess = exec(command_str, {});
+    // cameraCaptureProcess.stdout?.on("data", function (data) {
+    //     // log_output_channel.append(data);
+    //     // console.log(data);
+    //     global.panel.webview.postMessage({ startFatigueDrivingRet: "success" });
+    // });
+    // cameraCaptureProcess.stderr?.on("data", function (data) {
+    //     log_output_channel.append(data);
+    //     console.log(data);
+    // });
+    // cameraCaptureProcess.on("exit", function () {
+    //     console.log("websocket server exit!!");
+    // });
 
-    cameraCaptureProcess.stdout?.on("data", function (data) {
-        // log_output_channel.append(data);
-        // console.log(data);
-        global.panel.webview.postMessage({ startFatigueDrivingRet: "success" });
-    });
-    cameraCaptureProcess.stderr?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-    });
-    cameraCaptureProcess.on("exit", function () {
-        console.log("websocket server exit!!");
-    });
+
+     // 脚本位置
+     cameraCaptureProcess = vscode.window.createTerminal('webServer')
+     cameraCaptureProcess.sendText("cd " + scriptPath);
+     cameraCaptureProcess.sendText("python3 main.py");
+
+     sleep(2000);
+     global.panel.webview.postMessage({ startFatigueDrivingRet: "success" });
 }
 
 
@@ -743,25 +726,25 @@ function sendVideoImgToChip(global) {
     let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "fatigue_detect_compile", "send_input.py");
     let command_str = "python3 " + scriptPath;
     console.log("执行命令为", command_str);
-    cameraCaptureProcess = exec(command_str, {});
+    let chipCalculateProcess = exec(command_str, {});
 
-    cameraCaptureProcess.stdout?.on("data", function (data) {
+    chipCalculateProcess.stdout?.on("data", function (data) {
         log_output_channel.append(data);
         console.log(data);
 
         // 解析识别结果的输出
         if (data.indexOf("FATIGUEDRIVING RESULT") !== -1) {
-            console.log("疲劳检测结果：", data);
             // 图像识别结果
             let ret = data.split("**")[1];
+            console.log("疲劳检测结果：", ret);
             global.panel.webview.postMessage({ chipFatigueDrivingResult: ret }); // 0-不疲劳，1-疲劳
         }
     });
-    cameraCaptureProcess.stderr?.on("data", function (data) {
+    chipCalculateProcess.stderr?.on("data", function (data) {
         log_output_channel.append(data);
         console.log(data);
     });
-    cameraCaptureProcess.on("exit", function () {
+    chipCalculateProcess.on("exit", function () {
         console.log("chip calculate finished!!");
         // 执行完一帧图像的识别，接着下一张
         ifNeedEncodeAndChipSendNextFrame = true;
@@ -783,13 +766,14 @@ function fatigueDrivingProcess(global) {
     // 4. 每个帧的特征向量进行脉冲编码、打包
     // 5. input数据发送给芯片
     // 6. 接收芯片处理结果
-    videoEncodeAndChipSendTimer = setTimeout(function encodeAndSendData() {
+    videoEncodeAndChipSendTimer = setInterval(function encodeAndSendData() {
+        console.log("标志值：", ifNeedEncodeAndChipSendNextFrame);
         if (ifNeedEncodeAndChipSendNextFrame == true) {
             console.log("循环");
             callPythonEncodeVideoImg();
             sendVideoImgToChip(global);
         }
-    }, 500);
+    }, 3000);
 
     // 7. 检测到疲劳时前端界面上显示warning告警
 }
@@ -805,10 +789,10 @@ function finishDrivingProcess() {
         console.log("websocket process killed！");
     }
     if (cameraCaptureProcess != undefined) {
-        console.log("camera python push process pid: ", cameraCaptureProcess.pid);
-        cameraCaptureProcess.kill('SIGINT');
+        cameraCaptureProcess.dispose();
+        cameraCaptureProcess = undefined;
         console.log("camera capture process killed! ");
     }
     console.log("取消计时器");
-    clearTimeout(videoEncodeAndChipSendTimer);
+    clearInterval(videoEncodeAndChipSendTimer);
 }

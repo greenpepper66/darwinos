@@ -63,13 +63,13 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 		);
 		this.appKinds.push(brainApp);
 		var otherApp = new AppKind(
-			"其它应用",
+			"疲劳检测",
 			AppsProvider.getIconUriForLabel("其它应用.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
-				command: '',
+				command: 'extension.gotoAppPage',
 				title: '',
-				arguments: []
+				arguments: ["imgApp", 4]
 			}
 		);
 		this.appKinds.push(otherApp);

@@ -1,0 +1,19 @@
+{
+    "data": [
+        {
+            "id": 1622367627878,
+            "name": "ppppp",
+            "createTime": "2021-05-30 17:40",
+            "modeFileID": "11",
+            "modelFileName": "model_name",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.1",
+            "encodeMethodID": "0",
+            "encodeConfigFile": "c:\\Users\\Administrator\\package-lock.json",
+            "outputDir": "c:\\Users\\Administrator\\Desktop",
+            "status": 0,
+            "appType": 1
+        }
+    ],
+    "total": 1
+}

@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { openImgAppHomePage } from "./ImgAppHome";
+import { openImgAppHomePage, openFatigueDrivingAppHomePage } from "./ImgAppHome";
 import { IDEPanels } from "../extension";
 
 
@@ -92,6 +92,8 @@ export function AppsHomePageProvide(context) {
 export function openCertainAppHomePage(context, num) {
     if (num == 1) {  // 数字图像识别应用
         openImgAppHomePage(context);
+    } else if (num == 4) {
+        openFatigueDrivingAppHomePage(context);
     } else {
         openOtherAppHomePage(context);
     }

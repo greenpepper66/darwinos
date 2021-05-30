@@ -46,12 +46,19 @@ window.addEventListener('message', event => {
 
     if (message.startFatigueDrivingRet != undefined) {
         console.log("get startFatigueDrivingRet:", message.startFatigueDrivingRet);
-        document.getElementById("startFatigueDrivingRet").innerHTML = "监测中......"
+        document.getElementById("startFatigueDrivingRet").innerHTML = "检测中......";
+        
     }
 
     // 0-不疲劳，1-疲劳
     if (message.chipFatigueDrivingResult != undefined) {
-        
+        console.log("***************************疲劳检测结果********************", message.chipFatigueDrivingResult);
+        document.getElementById("fdtest").innerHTML = "result: " +  message.chipFatigueDrivingResult;
+        if(message.chipFatigueDrivingResult == "1" || message.chipFatigueDrivingResult == 1) {
+            document.getElementById('fatigueDrivingApp_result').style.display = 'block';
+            sleep(3000);
+            document.getElementById('fatigueDrivingApp_result').style.display = 'none';
+        }
     }
 });
 

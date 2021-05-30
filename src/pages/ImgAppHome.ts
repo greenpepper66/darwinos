@@ -12,6 +12,10 @@ const imgAppInfoHtmlFilePath = "src/static/views/imgAppInfo.html";
 const imgAppRunTaskHtmlFilePath = "src/static/views/imgAppRunTask.html";
 const imgAppTasksHtmlFilePath = "src/static/views/imgAppTasks.html";
 
+// 疲劳检测应用
+const newFDAppHtmlFilePath = "src/static/views/newFatigueDrivingApp.html";
+const fatigueDrivingHomeHtmlFilePath = "src/static/views/fatigueDrivingAppHome.html";
+
 /**
  * ******************************************************************************************************
  * 消息通信
@@ -32,7 +36,7 @@ const imgAppMessageHandler = {
     // 2.2 查询所有应用列表
     getAppsConfigList(global, message) {
         console.log(message);
-        let allApps = searchAllJson(global.context);
+        let allApps = searchAllJson(global.context, 0);
         global.panel.webview.postMessage({ cmd: 'appsConfigListRet', cbid: message.cbid, data: allApps });
     },
 
@@ -55,7 +59,7 @@ const imgAppMessageHandler = {
 
 // 保存应用配置到json文件中
 // message.text: [appName, modelFileID, encodeMethodID, encodeConfDir, outputDir]
-function writeImgAppInfoToJson(global, message) {
+function writeImgAppInfoToJson(global, message, appType) {
     if (message.text.length != 5 || message.text[0] == "" || message.text[1] == "" || message.text[2] == ""
         || message.text[3] == "" || message.text[4] == "") {
         return "error: save failed, please check your input!";
@@ -91,6 +95,8 @@ function writeImgAppInfoToJson(global, message) {
                 imgAppConfig.outputDir = message.text[4];
 
                 imgAppConfig.status = 0; // 状态默认为0
+
+                imgAppConfig.appType = appType;  // 应用类型： 0-手写体图像识别， 1-疲劳检测
 
                 let writeRet = writeJson(global.context, imgAppConfig); //写入json文件
                 console.log("保存结果为： ", writeRet);  // success 或 error
@@ -129,7 +135,7 @@ const newImgAppMessageHandler = {
     // 3.3 保存应用配置 - 新建应用页面的“保存应用”按钮触发
     saveImgAppConfig(global, message) {
         console.log(message);
-        let saveRet = writeImgAppInfoToJson(global, message);
+        let saveRet = writeImgAppInfoToJson(global, message, 0);
         console.log("saveImgAppConfig save result： ", saveRet);
         global.panel.webview.postMessage({ saveImgAppConfigRet: saveRet });
     },
@@ -404,7 +410,7 @@ export function openImgAppRunTaskPage(context, appID) {
             }
         );
         panel.webview.html = getAppsHomeHtml(context, imgAppRunTaskHtmlFilePath);
-        
+
 
         let global = { panel, context, appInfo };
         IDEPanels.taskInfoImgAppPagePanelsMap.set(appID, panel);
@@ -534,3 +540,186 @@ function getImgFileNum(path: string) {
     console.log("getFiles list =--------", files);
     return files.length;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * ******************************************************************************************************
+ * 疲劳检测应用
+ * ******************************************************************************************************
+ */
+// 1. 新建应用页面交互
+const newFatigueDrivingAppMessageHandler = {
+    // 1.1 获取模型文件
+    fdAppGetModelFileList(global, message) {
+        console.log(message);
+        console.log("list:", allData.deployedModelList);
+        global.panel.webview.postMessage({ fdAppGetModelFileListRet: allData.deployedModelList });
+    },
+
+    // 1.2 选择启动任务所需的各个配置文件 - 打包成一个了
+    fdAppSelectEncodeConfFile(global, message) {
+        console.log(message);
+        const options: vscode.OpenDialogOptions = {
+            openLabel: "选择文件",
+            // canSelectFolders: true,
+        };
+        vscode.window.showOpenDialog(options).then(fileUri => {
+            console.log("选择配置文件为", fileUri);
+            // 将选择的目录返回给webview
+            global.panel.webview.postMessage({ fdAppSelectEncodeConfFileRet: fileUri[0].fsPath });
+        });
+    },
+
+    //1.3 选择编码过程中输出文件所在的文件夹
+    fdAppSelectOutputDir(global, message) {
+        console.log(message);
+        const options: vscode.OpenDialogOptions = {
+            openLabel: "选择目录",
+            canSelectFolders: true,
+        };
+        vscode.window.showOpenDialog(options).then(fileUri => {
+            console.log("选择目录为", fileUri);
+            // 将选择的目录返回给webview
+            global.panel.webview.postMessage({ fdAppSelectOutputDirRet: fileUri[0].fsPath });
+        });
+    },
+
+    // 1.4 保存应用配置 - 新建应用页面的“保存应用”按钮触发
+    saveFatigueDrivingAppConfig(global, message) {
+        console.log(message);
+        let saveRet = writeImgAppInfoToJson(global, message, 1);
+        console.log("saveFatigueDrivingAppConfig save result： ", saveRet);
+        global.panel.webview.postMessage({ saveFatigueDrivingAppConfigRet: saveRet });
+    },
+
+    // 1.5 应用保存成功后，弹出框显示“保存成功！”, 页面跳转到应用列表页面
+    newFDAppSaveSuccGotoListPage(global, message) {
+        console.log(message);
+        openFatigueDrivingAppHomePage(global.context);
+    },
+
+};
+
+// 2. 打开新建页面
+export function openNewFatigueDrivingAppPage(context) {
+    console.log("IDE openNewFatigueDrivingAppPage!", IDEPanels.newFatigueDrivingAppPanel);
+    if (IDEPanels.newFatigueDrivingAppPanel) {
+        console.log("打开新建疲劳检测应用页面：", IDEPanels.newFatigueDrivingAppPanel.visible);
+        IDEPanels.newFatigueDrivingAppPanel.reveal();
+    } else {
+        console.log("新建 新建疲劳检测应用页面");
+
+        IDEPanels.newFatigueDrivingAppPanel = vscode.window.createWebviewPanel(
+            'openNewFatigueDrivingAppPage',
+            "新建应用",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        let panel = IDEPanels.newFatigueDrivingAppPanel;
+        let global = { panel, context };
+        IDEPanels.newFatigueDrivingAppPanel.webview.html = getAppsHomeHtml(context, newFDAppHtmlFilePath);
+        // 发送消息 弹出模态框
+        global.panel.webview.postMessage({ createImgApplictaion: "yes" });
+
+        IDEPanels.newFatigueDrivingAppPanel.webview.onDidReceiveMessage(message => {
+            if (newFatigueDrivingAppMessageHandler[message.command]) {
+                newFatigueDrivingAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openNewFatigueDrivingAppPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.newFatigueDrivingAppPanel.onDidDispose(
+            () => {
+                IDEPanels.newFatigueDrivingAppPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+// 3. 疲劳检测列表页交互
+const fatigueDrivingAppMessageHandler = {
+    // 3.1 单击“新建应用”按钮 跳转到新建应用页面
+    gotoNewFDAppPage(global, message) {
+        console.log(message);
+        openNewFatigueDrivingAppPage(global.context);
+    },
+
+    // 3.2 查询所有应用列表
+    getFDAppsConfigList(global, message) {
+        console.log(message);
+        let allApps = searchAllJson(global.context, 1);
+        global.panel.webview.postMessage({ cmd: 'getFDAppsConfigListRet', cbid: message.cbid, data: allApps });
+    },
+
+
+
+    
+};
+
+// 4. 打开疲劳检测应用列表首页
+export function openFatigueDrivingAppHomePage(context) {
+    console.log("IDE openFatigueDrivingAppHomePage!", IDEPanels.fatigueDrivingAppListPanel);
+    if (IDEPanels.fatigueDrivingAppListPanel) {
+        console.log("打开疲劳检测应用列表页面：", IDEPanels.fatigueDrivingAppListPanel.visible);
+        IDEPanels.fatigueDrivingAppListPanel.reveal();
+    } else {
+        console.log("新建疲劳检测应用列表页面");
+        IDEPanels.fatigueDrivingAppListPanel = vscode.window.createWebviewPanel(
+            'fatigueDrivingAppListPage',
+            "疲劳检测",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+
+        let panel = IDEPanels.fatigueDrivingAppListPanel;
+        let global = { panel, context };
+
+        IDEPanels.fatigueDrivingAppListPanel.webview.html = getAppsHomeHtml(context, fatigueDrivingHomeHtmlFilePath);
+        IDEPanels.fatigueDrivingAppListPanel.webview.onDidReceiveMessage(message => {
+            if (fatigueDrivingAppMessageHandler[message.command]) {
+                fatigueDrivingAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openFatigueDrivingAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.fatigueDrivingAppListPanel.onDidDispose(
+            () => {
+                IDEPanels.fatigueDrivingAppListPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+// 工具函数
+

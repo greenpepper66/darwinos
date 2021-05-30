@@ -48,7 +48,7 @@ export class UserProvider implements vscode.TreeDataProvider<UserAppKind> {
 		);
 		this.userAppKinds.push(brainApp);
 		var otherApp = new UserAppKind(
-			"其它应用",
+			"疲劳检测",
 			UserProvider.getIconUriForLabel("其它应用.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
