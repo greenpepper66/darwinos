@@ -83,7 +83,7 @@
             <div class="imgAppHome_title">最近使用的应用</div>
 
             <div class="row">
-                <table class="imgAppHome_page_table-list" id="appsTable">
+                <table class="imgAppHome_page_table-list" id="fdAppsTable">
                     <thead>
                         <tr>
                             <th>编号</th>
@@ -124,10 +124,10 @@
                                 <td>{{ item.createTime }}</td>
                                 <td>
                                     <button type="button" class="imgAppHome_detail_btn"
-                                        @click="">详情</button>
+                                        @click="gotoFatigueDrivingAppInfoPage(item.id)">详情</button>
                                    
                                     <button type="button" class="imgAppHome_delete_btn"
-                                        @click="">删除</button>
+                                        @click="deleteFDAppConfig(item.id)">删除</button>
                                 </td>
                             </tr>
                         </template>

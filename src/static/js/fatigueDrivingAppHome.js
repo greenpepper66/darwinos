@@ -46,13 +46,30 @@ window.addEventListener('message', event => {
         console.log(message.data);
         (callbacks[message.cbid] || function () { })(message.data);
         delete callbacks[message.cbid];
-        console.log('---------------------------message：get apps list', this.appsConfigList.length);
+        console.log('---------------------------message：get fatigueDriving apps list', this.appsConfigList.length);
     }
 
-
+    // 应用删除结果
+    if (message.deleteFDAppConfigRet != undefined) {
+        console.log('---------------------------message：delete fatigueDriving app ', message.deleteAppConfigRet);
+        deleteRowByID(message.deleteFDAppConfigRet);
+    }
 
 });
 
+
+// 根据id匹配结果，删除一行记录
+function deleteRowByID(id) {
+    let tab = document.getElementById('fdAppsTable');
+    let trs = tab.getElementsByTagName('tr');
+    for (let i = 0; i < trs.length; i++) {
+        console.log("行号：", trs[i].rowIndex);
+        if (trs[i].cells[1].innerHTML == id) {
+            console.log("列一内容：", trs[i].cells[1].innerHTML);
+            tab.deleteRow(trs[i].rowIndex);
+        }
+    }
+}
 
 
 new Vue({
@@ -83,10 +100,27 @@ new Vue({
             });
         },
 
+        gotoFatigueDrivingAppInfoPage(imgAppID) {
+            console.log("search app: ", imgAppID);
+            // 给插件发送消息 跳转到详情页
+            vscode.postMessage({
+                command: 'gotoFatigueDrivingAppInfoPage',
+                text: imgAppID,
+            });
+        },
+
+        deleteFDAppConfig(appID) {
+            console.log("delete fatigueDriving app: ", appID);
+            // 给插件发送消息 删除一条应用
+            vscode.postMessage({
+                command: 'deleteFDAppConfig',
+                text: appID,
+            });
+        },
 
         /* 搜索框实现 */
         searchImgApp() {
-          
+
         },
     }
 });

@@ -15,6 +15,7 @@ const imgAppTasksHtmlFilePath = "src/static/views/imgAppTasks.html";
 // 疲劳检测应用
 const newFDAppHtmlFilePath = "src/static/views/newFatigueDrivingApp.html";
 const fatigueDrivingHomeHtmlFilePath = "src/static/views/fatigueDrivingAppHome.html";
+const fatigueDrivingAppInfoHtmlFilePath = "src/static/views/fatigueDrivingAppInfo.html";
 
 /**
  * ******************************************************************************************************
@@ -43,7 +44,7 @@ const imgAppMessageHandler = {
     // 2.3 删除应用
     deleteAppConfig(global, message) {
         console.log(message);
-        let delRet = deleteJson(global.context, message.text);
+        let delRet = deleteJson(global.context, message.text, 0);
         console.log("deleteAppConfig ret: ", delRet);
         global.panel.webview.postMessage({ deleteAppConfigRet: message.text });
     },
@@ -179,7 +180,7 @@ const newImgAppMessageHandler = {
 const imgAppInfoMessageHandler = {
     getImgAppInfos(global, message) {
         console.log(message);
-        let infos = searchImgAppByID(global.context, global.appID);
+        let infos = searchImgAppByID(global.context, global.appID, 0);
         global.panel.webview.postMessage({ cmd: 'getImgAppInfosRet', cbid: message.cbid, data: infos });
     },
 };
@@ -387,7 +388,7 @@ export function openImgAppInfoPage(context, appID) {
 // 4. 打开任务详情页面 —— 显示板子芯片信息 
 export function openImgAppRunTaskPage(context, appID) {
     // 查询应用信息
-    let appInfo = searchImgAppByID(context, appID);
+    let appInfo = searchImgAppByID(context, appID, 0);
     if (appInfo == "none") {
         console.error("can not found the app: ", appID);
     }
@@ -674,9 +675,21 @@ const fatigueDrivingAppMessageHandler = {
         global.panel.webview.postMessage({ cmd: 'getFDAppsConfigListRet', cbid: message.cbid, data: allApps });
     },
 
+    // 3.3 删除应用
+    deleteFDAppConfig(global, message) {
+        console.log(message);
+        let delRet = deleteJson(global.context, message.text, 1);
+        console.log("deleteFDAppConfig ret: ", delRet);
+        global.panel.webview.postMessage({ deleteFDAppConfigRet: message.text });
+    },
+
+    // 2.4 查询应用  显示详情页
+    gotoFatigueDrivingAppInfoPage(global, message) {
+        console.log(message);
+        openFatigueDrivingAppInfoPage(global.context, message.text);
+    },
 
 
-    
 };
 
 // 4. 打开疲劳检测应用列表首页
@@ -721,5 +734,57 @@ export function openFatigueDrivingAppHomePage(context) {
     }
 }
 
-// 工具函数
+// 5. 应用详情页面交互
+const fatigueDrivingAppInfoMessageHandler = {
+    getFatigueDrivingAppInfos(global, message) {
+        console.log(message);
+        let infos = searchImgAppByID(global.context, global.appID, 1);
+        global.panel.webview.postMessage({ cmd: 'getFatigueDrivingAppInfosRet', cbid: message.cbid, data: infos });
+    },
+}
+
+// 6. 打开应用详情页面
+export function openFatigueDrivingAppInfoPage(context, appID) {
+
+    console.log("IDE openFatigueDrivingAppInfoPage!", IDEPanels.fatigueDrivingAppInfoPagePanelsMap);
+    if (IDEPanels.fatigueDrivingAppInfoPagePanelsMap.has(appID)) {
+        console.log("打开疲劳检测应用详情页面：", IDEPanels.fatigueDrivingAppInfoPagePanelsMap.get(appID).visible);
+        IDEPanels.fatigueDrivingAppInfoPagePanelsMap.get(appID).reveal();
+    } else {
+        console.log("新建疲劳检测应用详情页面");
+        let panel = vscode.window.createWebviewPanel(
+            'fatigueDrivingAppInfoPage',
+            "应用详情",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        panel.webview.html = getAppsHomeHtml(context, fatigueDrivingAppInfoHtmlFilePath);
+
+        // 保存应用ID
+        let global = { panel, context, appID };
+        IDEPanels.fatigueDrivingAppInfoPagePanelsMap.set(appID, panel);
+
+        panel.webview.onDidReceiveMessage(message => {
+            if (fatigueDrivingAppInfoMessageHandler[message.command]) {
+                fatigueDrivingAppInfoMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openFatigueDrivingAppInfoPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        panel.onDidDispose(
+            () => {
+                panel = undefined;
+                IDEPanels.fatigueDrivingAppInfoPagePanelsMap.delete(appID);
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
 

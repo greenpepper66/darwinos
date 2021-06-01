@@ -42,16 +42,19 @@ export module IDEPanels {
 	export let imgAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
 	export let newFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined;  // 疲劳检测应用 
 	export let fatigueDrivingAppListPanel: vscode.WebviewPanel | undefined = undefined; // 疲劳检测应用列表页
+	export let fatigueDrivingAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
 	// 用户视图
 	export let userHomePanel: vscode.WebviewPanel | undefined = undefined;
 	export let userImgAppSquarePanel: vscode.WebviewPanel | undefined = undefined;
 	export let userImgAppRunPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	export let userFatigueDrivingAppHomePanel: vscode.WebviewPanel | undefined = undefined;  // 疲劳检测首页九宫格页面
+	export let userFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined;      // 疲劳检测应用运行页面
+	export let userFatigueDrivingAppAfterPanel: vscode.WebviewPanel | undefined = undefined;      // 疲劳检测应用运行页面
 	// 任务视图
 	export let taskHomeImgAppListPanel: vscode.WebviewPanel | undefined = undefined;
 	export let taskInfoImgAppPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为任务的id
 
-	// 疲劳检测 用户视图 
-	export let userFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined;
+
 }
 
 // var commandsRegistry = new Map<string, vscode.Disposable>();

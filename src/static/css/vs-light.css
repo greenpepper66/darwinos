@@ -1351,9 +1351,10 @@ table.userMnistOneApp_recRetAnaTable td {
 }
 .fatigueDrivingApp_camera_show {
   margin: 0 auto;
-  margin-top: 100px;
+  margin-top: 50px;
   width: 600px;
   height: 400px;
+  border: 1px solid #d9d9d9;
 }
 .fatigueDrivingApp_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
@@ -1367,20 +1368,53 @@ table.userMnistOneApp_recRetAnaTable td {
   color: #ffffff;
   letter-spacing: 0.91px;
 }
-.fatigueDrivingApp_buts {
-  margin-top: 0px;
-}
 .fatigueDrivingApp_descs {
-  vertical-align: middle;
-  margin-top: 10px;
-  margin-left: 20px;
   font-size: 20px;
+}
+table.fatigueDrivingApp_page_table {
+  margin-right: 20px;
+  font-size: 14px;
+  color: #666666;
+  font-family: PingFangSC-Regular;
+  width: 90%;
+  margin: auto;
+  margin-top: 35px;
+}
+
+table.fatigueDrivingApp_page_table tr {
+  padding: 8px;
+  height: 70px;
+}
+
+table.fatigueDrivingApp_page_table tr td:nth-child(1),
+table.fatigueDrivingApp_page_table tr td:nth-child(3),
+table.fatigueDrivingApp_page_table tr td:nth-child(5) {
   text-align: center;
-  margin-bottom: 100px;
+}
+
+table.fatigueDrivingApp_page_table tr td:nth-child(2),
+table.fatigueDrivingApp_page_table tr td:nth-child(4),
+table.fatigueDrivingApp_page_table tr td:nth-child(6) {
+  text-align: left;
+}
+
+.imgAppHome_search_title {
+  font-size: 16px;
+  color: #333333;
+  letter-spacing: 0.91px;
+  vertical-align: middle;
+}
+
+.fatigueDrivingApp_page_table {
+  border-radius: 6px;
+  height: 40px;
+  font-size: 16px;
+  color: #999999;
+  letter-spacing: 0;
+  line-height: 14px;
+  width: 80%;
 }
 .fatigueDrivingApp_result_show {
-  font-size: 26px;
   color: red;
-  text-align: center;
-  display: none;
+  font-size: 26px;
 }

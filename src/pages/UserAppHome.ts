@@ -17,8 +17,10 @@ const userAppHomeHtmlFilePath = "src/static/views/userAppHome.html";
 const userMnistAppHomeHtmlFilePath = "src/static/views/userMnistAppHome.html";
 const userMnistOneAppHtmlFilePath = "src/static/views/userMnistOneApp.html";
 const otherAppHomeHtmlFilePath = "src/static/views/otherAppHome.html";
-const userFatigueDrivingAppHtmlPath = "src/static/views/fatigueDrivingApp.html";
 
+const userFatigueDrivingAppHtmlPath = "src/static/views/fatigueDrivingApp.html";
+const userFatigueDrivingAppAfterHtmlPath = "src/static/views/fatigueDrivingAppAfter.html";
+const userFatigueDrivingAppHomeHtmlPath = "src/static/views/userFatigueDrivingAppHome.html";
 
 
 // 1. 与应用视图首页webview的交互
@@ -78,7 +80,7 @@ const oneUserAppMessageHandler = {
         console.log("updateImgAppInfo ret: ", ret);
 
         // 更新global中的应用信息
-        global.appInfo = searchImgAppByID(global.context, global.appInfo.id);
+        global.appInfo = searchImgAppByID(global.context, global.appInfo.id, 0);
         console.log("更新global中应用信息：", global.appInfo);
 
         if (ret == "success") {
@@ -119,23 +121,6 @@ const oneUserAppMessageHandler = {
         openImgAppRunTaskPage(global.context, message.text);
     },
 };
-
-// 4. 疲劳检测页面
-const fatigueDrivingMessageHandler = {
-
-    // 开始疲劳检测
-    startFatigueDriving(global, message) {
-        console.log(message);
-        fatigueDrivingProcess(global)
-    },
-
-    // 结束疲劳检测
-    finishFatigueDriving(global, message) {
-        console.log(message);
-        finishDrivingProcess();
-    },
-
-}
 
 
 /********************************************************************************************
@@ -190,7 +175,7 @@ export function openOneKindUserAppPage(context, num) {
     if (num == 1) {  // 数字图像识别应用
         openMnistUserAppHomePage(context);
     } else if (num == 4) {
-        openFatigueDrivingAppPage(context);
+        openFatigueDrivingAppHomePage(context);
     }
     else {
         openOtherUserAppHomePage(context);
@@ -276,7 +261,7 @@ export function openOneMnistUserAppPageByID(context, id) {
         );
         panel.webview.html = getHtmlContent(context, userMnistOneAppHtmlFilePath);
 
-        var appInfo = searchImgAppByID(context, id);
+        var appInfo = searchImgAppByID(context, id, 0);
         if (appInfo == "none") {
             console.error("can not found the app: ", id);
         }
@@ -307,51 +292,6 @@ export function openOneMnistUserAppPageByID(context, id) {
 
 }
 
-
-
-// 4. 打开疲劳检测摄像头应用页面
-function openFatigueDrivingAppPage(context) {
-    console.log("IDE openMnistUserAppHomePage!", IDEPanels.userFatigueDrivingAppPanel);
-    if (IDEPanels.userFatigueDrivingAppPanel) {
-        console.log("打开疲劳检测页面：", IDEPanels.userFatigueDrivingAppPanel.visible);
-        IDEPanels.userFatigueDrivingAppPanel.reveal();
-    } else {
-        console.log("新建疲劳检测页面");
-
-        IDEPanels.userFatigueDrivingAppPanel = vscode.window.createWebviewPanel(
-            'fatigueDrivingAppPage',
-            "疲劳检测",
-            vscode.ViewColumn.One,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true,
-            }
-        );
-        IDEPanels.userFatigueDrivingAppPanel.webview.html = getHtmlContent(context, userFatigueDrivingAppHtmlPath);
-
-        let panel = IDEPanels.userFatigueDrivingAppPanel;
-        let global = { panel, context };
-
-        IDEPanels.userFatigueDrivingAppPanel.webview.onDidReceiveMessage(message => {
-            if (fatigueDrivingMessageHandler[message.command]) {
-                fatigueDrivingMessageHandler[message.command](global, message);
-            } else {
-                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-            }
-        }, undefined, context.subscriptions);
-
-        console.log("IDE openMnistUserAppHomePage 2!", global.panel);
-
-        // 面板被关闭后重置
-        IDEPanels.userFatigueDrivingAppPanel.onDidDispose(
-            () => {
-                IDEPanels.userFatigueDrivingAppPanel = undefined;
-            },
-            null,
-            context.subscriptions
-        );
-    }
-}
 
 
 /********************************************************************************************
@@ -655,12 +595,220 @@ function runMnistSendInputScript(global) {
  * 运行摄像头应用 —— 疲劳检测
  * ******************************************************************************************************
  */
-var websocketServerProcess: vscode.Terminal | undefined = undefined;  // 启动 websocket，接收python推送过来的视频数据
-var cameraCaptureProcess: vscode.Terminal | undefined = undefined;    // 实时视频数据往socket服务器推送
 
-var videoEncodeAndChipSendTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
-var ifNeedEncodeAndChipSendNextFrame: boolean | undefined = true;  // 是否需要编码识别下一幅帧
+ var websocketServerProcess: vscode.Terminal | undefined = undefined;  // 启动 websocket，接收python推送过来的视频数据
+ var cameraCaptureProcess: vscode.Terminal | undefined = undefined;    // 实时视频数据往socket服务器推送
 
+ var videoEncodeAndChipSendTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
+ var ifNeedEncodeAndChipSendNextFrame: boolean | undefined = true;  // 是否需要编码识别下一幅帧
+
+ 
+// 1. 用户视图疲劳检测九宫格页面消息处理
+const userFatigueDrivingHomeMessageHandler = {
+    // 查询所有疲劳检测应用列表
+    getUserFatigueDrivingAppsList(global, message) {
+        console.log(message);
+        let allImgTasks = searchAllJson(global.context, 1);
+        global.panel.webview.postMessage({ cmd: 'getUserFatigueDrivingAppsListRet', cbid: message.cbid, data: allImgTasks });
+    },
+
+    // 单击疲劳检测九宫格的按钮进入应用运行页面
+    gotoOneUserFatigueDrivingAppPage(global, message) {
+        console.log(message);
+        openOneUserFatigueDrivingAppPage(global.context);  // 全都是一个页面
+    },
+}
+
+// 2. 打开用户视图-疲劳检测首页
+function openFatigueDrivingAppHomePage(context) {
+    console.log("IDE openFatigueDrivingAppHomePage!", IDEPanels.userFatigueDrivingAppHomePanel);
+    if (IDEPanels.userFatigueDrivingAppHomePanel) {
+        console.log("打开疲劳检测九宫格页面：", IDEPanels.userFatigueDrivingAppHomePanel.visible);
+        IDEPanels.userFatigueDrivingAppHomePanel.reveal();
+    } else {
+        console.log("新建疲劳检测九宫格页面");
+
+        IDEPanels.userFatigueDrivingAppHomePanel = vscode.window.createWebviewPanel(
+            'fatigueDrivingAppPage',
+            "疲劳检测",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
+        IDEPanels.userFatigueDrivingAppHomePanel.webview.html = getHtmlContent(context, userFatigueDrivingAppHomeHtmlPath);
+
+        let panel = IDEPanels.userFatigueDrivingAppHomePanel;
+        let global = { panel, context };
+
+        IDEPanels.userFatigueDrivingAppHomePanel.webview.onDidReceiveMessage(message => {
+            if (userFatigueDrivingHomeMessageHandler[message.command]) {
+                userFatigueDrivingHomeMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openFatigueDrivingAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userFatigueDrivingAppHomePanel.onDidDispose(
+            () => {
+                IDEPanels.userFatigueDrivingAppHomePanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+// 3. 
+const oneUserFatigueDrivingMessageHandler = {
+
+    // 摄像头页面执行“检测摄像头”按钮后，先启动服务进行推流
+    startWebsocketServerAndPushCamera(global, message) {
+        console.log(message);
+        // 1. 启动WebSocket服务器
+        startWebSocketServer(global);
+
+        // 2. 启动李畅的疲劳检测脚本，获取摄像头，取帧，特征处理
+        startPythonPushCameraData(global);
+
+        global.panel.webview.postMessage({ startWebsocketServerAndPushCameraRet: "success" });
+    },
+
+    // 开始疲劳检测, 关闭当前页面，跳转到after页面，模拟刷新，否则画面无法显示
+    startFatigueDriving(global, message) {
+        console.log(message);
+        global.panel.dispose();
+        openOneUserFatigueDrivingAppAfterPage(global.context);
+    },
+
+    // 结束疲劳检测
+    finishFatigueDriving(global, message) {
+        console.log(message);
+        finishDrivingProcess();
+    },
+
+}
+
+// 4. 打开疲劳检测摄像头监视画面的页面
+function openOneUserFatigueDrivingAppPage(context) {
+    console.log("IDE openOneUserFatigueDrivingAppPage!", IDEPanels.userFatigueDrivingAppPanel);
+    if (IDEPanels.userFatigueDrivingAppPanel) {
+        console.log("打开疲劳检测页面：", IDEPanels.userFatigueDrivingAppPanel.visible);
+        IDEPanels.userFatigueDrivingAppPanel.reveal();
+    } else if (IDEPanels.userFatigueDrivingAppAfterPanel) {
+        console.log("打开疲劳检测显示页面：", IDEPanels.userFatigueDrivingAppAfterPanel.visible);
+        IDEPanels.userFatigueDrivingAppAfterPanel.reveal();
+    } else {
+        console.log("新建疲劳检测页面");
+
+        IDEPanels.userFatigueDrivingAppPanel = vscode.window.createWebviewPanel(
+            'fatigueDrivingAppPage',
+            "疲劳检测应用",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
+        IDEPanels.userFatigueDrivingAppPanel.webview.html = getHtmlContent(context, userFatigueDrivingAppHtmlPath);
+
+        let panel = IDEPanels.userFatigueDrivingAppPanel;
+        let global = { panel, context };
+
+        IDEPanels.userFatigueDrivingAppPanel.webview.onDidReceiveMessage(message => {
+            if (oneUserFatigueDrivingMessageHandler[message.command]) {
+                oneUserFatigueDrivingMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openOneUserFatigueDrivingAppPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userFatigueDrivingAppPanel.onDidDispose(
+            () => {
+                IDEPanels.userFatigueDrivingAppPanel = undefined;
+                // // 当前页面被手动关闭，如果点击了“检测摄像头”按钮，但是没有执行“疲劳检测”，即after页面没有显示，需要停止websocket和python推流
+                // if(IDEPanels.userFatigueDrivingAppAfterPanel == undefined) {
+                //     finishDrivingProcess();
+                // }
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+
+// 5. 显示画面信息交互
+const oneUserFatigueDrivingAfterMessageHandler = {
+    fatigueDrivingAppAfterConnChip(global, message) {
+        console.log(message);
+        fatigueDrivingProcess(global);
+    },
+
+    // 点击页面“停止检测”按钮，跳转回一开始的疲劳检测页面
+    finishFatigueDrivingAfter(global, message) {
+        console.log(message);
+        finishDrivingProcess();
+        // 停止推流后
+        sleep(5000);
+        global.panel.dispose();
+        openOneUserFatigueDrivingAppPage(global.context);
+    },
+};
+
+
+// 6. 打开疲劳检测显示画面页面
+function openOneUserFatigueDrivingAppAfterPage(context) {
+    console.log("IDE openOneUserFatigueDrivingAppAfterPage!", IDEPanels.userFatigueDrivingAppAfterPanel);
+    if (IDEPanels.userFatigueDrivingAppAfterPanel) {
+        console.log("打开疲劳检测显示页面：", IDEPanels.userFatigueDrivingAppAfterPanel.visible);
+        IDEPanels.userFatigueDrivingAppAfterPanel.reveal();
+    } else {
+        console.log("新建疲劳检测显示页面");
+
+        IDEPanels.userFatigueDrivingAppAfterPanel = vscode.window.createWebviewPanel(
+            'fatigueDrivingAppPage',
+            "疲劳检测应用",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
+        IDEPanels.userFatigueDrivingAppAfterPanel.webview.html = getHtmlContent(context, userFatigueDrivingAppAfterHtmlPath);
+
+        let panel = IDEPanels.userFatigueDrivingAppAfterPanel;
+        let global = { panel, context };
+
+        IDEPanels.userFatigueDrivingAppAfterPanel.webview.onDidReceiveMessage(message => {
+            if (oneUserFatigueDrivingAfterMessageHandler[message.command]) {
+                oneUserFatigueDrivingAfterMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openOneUserFatigueDrivingAppAfterPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userFatigueDrivingAppAfterPanel.onDidDispose(
+            () => {
+                IDEPanels.userFatigueDrivingAppAfterPanel = undefined;
+                // 显示页面关闭后要停止检测
+                finishDrivingProcess();
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
 
 // 1. 启动 WebSocket server, 接收python推送的视频帧数据
 function startWebSocketServer(global) {
@@ -679,7 +827,7 @@ function startPythonPushCameraData(global) {
     console.log("启动 python 推送视频帧  ");
 
     let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "fatigue_detect_compile");
-   
+
     // let command_str = "python3 " + scriptPath;
     // console.log("执行命令为", command_str);
     // cameraCaptureProcess = exec(command_str, {});
@@ -696,14 +844,11 @@ function startPythonPushCameraData(global) {
     //     console.log("websocket server exit!!");
     // });
 
+    // 脚本位置
+    cameraCaptureProcess = vscode.window.createTerminal('webServer')
+    cameraCaptureProcess.sendText("cd " + scriptPath);
+    cameraCaptureProcess.sendText("python3 main.py");
 
-     // 脚本位置
-     cameraCaptureProcess = vscode.window.createTerminal('webServer')
-     cameraCaptureProcess.sendText("cd " + scriptPath);
-     cameraCaptureProcess.sendText("python3 main.py");
-
-     sleep(2000);
-     global.panel.webview.postMessage({ startFatigueDrivingRet: "success" });
 }
 
 
@@ -752,20 +897,15 @@ function sendVideoImgToChip(global) {
 }
 
 
-
 // 疲劳检测处理流程
 // 参考方案：https://blog.csdn.net/zhuzheqing/article/details/109819702?spm=1001.2014.3001.5501
 function fatigueDrivingProcess(global) {
-    // 1. 启动WebSocket服务器
-    startWebSocketServer(global);
-
-    // 2. 启动李畅的疲劳检测脚本，获取摄像头，取帧，特征处理
-    startPythonPushCameraData(global);
 
     // 3. 给python发消息，执行编码
     // 4. 每个帧的特征向量进行脉冲编码、打包
     // 5. input数据发送给芯片
     // 6. 接收芯片处理结果
+
     videoEncodeAndChipSendTimer = setInterval(function encodeAndSendData() {
         console.log("标志值：", ifNeedEncodeAndChipSendNextFrame);
         if (ifNeedEncodeAndChipSendNextFrame == true) {
@@ -773,7 +913,7 @@ function fatigueDrivingProcess(global) {
             callPythonEncodeVideoImg();
             sendVideoImgToChip(global);
         }
-    }, 3000);
+    }, 500);
 
     // 7. 检测到疲劳时前端界面上显示warning告警
 }
@@ -794,5 +934,10 @@ function finishDrivingProcess() {
         console.log("camera capture process killed! ");
     }
     console.log("取消计时器");
-    clearInterval(videoEncodeAndChipSendTimer);
+    if (videoEncodeAndChipSendTimer != undefined) {
+        clearInterval(videoEncodeAndChipSendTimer);
+        videoEncodeAndChipSendTimer = undefined;
+        console.log("timer killed！");
+    }
+   
 }

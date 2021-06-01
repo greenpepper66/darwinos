@@ -1,7 +1,6 @@
 
 const vscode = acquireVsCodeApi();
 
-
 /**
  * ******************************************************************************************************
  * 给插件发送消息
@@ -91,7 +90,6 @@ function startRecognitionProcess() {
     });
 }
 
-
 /**
  * ******************************************************************************************************
  * 接收插件的消息
@@ -122,8 +120,6 @@ window.addEventListener('message', event => {
         console.log('---------------------------message：get img num', message.userAppStartRunReturnImgNum);
         document.getElementById("userMnistOneApp_imgNum").innerHTML = message.userAppStartRunReturnImgNum;
     }
-
-
 
     // 0. 解包配置文件的脚本
     // 日志输出
@@ -238,11 +234,7 @@ window.addEventListener('message', event => {
         newCell1.innerHTML = '<img src="' + message.recognitionOneResult[1] + '"></img>';
         newCell2.innerHTML = message.recognitionOneResult[0];
     }
-
-
 });
-
-
 
 new Vue({
     el: '#userMnistOneApp',

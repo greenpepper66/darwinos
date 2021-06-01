@@ -1,7 +1,7 @@
 <html>
 
 <body>
-	<div class="fatigueDrivingApp_page" id="fatigueDrivingApp">
+	<div class="fatigueDrivingApp_page" id="fatigueDrivingAppAfter">
 
 		<div class="row">
 			<table class="fatigueDrivingApp_page_table">
@@ -11,10 +11,7 @@
 							<div class="imgAppHome_search_title">输入摄像头网络地址：</div>
 						</td>
 						<td colspan="5">
-							<div class="">
-								<input type="text" id="fatigueDrivingApp_rtsp_addr" class="imgAppHome_inputBox"
-									placeholder="请输入摄像头RTSP地址" />
-							</div>
+							<span id="fatigueDrivingApp_camera_addr" class="">rtsp://admin:zhijianglab123@192.168.1.108:554/h264/ch1/sub/av_stream</span>
 						</td>
 
 					</tr>
@@ -23,31 +20,31 @@
 					<tr>
 						<td>
 							<div>
-								<button type="button" onclick="checkCameraStatus()" class="fatigueDrivingApp_btn">
+								<button type="button" onclick="" class="fatigueDrivingApp_btn">
 									1. 检测摄像头
 								</button>
 							</div>
 						</td>
 						<td>
 							<div class="fatigueDrivingApp_descs">
-								<span id="checkCameraStatusRet" class=""></span>
+								<span id="checkCameraStatusRet" class="">摄像头连接成功!</span>
 							</div>
 						</td>
 						<td>
 							<div>
-								<button type="button" onclick="startFatigueDriving()" class="fatigueDrivingApp_btn">
+								<button type="button" onclick="" class="fatigueDrivingApp_btn">
 									2. 疲劳检测
 								</button>
 							</div>
 						</td>
 						<td>
 							<div class="fatigueDrivingApp_descs">
-								<span id="startFatigueDrivingRet" class="fatigueDrivingApp_descs"></span>
+								<span id="startFatigueDrivingRet" class="fatigueDrivingApp_descs">检测中...</span>
 							</div>
 						</td>
 						<td>
 							<div>
-								<button type="button" onclick="finishFatigueDriving()" class="fatigueDrivingApp_btn">
+								<button type="button" onclick="finishFatigueDrivingAfter()" class="fatigueDrivingApp_btn">
 									3. 停止检测
 								</button>
 							</div>
@@ -71,8 +68,24 @@
 
 
 
+		<br>
+		<br>
+		<br>
+		<div class="row">
+			<div class="col-md-4">
+				<!-- <span id="fdtest">result:</span> -->
+			</div>
 
+			<div class=" col-md-4" id="fatigueDrivingApp_result">
+				<!-- <canvas id="canvas" style="height: 600px; width: 600px;"></canvas> -->
+				<span id="fatigueDrivingApp_result_txt" class="fatigueDrivingApp_result_show"></span>
+			</div>
 
+			<div class="col-md-4">
+				<!-- <span id="fdtest">result:</span> -->
+			</div>
+
+		</div>
 	</div>
 
 
@@ -83,14 +96,14 @@
 	<script src="../lib/jquery/jquery.min.js"></script>
 	<script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
 	<script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../js/fatigueDrivingApp.js"></script>
+	<script src="../js/fatigueDrivingAppAfter.js"></script>
 	<script>Vue.config.ProductionTip = false</script>
 
 	<script>
 		try {
 			var ws = new WebSocket("ws://127.0.0.1:8188/");
 			ws.onopen = function (evt) {
-				console.log("Connection open ...");
+				console.log("2222222Connection open ...");
 				ws.send("Hello WebSockets!");
 			};
 
@@ -99,23 +112,20 @@
 					let img_tag = document.createElement('img');
 					img_tag.src = evt.data;
 					img_tag.id = "cameraImg";
-					console.log("*********************receive ws message!!!!!!!!!!!!!!!!!");
 					document.getElementById("fatigueDrivingApp_camera_img").appendChild(img_tag);
 				} else {
-					console.log("##################receive ws message again!!!!!!!!!!!!");
 					document.getElementById("cameraImg").src = evt.data;
 				}
 				// $("#resImg").attr("src", evt.data);
 				// <img alt="视频加载中" id="resImg" src="" />
-				console.log("Received Message: " + evt.data);
 				// ws.close();
 			};
 
 			ws.onclose = function (evt) {
-				console.log("Connection closed.");
+				console.log("2222Connection closed.");
 			};
 		} catch (error) {
-			console.log("$$$$$$$$$$$$$$$$$$$$$$$4", error);
+			console.log("222222222$$$$$$$$$$$$$$$$$$$$$$$4", error);
 		}
 
 

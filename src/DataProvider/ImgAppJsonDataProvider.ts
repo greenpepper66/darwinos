@@ -123,9 +123,13 @@ export function writeJson(context, imgAppConfig) {
 }
 
 // 2. 删：根据id删除json文件中的选项
-export function deleteJson(context, id) {
+export function deleteJson(context, id, appType) {
     console.log("json deleting...");
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    if (appType == 0) {
+        var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    } else if (appType == 1) {
+        var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }
 
     try {
         let data = fs.readFileSync(resourcePath, 'utf-8');
@@ -177,9 +181,13 @@ export function searchAllJson(context, appType) {
 }
 
 // 4. 查一个：根据应用id
-export function searchImgAppByID(context, id) {
+export function searchImgAppByID(context, id, appType) {
     console.log("json searching ...", id);
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    if (appType == 0) {
+        var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    } else if (appType == 1) {
+        var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }
 
     let data = fs.readFileSync(resourcePath, 'utf-8');
 

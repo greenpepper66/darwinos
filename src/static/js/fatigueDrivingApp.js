@@ -20,17 +20,7 @@ function callVscode(data, cb) {
     console.log("call vscode to get this img app information", data.command, data.cbid);
 }
 
-
-
-
-
-/**
- * ******************************************************************************************************
- * 接收插件的消息
- * ******************************************************************************************************
- */
 // vscode返回的消息处理
-
 window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
@@ -44,33 +34,20 @@ window.addEventListener('message', event => {
     //     default: break;
     // }
 
-    if (message.startFatigueDrivingRet != undefined) {
-        console.log("get startFatigueDrivingRet:", message.startFatigueDrivingRet);
-        document.getElementById("startFatigueDrivingRet").innerHTML = "检测中......";
-        
+    // 启动websocket和python推流脚本后
+    if (message.startWebsocketServerAndPushCameraRet != undefined) {
+        console.log("get startWebsocketServerAndPushCameraRet");
+        sleep(8000);
+        ping("192.168.1.108");
     }
 
-    // 0-不疲劳，1-疲劳
-    if (message.chipFatigueDrivingResult != undefined) {
-        console.log("***************************疲劳检测结果********************", message.chipFatigueDrivingResult);
-        document.getElementById("fdtest").innerHTML = "result: " +  message.chipFatigueDrivingResult;
-        if(message.chipFatigueDrivingResult == "1" || message.chipFatigueDrivingResult == 1) {
-            document.getElementById('fatigueDrivingApp_result').style.display = 'block';
-            sleep(3000);
-            document.getElementById('fatigueDrivingApp_result').style.display = 'none';
-        }
-    }
 });
-
-
-
-
 
 // 开始疲劳检测
 function startFatigueDriving() {
     let pingRet = document.getElementById("checkCameraStatusRet").innerHTML;
     console.log("ip通不通：", pingRet);
-    if (pingRet.indexOf("success") == -1) {
+    if (pingRet.indexOf("成功") == -1) {
         document.getElementById("startFatigueDrivingRet").innerHTML = "找不到摄像头！"
         return
     }
@@ -82,7 +59,7 @@ function startFatigueDriving() {
     });
 }
 
-// 结束疲劳检测
+// 结束推流，关闭websocket和Python脚本
 function finishFatigueDriving() {
     console.log("finish 疲劳检测.");
     vscode.postMessage({
@@ -91,32 +68,43 @@ function finishFatigueDriving() {
     });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
- *************************************************************************************
- * 工具函数
- * ************************************************************************************
- */
+// 检查摄像头状态
 function checkCameraStatus() {
-    ping("192.168.1.108");
+    // 如果没有输入摄像头地址
+    let addr = document.getElementById("fatigueDrivingApp_rtsp_addr").value;
+    if(addr == "") {
+        document.getElementById("checkCameraStatusRet").innerHTML = "请输入摄像头地址";
+        return;
+    }
+    // 摄像头如果已经连接成功
+    let pingRet = document.getElementById("checkCameraStatusRet").innerHTML;
+    if (pingRet.indexOf("成功") != -1) {
+        document.getElementById("checkCameraStatusRet").innerHTML = "摄像头已连接成功！"
+        return;
+    }
+    
+    // 暂时将地址写死
+    if(addr.indexOf("192.168.1.108") == -1) {
+        document.getElementById("checkCameraStatusRet").innerHTML = "地址错误!";
+        return;
+    }
+
+
+    // todo
+    // 地址校验，ip能联通，用户名密码正确才启动websocket和python推流
+    // 如果输入地址变了，又重新连接摄像头
+
+    document.getElementById("checkCameraStatusRet").innerHTML = "摄像头连接中，请等待!";
+    // 给插件发消息，提前启动websocket和python推流
+    console.log("start push video.");
+    vscode.postMessage({
+        command: 'startWebsocketServerAndPushCamera',
+        text: '开始疲劳检测'
+    });
+
 }
+
+// ping
 function ping(ip) {
     var img = new Image();
     var start = new Date().getTime();
@@ -129,7 +117,7 @@ function ping(ip) {
             hasFinish = true;
             console.log('Ping ' + ip + ' success. ');
             // alert("成功" + ip);
-            document.getElementById("checkCameraStatusRet").innerHTML = "Connection " + ip + " success!";
+            document.getElementById("checkCameraStatusRet").innerHTML = "摄像头连接成功!";
         }
     };
     img.onerror = function () {
@@ -138,7 +126,7 @@ function ping(ip) {
                 flag = true;
                 console.log('Ping ' + ip + ' success. ');
                 // alert("成功" + ip);
-                document.getElementById("checkCameraStatusRet").innerHTML = "Connection " + ip + " success!";
+                document.getElementById("checkCameraStatusRet").innerHTML = "摄像头连接成功!";
             } else {
                 console.log('network is not working!');
             }
@@ -156,10 +144,14 @@ function ping(ip) {
             flag = false;
             console.log('Ping ' + ip + ' fail. ');
             // alert("失败" + ip);
-            document.getElementById("checkCameraStatusRet").innerHTML = "Connection " + ip + " failed!";
+            document.getElementById("checkCameraStatusRet").innerHTML = "摄像头连接失败!";
+
+            // 失败的话，关闭推流过程
+            finishFatigueDriving();
         }
     }, 3000);
 }
+
 
 function sleep(numberMillis) {
     var start = new Date().getTime();
@@ -169,21 +161,6 @@ function sleep(numberMillis) {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 new Vue({
     el: '#fatigueDrivingApp',
