@@ -1,6 +1,9 @@
 
 const vscode = acquireVsCodeApi();
 
+// 标记脚本运行是否返回错误，有错误的话不再执行下一步
+var runScriptProcessError = false;
+
 /**
  * ******************************************************************************************************
  * 给插件发送消息
@@ -32,7 +35,11 @@ function userAppSelectImgDir() {
     });
 }
 
+// 点击启动应用按钮
 function userAppStartRun() {
+    // 标志值初始化
+    runScriptProcessError = false;
+
     // 清空进度条
     document.getElementById("png_convert_progress_div").style.width = "0%";
     document.getElementById("pickle_convert_progress_div").style.width = "0%";
@@ -63,7 +70,6 @@ function userAppStartRun() {
         command: 'userAppStartRun',
         text: [imgKind, imgDir]
     });
-
 }
 
 function startImgConvertProcess() {
@@ -132,12 +138,23 @@ window.addEventListener('message', event => {
     // 错误和告警输出
     if (message.unpackConfigFileProcessErrorLog != undefined) {
         console.log("run script err: ", message.unpackConfigFileProcessErrorLog);
+
+        // 脚本运行失败，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "解包配置文件失败，请查看日志或联系系统管理员！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+
+        // 标记脚本运行有误
+        runScriptProcessError = true;
     }
 
     // 解包结束，发送命令 编码
     if (message.unpackConfigFileProcessFinish != undefined) {
         console.log("run script over!", message.unpackConfigFileProcessFinish);
-        startImgConvertProcess();
+
+        // 解包没有错误才执行下一步
+        if (runScriptProcessError == false) {
+            startImgConvertProcess();
+        }
     }
 
 
@@ -160,6 +177,13 @@ window.addEventListener('message', event => {
     // 错误和告警输出
     if (message.imgConvertProcessErrorLog != undefined) {
         console.log("run script err: ", message.imgConvertProcessErrorLog);
+
+        // 脚本运行失败，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "脉冲编码失败，请查看日志或联系系统管理员！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+
+        // 标记脚本运行有误
+        runScriptProcessError = true;
     }
 
     // 脉冲编码结束，进度条刷满格
@@ -167,8 +191,10 @@ window.addEventListener('message', event => {
         console.log("run script over!", message.imgConvertProcessFinish);
         document.getElementById("png_convert_progress_div").style.width = "100%";
 
-        // 发送消息执行柳铮的脚本
-        startPickleConvertProcess();
+        // 编码没有错误， 才 发送消息执行柳铮的脚本
+        if (runScriptProcessError == false) {
+            startPickleConvertProcess();
+        }
     }
 
     // 2. 柳铮的脚本 - 打包编译 相关消息
@@ -187,14 +213,22 @@ window.addEventListener('message', event => {
 
     if (message.pickleConvertProcessErrorLog != undefined) {
         console.log("run script2 err: ", message.pickleConvertProcessErrorLog);
+        // 脚本运行失败，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "脉冲打包失败，请查看日志或联系系统管理员！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+
+        // 标记脚本运行有误
+        runScriptProcessError = true;
     }
 
     if (message.pickleConvertProcessFinish != undefined) {
         console.log("run script2 over!", message.pickleConvertProcessFinish);
         document.getElementById("pickle_convert_progress_div").style.width = "100%";
 
-        // 发送消息执行图像识别的脚本
-        startRecognitionProcess();
+        // 打包没有错误，才 发送消息执行图像识别的脚本
+        if (runScriptProcessError == false) {
+            startRecognitionProcess();
+        }
     }
 
     // 3. 图像识别 相关消息
@@ -211,8 +245,21 @@ window.addEventListener('message', event => {
         document.getElementById("recognition_task_progress_div").style.width = addVal;
     }
 
+    if (message.getConnectionIPAndPortFailed != undefined) {
+        console.log("get config info by md5 failed!", message.getConnectionIPAndPortFailed);
+        // 脚本运行失败,节点上没找到config.b，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "数据发送失败，找不到模型文件！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+    }
+
     if (message.recognitionProcessErrorLog != undefined) {
         console.log("run mnist err: ", message.recognitionProcessErrorLog);
+        // 脚本运行失败，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "数据发送失败，请查看日志或联系系统管理员！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+
+        // 标记脚本运行有误
+        runScriptProcessError = true;
     }
 
     // 获取应用运行时间

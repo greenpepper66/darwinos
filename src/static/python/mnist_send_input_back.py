@@ -55,6 +55,7 @@ def get_slave_ip_port_fid(config_file_path):
             status = jsn["status"]
         else:
             print(jsn)
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] get slave ip port failed. ", flush=True)
             exit(0)
         return ip,port
 

@@ -538,6 +538,9 @@ function runMnistSendInputScript(global) {
             imgNum++;
             global.panel.webview.postMessage({ recognitionOneDone: [imgNum, totalImgNum] });
         }
+        if(data.indexOf("get slave ip port failed") != -1) {
+            global.panel.webview.postMessage({ getConnectionIPAndPortFailed: data });
+        }
 
         // 解析识别结果的输出
         if (data.indexOf("RECOGNITION RESULT") !== -1) {
