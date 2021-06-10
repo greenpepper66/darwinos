@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+   Remove this if you use the .htaccess -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="initial-scale=1.0, target-densitydpi=device-dpi" />
+	<!-- this is for mobile (Android) Chrome -->
+	<meta name="viewport" content="initial-scale=1.0, width=device-height">
+	<!--  mobile Safari, FireFox, Opera Mobile  -->
+	<script src="libs/modernizr.js"></script>
+	<!--[if lt IE 9]>
+<script type="text/javascript" src="libs/flashcanvas.js"></script>
+<![endif]-->
+	<style type="text/css">
+		div {
+			margin-top: 1em;
+			margin-bottom: 1em;
+		}
+
+		input {
+			padding: .5em;
+			margin: .5em;
+		}
+
+		select {
+			padding: .5em;
+			margin: .5em;
+		}
+
+		#signatureparent {
+			color: darkblue;
+			background-color: darkgrey;
+			/*max-width:600px;*/
+			padding: 20px;
+		}
+
+		/*This is the div within which the signature canvas is fitted*/
+		#signature {
+			border: 2px dotted black;
+			background-color: lightgrey;
+			width: 360px;
+			height: 360px;
+			margin: 0 auto;
+		}
+
+		/* Drawing the 'gripper' for touch-enabled devices */
+		html.touch #content {
+			float: left;
+			width: 92%;
+		}
+
+		html.touch #scrollgrabber {
+			float: right;
+			width: 4%;
+			margin-right: 2%;
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAFCAAAAACh79lDAAAAAXNSR0IArs4c6QAAABJJREFUCB1jmMmQxjCT4T/DfwAPLgOXlrt3IwAAAABJRU5ErkJggg==)
+		}
+
+		html.borderradius #scrollgrabber {
+			border-radius: 1em;
+		}
+	</style>
+</head>
+
+<body>
+	<div>
+		<div id="content">
+
+			<div id="signatureparent">
+				<div style="text-align: center;"> Hand-written board </div>
+				<div id="signature"></div>
+			</div>
+
+			<div id="tools"></div>
+
+			<div>
+				<p>Display Area:</p>
+				<div id="displayarea" style="text-align: center;"></div>
+			</div>
+
+		</div>
+
+		<div id="scrollgrabber"></div>
+
+	</div>
+	<script src="libs/jquery.js"></script>
+	<script>
+		/*  @preserve
+		jQuery pub/sub plugin by Peter Higgins (dante@dojotoolkit.org)
+		Loosely based on Dojo publish/subscribe API, limited in scope. Rewritten blindly.
+		Original is (c) Dojo Foundation 2004-2010. Released under either AFL or new BSD, see:
+		http://dojofoundation.org/license for more information.
+		*/
+		// 发布者/订阅模式
+		(function ($) {
+			var topics = {};
+			$.publish = function (topic, args) {
+				if (topics[topic]) {
+					var currentTopic = topics[topic],
+						args = args || {};
+
+					for (var i = 0, j = currentTopic.length; i < j; i++) {
+						currentTopic[i].call($, args);
+					}
+				}
+			};
+			$.subscribe = function (topic, callback) {
+				if (!topics[topic]) {
+					topics[topic] = [];
+				}
+				topics[topic].push(callback);
+				return {
+					"topic": topic,
+					"callback": callback
+				};
+			};
+			$.unsubscribe = function (handle) {
+				var topic = handle.topic;
+				if (topics[topic]) {
+					var currentTopic = topics[topic];
+
+					for (var i = 0, j = currentTopic.length; i < j; i++) {
+						if (currentTopic[i] === handle.callback) {
+							currentTopic.splice(i, 1);
+						}
+					}
+				}
+			};
+		})(jQuery);
+
+	</script>
+	<script src="src/jSignature.js"></script>
+	<script src="src/plugins/jSignature.CompressorBase30.js"></script>
+	<script src="src/plugins/jSignature.CompressorSVG.js"></script>
+	<script src="src/plugins/jSignature.UndoButton.js"></script>
+	<script src="src/plugins/signhere/jSignature.SignHere.js"></script>
+	<script>
+		$(document).ready(function () {
+
+			// This is the part where jSignature is initialized.
+			var $sigdiv = $("#signature").jSignature({ 'UndoButton': true })
+
+				// All the code below is just code driving the demo. 
+				, $tools = $('#tools')
+				, $extraarea = $('#displayarea')
+				, pubsubprefix = 'jSignature.demo.'
+
+
+
+			$('<input type="button" value="Apply">').bind('click', function (e) {
+				var data = $sigdiv.jSignature('getData', 'default')
+				if (typeof data === 'string') {
+					$('textarea', $tools).val(data)
+					$.publish(pubsubprefix + "apply", data);
+				} else {
+					try {
+						$('textarea', $tools).val(JSON.stringify(data))
+					} catch (ex) {
+						$('textarea', $tools).val('Not sure how to stringify this, likely binary, format.')
+					}
+				}
+			}).appendTo($tools)
+
+			$('<input type="button" value="Reset">').bind('click', function (e) {
+				$sigdiv.jSignature('reset')
+				$extraarea.html('')
+				$('textarea', $tools).val('')
+			}).appendTo($tools)
+
+			$('<div><textarea style="width:100%;height:7em;"></textarea></div>').appendTo($tools)
+
+			$.subscribe(pubsubprefix + 'apply', function (imgData) {
+				$extraarea.html('')
+				var i = new Image()
+				i.src = imgData
+				// $('<span><b>As you can see, one of the problems of "image" extraction (besides not working on some old Androids, elsewhere) is that it extracts A LOT OF DATA and includes all the decoration that is not part of the signature.</b></span>').appendTo($extraarea)
+				$(i).appendTo($extraarea)
+				$.ajax({
+					url: "/sendData",
+					type: "POST",
+					data: JSON.stringify({ img: imgData }),
+					// success: function (data) {
+					// 	alert(data);
+					// },
+					// error: function (data, status, e) {
+					// 	alert("error");
+					// }
+				});
+
+				// var arr = data.split(',')
+				// var mime = arr[0].match(/:(.*?);/)[1]
+				// // var FileController = "/cgi-bin/save_file.py";// 接收上传文件的后台地址   
+				// var FileController = "http://localhost:5002/uploadHandWriteImg" 
+				// // FormData 对象
+				// var form = new FormData();                   // 可以增加表单数据
+				// // 存入项目名称
+				// form.append("projectname", "hand-writer");
+				// // 存入激励文件
+				// bstr = atob(arr[1])
+				// n = bstr.length
+				// u8arr = new Uint8Array(n)
+				// while (n--) {
+				// 	u8arr[n] = bstr.charCodeAt(n)
+				// }
+				// var blob = new Blob([u8arr], { type: mime })
+				// form.append("stimulus_file", blob, "image.png");
+				// // XMLHttpRequest 对象
+				// var xhr = new XMLHttpRequest();
+				// xhr.open("POST", FileController, true);
+				// xhr.onload = function () {
+				// 	if (xhr.readyState == 4 && xhr.status == 200) {
+				// 		// 查看后台反馈
+				// 		var req = xhr.responseText;
+				// 	} else if (xhr.readyState == 4 && xhr.status == 404) {
+				// 	};
+				// 	return;
+				// }
+				// xhr.send(form);
+			});
+
+			// $.subscribe(pubsubprefix + 'image/jsignature;base30', function(data) {
+			// 	$('<span><b>This is a vector format not natively render-able by browsers. Format is a compressed "movement coordinates arrays" structure tuned for use server-side. The bonus of this format is its tiny storage footprint and ease of deriving rendering instructions in programmatic, iterative manner.</b></span>').appendTo($extraarea)
+			// });
+
+			if (Modernizr.touch) {
+				$('#scrollgrabber').height($('#content').height())
+			}
+
+		})
+	</script>
+</body>
+
+</html>

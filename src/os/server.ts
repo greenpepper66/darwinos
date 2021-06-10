@@ -2,10 +2,14 @@ var http = require('http');
 var path = require('path');
 var fs = require('fs');
 var url = require('url');
+var express = require('express'); //express框架模块
+var ip = require('ip');
+
 import { ResProvider } from "../DataProvider/ResProvider";
 import { ModelProvider, Model } from "../DataProvider/ModelProvider";
 import { uploadModelPageProvideByPort, modelHomePageProvideByPort, nodePageProvideByPort, chipPageProvideByPort } from "../PageProvider";
 import { LocalHttpServer } from "../extension";
+import { time } from "console";
 // 定义全局变量，供外部文件调用
 export module allData {
 	export let nodeList: any[];
@@ -13,7 +17,7 @@ export module allData {
 	export let deployedModelList: any[]; // 部署后的模型列表，可以用来运行任务
 }
 
-
+// 本地server，与web页面通信，接收web页面的请求和数据
 export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider: ModelProvider, context) {
 	var routes = {
 		'/post': function (req, res) {
@@ -102,12 +106,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 			res.end('upload success');
 
 			console.log("请求体数据：", req);
-			let JSONdata = JSON.parse(req.msg);
-			let base64Img = JSONdata.img;  // number类型
-			// console.log("图像为： ", base64Img);
 
-			// 发送给前端页面显示
-			
 		},
 
 	}
@@ -160,4 +159,41 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 }
 
 
+// 手写体应用，本地server
+export function startHandWriterServer(context) {
 
+	// 获取本机ip
+	const hostName = ip.address();
+	console.log("本机ip地址为：", hostName);
+	const port = 5003; //端口
+	const app = express();
+
+	app.use(express.static(path.join(context.extensionPath, 'src/resources/hand-writer'))); //指定静态文件目录
+
+	// app.get('/', function (req, res) {
+	// 	res.sendfile(path.join(context.extensionPath, 'src/resources/hand-writer') + '/index.html')
+	// });
+	app.post('/sendData', function (req, res) {
+		req.on('data', function (data) {
+			console.log(data.toString());
+			console.log(new Date().getTime());
+			// let obj = JSON.parse(data);
+			// let base64Img = obj.img;
+
+
+
+
+			res.send('数据已接收');
+
+
+
+
+			// 发送给工具页面显示
+
+		})
+	});
+
+	app.listen(port, hostName, function () {
+		console.log(`手写板服务器运行在http://${hostName}:${port}`);
+	});
+}

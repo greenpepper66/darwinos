@@ -248,6 +248,8 @@
 		"axios": "^0.19.2",
 		"byte-length": "1.0.2",
 		"child_process": "^1.0.2",
+		"express": "^4.17.1",
+		"ip": "^1.1.5",
 		"jquery": "^3.5.1",
 		"jsdom": "^16.4.0",
 		"node-rtsp-stream": "0.0.9",
@@ -257,18 +259,18 @@
 		"ws": "^7.4.5"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.52.0",
 		"@types/glob": "^7.1.3",
+		"@types/jquery": "^3.5.1",
 		"@types/mocha": "^8.0.4",
 		"@types/node": "^12.11.7",
+		"@types/vscode": "^1.52.0",
 		"@typescript-eslint/eslint-plugin": "^3.0.2",
 		"@typescript-eslint/parser": "^3.0.2",
 		"eslint": "^7.1.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.3",
-		"typescript": "^4.1.2",
-		"vscode-test": "^1.4.1",
 		"serve-handler": "^6.1.3",
-		"@types/jquery": "^3.5.1"
+		"typescript": "^4.3.2",
+		"vscode-test": "^1.4.1"
 	}
 }
