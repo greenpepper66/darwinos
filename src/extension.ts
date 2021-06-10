@@ -92,6 +92,7 @@ var resourceUpdateTimer: NodeJS.Timeout | undefined = undefined;
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 	console.log('Congratulations, your extension "darwinos" is now active!');
 
 	context.subscriptions.push(vscode.commands.registerCommand('darwinos.helloWorld', () => {

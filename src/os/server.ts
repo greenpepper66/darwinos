@@ -49,7 +49,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 
 		// 模型视图首页 点击“上传模型”按钮， 跳转到模型上传页面
 		'/modelListGotoUploadPage': function (req, res) {
-			console.log("form modelist page to upload page, and get web req, modelListGotoUploadPage");
+			console.log("from modelist page to upload page, and get web req, modelListGotoUploadPage");
 			res.setHeader("Content-Type", "text/plain; charset=utf-8");
 			res.setHeader("Access-Control-Allow-Origin", "*");
 			res.end('goto success');
@@ -59,7 +59,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 
 		// 资源视图首页拓扑图 点击每个圆圈（节点） 跳转到节点详情页面
 		'/gotoNodeDetailPage': function (req, res) {
-			console.log("form resHome echarts to nodeDetail page, and get web req, gotoNodeDetailPage");
+			console.log("from resHome echarts to nodeDetail page, and get web req, gotoNodeDetailPage");
 			res.setHeader("Content-Type", "text/plain; charset=utf-8");
 			res.setHeader("Access-Control-Allow-Origin", "*");
 			res.end('goto success');
@@ -77,7 +77,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 
 		// 节点详情页面，点击芯片组成图，跳转到芯片详情页面
 		'/gotoChipDetailPage': function (req, res) {
-			console.log("form node page echarts to chipDetail page, and get web req, gotoChipDetailPage");
+			console.log("from node page echarts to chipDetail page, and get web req, gotoChipDetailPage");
 			res.setHeader("Content-Type", "text/plain; charset=utf-8");
 			res.setHeader("Access-Control-Allow-Origin", "*");
 			res.end('goto success');
@@ -92,6 +92,22 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 			let route = "chip?nodeID=" + nodeID + "&chipID=" + chipID;
 			chipPageProvideByPort(context, name, 5001, route);
 
+		},
+
+		// 手写板数据上传接收
+		'/uploadHandWriteImg': function (req, res) {
+			console.log("from hand-writer");
+			res.setHeader("Content-Type", "text/plain; charset=utf-8");
+			res.setHeader("Access-Control-Allow-Origin", "*");
+			res.end('upload success');
+
+			console.log("请求体数据：", req);
+			let JSONdata = JSON.parse(req.msg);
+			let base64Img = JSONdata.img;  // number类型
+			// console.log("图像为： ", base64Img);
+
+			// 发送给前端页面显示
+			
 		},
 
 	}
