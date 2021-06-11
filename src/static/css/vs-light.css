@@ -1161,7 +1161,7 @@ table.userMnistOneApp_recRetAnaTable tr td:nth-child(1) {
 
 table.userMnistOneApp_recRetAnaTable tr td:nth-child(3) {
   background-color: #eeeeee;
-  text-align: right;
+  text-align: left;
 }
 
 table.userMnistOneApp_recRetAnaTable tr td:nth-child(2) {
@@ -1230,6 +1230,115 @@ table.userMnistOneApp_recRetAnaTable td {
   padding-top: 2px;
   border-style: none;
 }
+
+/****************************************************************************
+  **** 7.2. 用户视图 - 手写体数字图像识别页面  ——  手写板图像识别
+  ****************************************************************************/
+.userMnistOneApp_handWriter_desc {
+  float: left;
+  margin-top: 10px;
+  letter-spacing: 0.91px;
+}
+.userMnistOneApp_handWriter_url {
+  color: red;
+}
+.userMnistOneApp_handWriter_middle {
+  height: 500px;
+  background: #f5f5f5;
+  text-align: center;
+  margin-top: 30px;
+}
+.userMnistOneApp_handWriter_title {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.userMnistOneApp_handWriter_inputImg {
+  height: 380px;
+  width: 380px;
+  margin: 0 auto;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+}
+.userMnistOneApp_handWriter_outputRet {
+  height: 380px;
+  width: 380px;
+  margin: 0 auto;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+  font-size: 100px;
+  padding: 90px;
+}
+.userMnistOneApp_handWriter_startBtn {
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  border-radius: 5px;
+  width: 180px;
+  height: 40px;
+  padding-top: 2px;
+  margin: 0 auto;
+  margin-top: 100px;
+}
+.userMnistOneApp_handWriter_arrow {
+  width: 300px;
+  height: 30px;
+  background: #ffa73c;
+  margin-top: 15px;
+}
+
+/** 箭头按钮样式 **/
+.cssNav {
+  height: 100px;
+  padding: 0;
+}
+.cssNav li {
+  padding: 0px 20px;
+  line-height: 40px;
+  background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+  display: inline-block;
+  color: #fff;
+  position: relative;
+
+  margin: 0 auto;
+  margin-top: 150px;
+  cursor:pointer;
+}
+.cssNav li:after {
+  content: '';
+  display: block;
+  border-top: 20px solid #8fb740;
+  border-bottom: 26px solid #8fb740;
+  border-left: 20px solid #fff;
+  position: absolute;
+  right: -20px;
+  top: 0;
+}
+
+.cssNav li:after {
+  content: '';
+  display: block;
+  border-top: 20px solid transparent;
+  border-bottom: 26px solid transparent;
+  border-left: 20px solid #8fb740;
+  position: absolute;
+  right: -20px;
+  top: 0;
+  z-index: 10;
+}
+
+
+.cssNav li:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 /****************************************************************************
   **** 8. 登录页面

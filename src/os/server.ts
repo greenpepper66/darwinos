@@ -9,12 +9,19 @@ import { ResProvider } from "../DataProvider/ResProvider";
 import { ModelProvider, Model } from "../DataProvider/ModelProvider";
 import { uploadModelPageProvideByPort, modelHomePageProvideByPort, nodePageProvideByPort, chipPageProvideByPort } from "../PageProvider";
 import { LocalHttpServer } from "../extension";
-import { time } from "console";
+
+
 // 定义全局变量，供外部文件调用
 export module allData {
 	export let nodeList: any[];
 	export let modelFileList: any[];
 	export let deployedModelList: any[]; // 部署后的模型列表，可以用来运行任务
+}
+
+// 手写板应用数据
+export module handWriterData {
+	export const localIP = ip.address();
+	export let currentImgData: string;
 }
 
 // 本地server，与web页面通信，接收web页面的请求和数据
@@ -76,7 +83,6 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 			let name = "节点" + nodeID + "详情";
 			let route = "node?nodeID=" + nodeID;
 			nodePageProvideByPort(context, name, 5001, route);
-
 		},
 
 		// 节点详情页面，点击芯片组成图，跳转到芯片详情页面
@@ -95,18 +101,6 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 			let name = "节点" + nodeID + "芯片" + chipID + "详情";
 			let route = "chip?nodeID=" + nodeID + "&chipID=" + chipID;
 			chipPageProvideByPort(context, name, 5001, route);
-
-		},
-
-		// 手写板数据上传接收
-		'/uploadHandWriteImg': function (req, res) {
-			console.log("from hand-writer");
-			res.setHeader("Content-Type", "text/plain; charset=utf-8");
-			res.setHeader("Access-Control-Allow-Origin", "*");
-			res.end('upload success');
-
-			console.log("请求体数据：", req);
-
 		},
 
 	}
@@ -159,11 +153,13 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 }
 
 
+
+
 // 手写体应用，本地server
 export function startHandWriterServer(context) {
 
 	// 获取本机ip
-	const hostName = ip.address();
+	const hostName = handWriterData.localIP;
 	console.log("本机ip地址为：", hostName);
 	const port = 5003; //端口
 	const app = express();
@@ -174,23 +170,33 @@ export function startHandWriterServer(context) {
 	// 	res.sendfile(path.join(context.extensionPath, 'src/resources/hand-writer') + '/index.html')
 	// });
 	app.post('/sendData', function (req, res) {
-		req.on('data', function (data) {
-			console.log(data.toString());
+		var currentData = ""
+		req.on("data", function (data) {
+			currentData += data;
+		});
+		req.on("end", function (data) {
 			console.log(new Date().getTime());
-			// let obj = JSON.parse(data);
-			// let base64Img = obj.img;
-
-
-
+			console.log(currentData.toString());
 
 			res.send('数据已接收');
 
+			let obj = JSON.parse(currentData);
+			handWriterData.currentImgData = obj.img;
+		});
 
 
 
-			// 发送给工具页面显示
+		// req.on('data', function (data) {
+		// 	console.log(data.toString());
+		// 	console.log(new Date().getTime());
+		// 	// let obj = JSON.parse(data);
+		// 	// let base64Img = obj.img;
 
-		})
+		// 	res.send('数据已接收');
+
+		// 	// 发送给工具页面显示
+
+		// })
 	});
 
 	app.listen(port, hostName, function () {

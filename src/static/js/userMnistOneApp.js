@@ -2,7 +2,11 @@
 const vscode = acquireVsCodeApi();
 
 // 标记脚本运行是否返回错误，有错误的话不再执行下一步
-var runScriptProcessError = false;
+var runScriptProcessError = false;           // 本地图像的
+var runHandWriterScriptProcessError = false; // 手写板的
+
+// 手写板是否有输入图像传过来
+var getHandWriterImgFlag = false;   // 没收到图像的话是false
 
 /**
  * ******************************************************************************************************
@@ -281,6 +285,59 @@ window.addEventListener('message', event => {
         newCell1.innerHTML = '<img src="' + message.recognitionOneResult[1] + '"></img>';
         newCell2.innerHTML = message.recognitionOneResult[0];
     }
+
+
+
+
+    /**
+     * *************************
+     * 手写板应用
+     * *************************
+     */
+    // 获取网页地址
+    if (message.cmd == 'getHandWriterServerURLRet') {
+        this.handWriterServerURL = message.data;
+        console.log(message.data);
+        (callbacks[message.cbid] || function () { })(message.data);
+        delete callbacks[message.cbid];
+        console.log('---------------------------message：get hand writer url', this.handWriterServerURL);
+    }
+
+    // 获取手写图像
+    if (message.getHandWriterImgRet != undefined) {
+        console.log("message.getHandWriterImgRet 页面接收到图像");
+        getHandWriterImgFlag = true;
+        document.getElementById("userMnistOneApp_handWriter_imgData").src = message.getHandWriterImgRet;
+    }
+
+    // 解包配置文件失败
+    if (message.unpackHandWriterConfigProcessErrorLog != undefined) {
+        console.log("run hand-writer script err: ", message.unpackHandWriterConfigProcessErrorLog);
+        // 脚本运行失败，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "解包配置文件失败，请查看日志或联系系统管理员！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+        // 标记脚本运行有误
+        runHandWriterScriptProcessError = true;
+    }
+
+    // 解包结束，发送命令执行编码
+    if (message.unpackHandWriterConfigProcessFinish != undefined) {
+        console.log("run hand-writer unpack script over!", message.unpackHandWriterConfigProcessFinish);
+
+        // 解包没有错误才执行下一步
+        if (runHandWriterScriptProcessError == false) {
+            startHandWriterEncode();
+        }
+    }
+
+
+
+
+
+
+
+
+
 });
 
 new Vue({
@@ -288,10 +345,12 @@ new Vue({
     data: {
         show: true,
         userAppInfo: [],
+        handWriterServerURL: "",  // 手写板应用的ip地址
     },
 
     mounted() {
         callbacks('getOneMnistUserAppInfo', userAppInfo => this.userAppInfo = userAppInfo);
+        callbacks('getHandWriterServerURL', handWriterServerURL => this.handWriterServerURL = handWriterServerURL);
     },
     watch: {
 
@@ -319,19 +378,77 @@ new Vue({
 
 /**
  * ******************************************************************************************************
+ * 手写板应用
+ * ******************************************************************************************************
+ */
+// 1. 点击中间的按钮 执行图像识别
+function handWriterAppStartRun() {
+    // 检查有没有图像
+    if (getHandWriterImgFlag == false) {
+        document.getElementById("userMnistOneApp_alertContent").innerText = "请先在手机浏览器中绘制要识别的数字并提交！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+        return;
+    }
+
+    // 标志值初始化
+    runHandWriterScriptProcessError = false;
+
+    // 清空结果
+    // todo
+
+
+    // 解包配置文件
+    vscode.postMessage({
+        command: 'unpackHandWriterConfig',
+        text: "解包手写板配置文件",
+    });
+
+}
+
+// 2. 执行编码
+function startHandWriterEncode() {
+    vscode.postMessage({
+        command: 'startHandWriterEncode',
+        text: "执行手写板图像编码",
+    });
+}
+
+
+
+
+
+/**
+ * ******************************************************************************************************
  * 工具函数
  * ******************************************************************************************************
  */
-// 用户选择数据源：本地图像还是远程ip
+// 用户选择数据源：本地图像还是手写板
 function selectImgSrcKind() {
     console.log(document.getElementById("userMnistOneApp_select_imgSrc_type").value);
     let imgSrcKind = document.getElementById("userMnistOneApp_select_imgSrc_type").value
     if (imgSrcKind == "localImg") {
         document.getElementById("userMnistOneApp_select_local_path").style.display = "";//显示
-        document.getElementById("userMnistOneApp_get_remoteIP_addr").style.display = "none";//隐藏
-    } else if (imgSrcKind == "networkImg") {
+        document.getElementById("userMnistOneApp_localImg_startBtn").style.display = "";
+        document.getElementById("userMnistOneApp_localImg_mainPage").style.display = "";
+
+        document.getElementById("userMnistOneApp_handWriter_addr").style.display = "none"; //隐藏
+        document.getElementById("userMnistOneApp_handWriter_mainPage").style.display = "none";
+
+    } else if (imgSrcKind == "handWriter") {
         document.getElementById("userMnistOneApp_select_local_path").style.display = "none";//隐藏
-        document.getElementById("userMnistOneApp_get_remoteIP_addr").style.display = "";//显示
+        document.getElementById("userMnistOneApp_localImg_startBtn").style.display = "none";
+        document.getElementById("userMnistOneApp_localImg_mainPage").style.display = "none";
+
+        document.getElementById("userMnistOneApp_handWriter_addr").style.display = ""; //显示
+        document.getElementById("userMnistOneApp_handWriter_mainPage").style.display = "";
+
+        // 给vscode发送消息接收移动端输入的手写体图像
+        vscode.postMessage({
+            command: 'startGetHandWriterImg',
+            text: "接收手机手写体图像",
+        });
+
+
     }
 }
 

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        /*transparent 为透明*/
+
+        /*箭头向下*/
+        .box-down {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-right: 30px solid transparent;
+            border-left: 30px solid transparent;
+            border-bottom: 50px solid red;
+        }
+
+        /*箭头向上*/
+        .box-up {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-top: 50px solid green;
+        }
+
+
+
+        /*箭头向右*/
+        .box-right {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-top: 30px solid transparent;
+            border-right: 50px solid orange;
+            border-bottom: 30px solid transparent;
+        }
+
+
+        /*箭头向左*/
+        .box-left {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-left: 30px solid pink;
+            border-bottom: 10px solid transparent;
+            padding:0px;margin:0px;
+        }
+        .line {
+            display: inline-block;
+            height: 15px;
+            width: 50px;
+            background: #ffa73c;
+            padding:0px;margin:0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box-up"></div>
+    <div class="box-down"></div>
+    <div class="box-right"></div>
+    <div class="box-left"></div>
+
+
+    <br>
+    <br>
+    <div class="line"></div>
+    <div class="box-left"></div>
+</body>
+
+</html>

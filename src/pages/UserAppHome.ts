@@ -5,11 +5,16 @@ import { ChildProcess, exec, spawn } from "child_process";
 import { searchAllJson, updateImgAppInfo, searchImgAppByID } from '../DataProvider/ImgAppJsonDataProvider';
 import { openImgAppInfoPage, openImgAppRunTaskPage } from './ImgAppHome';
 import { IDEPanels } from "../extension";
+import { handWriterData } from '../os/server';
+
 var https = require('http');
 
 // 日志输出
 const log_output_channel = vscode.window.createOutputChannel("darwinos output");
 log_output_channel.show();
+
+// 手写板图像保存位置
+const handWriterImgSaveFilePath = "src/static/cache/handWriterImgBase64Data.txt";
 
 
 // html文件路径
@@ -120,7 +125,37 @@ const oneUserAppMessageHandler = {
         console.log(message);
         openImgAppRunTaskPage(global.context, message.text);
     },
+
+
+    /**
+     * *************************
+     * 手写板应用相关
+     * *************************
+     */
+    // 获取手写板url
+    getHandWriterServerURL(global, message) {
+        console.log(message);
+        global.panel.webview.postMessage({ cmd: 'getHandWriterServerURLRet', cbid: message.cbid, data: "http://" + handWriterData.localIP + ":5003" });
+    },
+    // 显示手机上的手写数字
+    startGetHandWriterImg(global, message) {
+        console.log(message);
+        getHandWriterImgLoop(global);
+    },
+    // 解包配置文件
+    unpackHandWriterConfig(global, message) {
+        console.log(message);
+        unpackHandWriterConfigProcess(global);
+    },
+    // 手写板图像编码
+    startHandWriterEncode(global, message) {
+        console.log(message);
+        encodeHandWriterImgProcess(global);
+    },
+
+
 };
+
 
 
 /********************************************************************************************
@@ -239,8 +274,6 @@ export function openOtherUserAppHomePage(context) {
 }
 
 
-
-
 // 3. 单击用户图像识别应用首页九宫格中的按钮，进入某个应用运行页面
 export function openOneMnistUserAppPageByID(context, id) {
     console.log("IDE openOneMnistUserAppPageByID!", IDEPanels.userImgAppRunPagePanelsMap);
@@ -284,6 +317,11 @@ export function openOneMnistUserAppPageByID(context, id) {
             () => {
                 panel = undefined;
                 IDEPanels.userImgAppRunPagePanelsMap.delete(id);
+                if (postHandWriterImgTimer != undefined) {
+                    clearInterval(postHandWriterImgTimer);
+                    postHandWriterImgTimer = undefined;
+                    console.log("handwriter timer killed！");
+                }
             },
             null,
             context.subscriptions
@@ -294,71 +332,13 @@ export function openOneMnistUserAppPageByID(context, id) {
 
 
 
-/********************************************************************************************
- * 工具函数
- ********************************************************************************************/
-// 1. html页面处理
-export function getHtmlContent(context, templatePath) {
-    const resourcePath = path.join(context.extensionPath, templatePath);
-    const dirPath = path.dirname(resourcePath);
-    let html = fs.readFileSync(resourcePath, 'utf-8');
 
-    html = html.replace(/(<link.+?href="|<script.+?src="|<img.+?src=")(.+?)"/g, (m, $1, $2) => {
-        return $1 + vscode.Uri.file(path.resolve(dirPath, $2)).with({ scheme: 'vscode-resource' }).toString() + '"';
-    });
-    // 替换登录页面中 style 中 background img 
-    html = html.replace(/(.+?)(url\(")(.+?)"/g, (m, $1, $2, $3) => {
-        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
-    });
-
-    // 任务输入执行页面样式
-    let vscodeColorTheme = vscode.window.activeColorTheme.kind;
-    if (vscodeColorTheme == 2) {
-        html = html.replace(/vs-light.css/, "vs-dark.css");
-    } else if (vscodeColorTheme == 1) {
-        html = html.replace(/vs-dark.css/, "vs-light.css");
-    }
-
-    return html;
-}
-
-// 获取文件夹下图像文件的数量
-function getImgFileNum(path: string) {
-    // 根据文件路径读取文件，返回一个文件列表
-    //读取文件夹下内容
-    let files = fs.readdirSync(path);
-    console.log("getFiles list =--------", files);
-    return files.length;
-}
-
-// 计算时间差
-function getAppRuntime(global) {
-    let start = global.startTime;
-    let end = global.endTime;
-    let timeDiff = end.getTime() - start.getTime();//时间差的毫秒数
-    let minutes = Math.floor(timeDiff / (60 * 1000))//计算相差分钟数
-    let leave1 = timeDiff % (60 * 1000)      //计算分钟数后剩余的毫秒数
-    let seconds = Math.floor(leave1 / 1000) //计算秒数
-    let leave2 = leave1 % 1000; // 剩余毫秒数
-    let runtime = minutes + "分钟" + seconds + "秒" + leave2 + "毫秒";
-    return runtime;
-}
-
-// 等待
-function sleep(numberMillis) {
-    var start = new Date().getTime();
-    while (true) {
-        if (new Date().getTime() - start > numberMillis) {
-            break;
-        }
-    }
-}
 
 
 
 /**
  * ******************************************************************************************************
- * 运行任务相关函数，执行python脚本
+ * 手写体图像识别，本地图像   ———    运行任务相关函数，执行python脚本
  * ******************************************************************************************************
  */
 
@@ -538,7 +518,7 @@ function runMnistSendInputScript(global) {
             imgNum++;
             global.panel.webview.postMessage({ recognitionOneDone: [imgNum, totalImgNum] });
         }
-        if(data.indexOf("get slave ip port failed") != -1) {
+        if (data.indexOf("get slave ip port failed") != -1) {
             global.panel.webview.postMessage({ getConnectionIPAndPortFailed: data });
         }
 
@@ -593,19 +573,152 @@ function runMnistSendInputScript(global) {
 
 
 
+
+/**
+ * ******************************************************************************************************
+ * 手写数字图像识别 —— 移动端手写板
+ * ******************************************************************************************************
+ */
+var postHandWriterImgTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
+var currentHandWriterImgData: string | undefined = undefined;
+
+// 1. 将手写板上传的base64编码的手写体数字图像发送给前端页面显示
+function getHandWriterImgLoop(global) {
+
+    postHandWriterImgTimer = setInterval(function encodeAndSendData() {
+        if (handWriterData.currentImgData != "" && handWriterData.currentImgData != undefined && currentHandWriterImgData != handWriterData.currentImgData) {
+            currentHandWriterImgData = handWriterData.currentImgData;
+            console.log("发送图片");
+            global.panel.webview.postMessage({ getHandWriterImgRet: handWriterData.currentImgData });
+            // 保存图片? handWriterImgSaveFilePath
+            saveHandWriterImgToLocal(global.context, currentHandWriterImgData);
+        }
+    }, 500);
+}
+
+
+// 保存手写板图像的base64数据
+function saveHandWriterImgToLocal(context, bs64_img: string) {
+    let resourcePath = path.join(context.extensionPath, handWriterImgSaveFilePath);
+    fs.writeFile(resourcePath, bs64_img, function (err) {
+        if (err) {
+            console.error(err);
+            return "error";
+        }
+        console.log('----------保存成功-------------');
+        return "success";
+    });
+
+}
+
+// 2. 解包配置文件
+function unpackHandWriterConfigProcess(global) {
+    console.log("start unpack config files for hand-writer app: ", global.appInfo.name);
+    // 获取应用运行的起始时间
+    let startTime = new Date();//获取当前时间 
+    global["handWriterStartTime"] = startTime;
+    console.log("应用运行起始时间为：", global.handWriterStartTime);
+
+    // 脚本位置
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "pack_bin_files.py");
+
+    let configFile = global.appInfo.encodeConfigFile;      // 配置文件
+    let outputDir = global.appInfo.outputDir;            // 输出路径,脚本里会新建一个文件夹unpack_target
+
+    let command_str = "python3 " + scriptPath + " " + configFile + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let scriptProcess = exec(command_str, {});
+
+    scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+    });
+
+    scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        let formatted_err = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({ unpackHandWriterConfigProcessErrorLog: formatted_err });
+    });
+
+    scriptProcess.on("exit", function () {
+        console.log("done!!");
+        let unpackPath = path.join(outputDir, "unpack_target");
+        let str = "Unpack hand-writer config files finished, the result is saved in " + unpackPath;
+        global.panel.webview.postMessage({ unpackHandWriterConfigProcessFinish: str });
+    });
+}
+
+
+// 3. 图像编码
+function encodeHandWriterImgProcess(global) {
+    console.log("start encode for hand-writer app: ", global.appInfo);
+
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "hand_writer", "main.py");
+
+    let imgFile = path.join(global.context.extensionPath, handWriterImgSaveFilePath);  // 保存图像的文件
+    let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹pickleDir
+    let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+
+
+    let command_str = "python3 " + scriptPath + " " + imgFile + " " + configDir + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let scriptProcess = exec(command_str, {});
+
+    scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+
+    });
+
+    scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+
+    });
+
+    scriptProcess.on("exit", function () {
+        console.log("done!!");
+
+    });
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * ******************************************************************************************************
  * 运行摄像头应用 —— 疲劳检测
  * ******************************************************************************************************
  */
 
- var websocketServerProcess: vscode.Terminal | undefined = undefined;  // 启动 websocket，接收python推送过来的视频数据
- var cameraCaptureProcess: vscode.Terminal | undefined = undefined;    // 实时视频数据往socket服务器推送
+var websocketServerProcess: vscode.Terminal | undefined = undefined;  // 启动 websocket，接收python推送过来的视频数据
+var cameraCaptureProcess: vscode.Terminal | undefined = undefined;    // 实时视频数据往socket服务器推送
 
- var videoEncodeAndChipSendTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
- var ifNeedEncodeAndChipSendNextFrame: boolean | undefined = true;  // 是否需要编码识别下一幅帧
+var videoEncodeAndChipSendTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
+var ifNeedEncodeAndChipSendNextFrame: boolean | undefined = true;  // 是否需要编码识别下一幅帧
 
- 
+
 // 1. 用户视图疲劳检测九宫格页面消息处理
 const userFatigueDrivingHomeMessageHandler = {
     // 查询所有疲劳检测应用列表
@@ -942,5 +1055,69 @@ function finishDrivingProcess() {
         videoEncodeAndChipSendTimer = undefined;
         console.log("timer killed！");
     }
-   
+
+}
+
+
+
+
+
+/********************************************************************************************
+ * 工具函数
+ ********************************************************************************************/
+// 1. html页面处理
+export function getHtmlContent(context, templatePath) {
+    const resourcePath = path.join(context.extensionPath, templatePath);
+    const dirPath = path.dirname(resourcePath);
+    let html = fs.readFileSync(resourcePath, 'utf-8');
+
+    html = html.replace(/(<link.+?href="|<script.+?src="|<img.+?src=")(.+?)"/g, (m, $1, $2) => {
+        return $1 + vscode.Uri.file(path.resolve(dirPath, $2)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
+    // 替换登录页面中 style 中 background img 
+    html = html.replace(/(.+?)(url\(")(.+?)"/g, (m, $1, $2, $3) => {
+        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
+
+    // 任务输入执行页面样式
+    let vscodeColorTheme = vscode.window.activeColorTheme.kind;
+    if (vscodeColorTheme == 2) {
+        html = html.replace(/vs-light.css/, "vs-dark.css");
+    } else if (vscodeColorTheme == 1) {
+        html = html.replace(/vs-dark.css/, "vs-light.css");
+    }
+
+    return html;
+}
+
+// 获取文件夹下图像文件的数量
+function getImgFileNum(path: string) {
+    // 根据文件路径读取文件，返回一个文件列表
+    //读取文件夹下内容
+    let files = fs.readdirSync(path);
+    console.log("getFiles list =--------", files);
+    return files.length;
+}
+
+// 计算时间差
+function getAppRuntime(global) {
+    let start = global.startTime;
+    let end = global.endTime;
+    let timeDiff = end.getTime() - start.getTime();//时间差的毫秒数
+    let minutes = Math.floor(timeDiff / (60 * 1000))//计算相差分钟数
+    let leave1 = timeDiff % (60 * 1000)      //计算分钟数后剩余的毫秒数
+    let seconds = Math.floor(leave1 / 1000) //计算秒数
+    let leave2 = leave1 % 1000; // 剩余毫秒数
+    let runtime = minutes + "分钟" + seconds + "秒" + leave2 + "毫秒";
+    return runtime;
+}
+
+// 等待
+function sleep(numberMillis) {
+    var start = new Date().getTime();
+    while (true) {
+        if (new Date().getTime() - start > numberMillis) {
+            break;
+        }
+    }
 }
