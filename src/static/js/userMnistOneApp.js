@@ -312,26 +312,59 @@ window.addEventListener('message', event => {
 
     // 解包配置文件失败
     if (message.unpackHandWriterConfigProcessErrorLog != undefined) {
-        console.log("run hand-writer script err: ", message.unpackHandWriterConfigProcessErrorLog);
-        // 脚本运行失败，弹出提示框
-        document.getElementById("userMnistOneApp_alertContent").innerText = "解包配置文件失败，请查看日志或联系系统管理员！";
-        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
-        // 标记脚本运行有误
+        console.log("run hand-writer unpack script err: ", message.unpackHandWriterConfigProcessErrorLog);
+
         runHandWriterScriptProcessError = true;
     }
 
     // 解包结束，发送命令执行编码
     if (message.unpackHandWriterConfigProcessFinish != undefined) {
         console.log("run hand-writer unpack script over!", message.unpackHandWriterConfigProcessFinish);
+    }
+
+    // 编码失败
+    if (message.encodeHandWriterImgProcessErrorLog != undefined) {
+        console.log("run hand-writer encode script err: ", message.encodeHandWriterImgProcessErrorLog);
+        // 脚本运行失败，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "脉冲编码失败，请查看日志或联系系统管理员！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+        // 标记脚本运行有误
+        runHandWriterScriptProcessError = true;
+    }
+
+    // 编码结束，发送命令执行芯片识别
+    if (message.encodeHandWriterImgProcessFinish != undefined) {
+        console.log("run hand-writer encode script over!", message.encodeHandWriterImgProcessFinish);
 
         // 解包没有错误才执行下一步
         if (runHandWriterScriptProcessError == false) {
-            startHandWriterEncode();
+            startHandWriterRecognitionProcess();
         }
     }
 
-
-
+    // 没有上传config.b文件
+    if (message.handWriterGetIPAndPortFailed != undefined) {
+        console.log("get config info by md5 failed!", message.handWriterGetIPAndPortFailed);
+        // 脚本运行失败,节点上没找到config.b，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "数据发送失败，找不到模型文件！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+    }
+    // 发送数据失败
+    if (message.runHandWriterSendInputProcessErrorLog != undefined) {
+        console.log("run hand writer img send-input script error, ", message.runHandWriterSendInputProcessErrorLog);
+        document.getElementById("userMnistOneApp_alertContent").innerText = "数据发送失败，请查看日志或联系系统管理员！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+    }
+    // 芯片图像识别结束
+    if (message.runHandWriterSendInputProcessResult != undefined) {
+        console.log("get hand-writer img recognition result", message.runHandWriterSendInputProcessResult);
+        document.getElementById("userMnistOneApp_handWriter_recognitionRet").innerHTML = message.runHandWriterSendInputProcessResult;
+    }
+    // 运行时间
+    if (message.handWriterRecognitionProcessTime != undefined) {
+        console.log("get hand writer run time: ", message.handWriterRecognitionProcessTime);
+        document.getElementById("userMnistOneApp_handWriter_runtime").innerHTML = message.handWriterRecognitionProcessTime;
+    }
 
 
 
@@ -390,19 +423,17 @@ function handWriterAppStartRun() {
         return;
     }
 
-    // 标志值初始化
-    runHandWriterScriptProcessError = false;
-
     // 清空结果
-    // todo
+    document.getElementById("userMnistOneApp_handWriter_recognitionRet").innerHTML = "";
 
-
-    // 解包配置文件
-    vscode.postMessage({
-        command: 'unpackHandWriterConfig',
-        text: "解包手写板配置文件",
-    });
-
+    // 解包没有错误才执行编码
+    if (runHandWriterScriptProcessError == false) {
+        startHandWriterEncode();
+    } else {
+        // 脚本运行失败，弹出提示框
+        document.getElementById("userMnistOneApp_alertContent").innerText = "解包配置文件失败，请查看日志或联系系统管理员，并刷新当前页面！";
+        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+    }
 }
 
 // 2. 执行编码
@@ -412,7 +443,13 @@ function startHandWriterEncode() {
         text: "执行手写板图像编码",
     });
 }
-
+// 3. 执行芯片识别过程
+function startHandWriterRecognitionProcess() {
+    vscode.postMessage({
+        command: 'startHandWriterRecognitionProcess',
+        text: "给芯片发送数据执行数字识别",
+    });
+}
 
 
 
@@ -448,7 +485,14 @@ function selectImgSrcKind() {
             text: "接收手机手写体图像",
         });
 
+        // 标志值初始化
+        runHandWriterScriptProcessError = false;
 
+        // 解包配置文件
+        vscode.postMessage({
+            command: 'unpackHandWriterConfig',
+            text: "解包手写板配置文件",
+        });
     }
 }
 

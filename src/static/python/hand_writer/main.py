@@ -12,11 +12,12 @@ import multiprocessing
 import base64
 from data_encode import gen_input
 import sys
-
+import time
+import datetime
 
 inputImgFile = sys.argv[1]  # base64编码的用户手写体数字图像文件
 configDir = sys.argv[2]  # 解包后的配置文件路径
-outputDir = sys.argv[3]  # 生成的编码文件所在路径
+outputDir = sys.argv[3]  # 生成的编码文件所在路径 
 
 
 SNN_MODEL_FILE_PATH = os.path.join(configDir, "br2.pkl")
@@ -31,7 +32,7 @@ ROW_TXT_FILE = os.path.join(outputDir, "row.txt")
 def real_time_snn_detect():
     with open(SNN_MODEL_FILE_PATH, "rb") as f:
         snn_model = pickle.load(f)
-    print("Loading snn model finish.")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Loading snn model finish.")
 
     br2_neurons = []
     br2_synapses = []
@@ -55,7 +56,7 @@ def real_time_snn_detect():
     br2_net = brian2.Network(br2_neurons, br2_synapses,
                              br2_output_spike_monitor, br2_input_spike_monitor)
     br2_net.store()
-    print("Finish initialize snn.")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Finish initialize snn.")
 
     with open(LAYER_WIDTH_FILE_PATH, "rb") as f:
         layerWidth = pickle.load(f)
@@ -67,15 +68,15 @@ def real_time_snn_detect():
     # 获取图像
     with open(inputImgFile, "r") as f:
         png_bs64 = f.read()
-    print("Loading img finish.", png_bs64)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Loading img finish.")
 
     img = base64.b64decode(png_bs64)
     img = cv2.imdecode(np.fromstring(img, np.uint8), cv2.IMREAD_COLOR)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, img = cv2.threshold(img, 120, 255, cv2.THRESH_BINARY)
+    _, img = cv2.threshold(img, 40, 255, cv2.THRESH_BINARY)
     img = cv2.resize(img, (28, 28))
     img = np.array(img, dtype="float32") / 255.0
-    print("Fetch one image.")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Fetch one image.")
 
     br2_neurons[0].bias = img.flatten() / brian2.ms
     print("Running....")
@@ -86,10 +87,8 @@ def real_time_snn_detect():
     out_spikes = [len(e) for e in out_spikes.values()]
     input_spike_seqs = []
     for i in range(len(br2_input_spike_monitor.spike_trains().items())):
-        input_spike_seqs.append(
-            [i, [int(tm/brian2.ms) for tm in list(br2_input_spike_monitor.spike_trains()[i])]])
-    print("out spikes={}, pred label={}".format(
-        out_spikes, np.argmax(out_spikes)))
+        input_spike_seqs.append([i, [int(tm/brian2.ms) for tm in list(br2_input_spike_monitor.spike_trains()[i])]])
+    print("out spikes={}, pred label={}".format(out_spikes, np.argmax(out_spikes)))
     br2_net.restore()
     # Encode input data
     input_node_map = {}
@@ -111,4 +110,5 @@ def real_time_snn_detect():
 
 if __name__ == '__main__':
     real_time_snn_detect()
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "encode img finish.")
 

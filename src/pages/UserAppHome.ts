@@ -15,6 +15,7 @@ log_output_channel.show();
 
 // 手写板图像保存位置
 const handWriterImgSaveFilePath = "src/static/cache/handWriterImgBase64Data.txt";
+const handWriterPngImgPath = "src/static/cache/tmpHandWriterImg.png";
 
 
 // html文件路径
@@ -152,9 +153,14 @@ const oneUserAppMessageHandler = {
         console.log(message);
         encodeHandWriterImgProcess(global);
     },
-
+    // 手写板数字芯片识别
+    startHandWriterRecognitionProcess(global, message) {
+        console.log(message);
+        runHandWriterSendInputProcess(global);
+    },
 
 };
+
 
 
 
@@ -563,7 +569,7 @@ function runMnistSendInputScript(global) {
         let endTime = new Date();//获取当前时间 
         global["endTime"] = endTime;
         console.log("应用运行结束时间为：", global.endTime);
-        global["totalRuntime"] = getAppRuntime(global);
+        global["totalRuntime"] = getAppRuntime(global.startTime, global.endTime);
         console.log("应用运行耗时为：", global.totalRuntime);
         global.panel.webview.postMessage({ recognitionProcessFinish: global.totalRuntime });
     });
@@ -600,7 +606,8 @@ function getHandWriterImgLoop(global) {
 // 保存手写板图像的base64数据
 function saveHandWriterImgToLocal(context, bs64_img: string) {
     let resourcePath = path.join(context.extensionPath, handWriterImgSaveFilePath);
-    fs.writeFile(resourcePath, bs64_img, function (err) {
+    let base64 = bs64_img.replace(/^data:image\/\w+;base64,/, "");
+    fs.writeFile(resourcePath, base64, function (err) {
         if (err) {
             console.error(err);
             return "error";
@@ -609,15 +616,25 @@ function saveHandWriterImgToLocal(context, bs64_img: string) {
         return "success";
     });
 
+
+    // // 保存为png格式图像 handWriterPngImgPath
+    // let resourcePath = path.join(context.extensionPath, handWriterPngImgPath);
+    // var base64 = bs64_img.replace(/^data:image\/\w+;base64,/, ""); //去掉图片base64码前面部分data:image/png;base64
+    // var dataBuffer = new Buffer(base64, 'base64'); //把base64码转成buffer对象，
+    // console.log('dataBuffer是否是Buffer对象：' + Buffer.isBuffer(dataBuffer)); // 输出是否是buffer对象
+    // fs.writeFile(resourcePath, dataBuffer, function (err) {//用fs写入文件
+    //     if (err) {
+    //         console.log(err);
+    //     } else {
+    //         console.log('写入成功！');
+    //     }
+    // });
+
 }
 
 // 2. 解包配置文件
 function unpackHandWriterConfigProcess(global) {
     console.log("start unpack config files for hand-writer app: ", global.appInfo.name);
-    // 获取应用运行的起始时间
-    let startTime = new Date();//获取当前时间 
-    global["handWriterStartTime"] = startTime;
-    console.log("应用运行起始时间为：", global.handWriterStartTime);
 
     // 脚本位置
     let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "pack_bin_files.py");
@@ -653,13 +670,16 @@ function unpackHandWriterConfigProcess(global) {
 // 3. 图像编码
 function encodeHandWriterImgProcess(global) {
     console.log("start encode for hand-writer app: ", global.appInfo);
+    // 获取应用运行的起始时间
+    let startTime = new Date();//获取当前时间 
+    global["handWriterStartTime"] = startTime;
+    console.log("应用运行起始时间为：", global.handWriterStartTime);
 
     let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "hand_writer", "main.py");
 
     let imgFile = path.join(global.context.extensionPath, handWriterImgSaveFilePath);  // 保存图像的文件
-    let outputDir = global.appInfo.outputDir;            // 输出pickle保存目录,脚本里会新建一个文件夹pickleDir
+    let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
     let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
-
 
     let command_str = "python3 " + scriptPath + " " + imgFile + " " + configDir + " " + outputDir;
     console.log("执行命令为", command_str);
@@ -668,21 +688,69 @@ function encodeHandWriterImgProcess(global) {
     scriptProcess.stdout?.on("data", function (data) {
         log_output_channel.append(data);
         console.log(data);
-
     });
-
     scriptProcess.stderr?.on("data", function (data) {
         log_output_channel.append(data);
         console.log(data);
-
+        let formatted_err = data.split("\r\n").join("<br/>");
+        // global.panel.webview.postMessage({ encodeHandWriterImgProcessErrorLog: formatted_err });
     });
-
     scriptProcess.on("exit", function () {
         console.log("done!!");
-
+        let str = "Encode hand writer img finished, the result is saved in " + outputDir;
+        global.panel.webview.postMessage({ encodeHandWriterImgProcessFinish: str });
     });
 
 }
+
+// 4. 发送数据，芯片识别
+function runHandWriterSendInputProcess(global) {
+    console.log("给芯片发送数据，执行手写板数字识别");
+
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "hand_writer", "send_input.py");
+    let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
+    let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+
+    let command_str = "python3 " + scriptPath + " " + configDir + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let chipCalculateProcess = exec(command_str, {});
+
+    chipCalculateProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        if (data.indexOf("get slave ip port failed") != -1) {
+            global.panel.webview.postMessage({ handWriterGetIPAndPortFailed: data });
+        }
+        // 解析识别结果的输出
+        if (data.indexOf("HANDWRITERRECOGNITION RESULT") !== -1) {
+            // 图像识别结果
+            let ret = data.split("**")[1];
+            console.log("手写板数字识别结果：", ret);
+            global.panel.webview.postMessage({ runHandWriterSendInputProcessResult: ret });
+        }
+    });
+    chipCalculateProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        let formatted_err = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({ runHandWriterSendInputProcessErrorLog: formatted_err });
+
+    });
+    chipCalculateProcess.on("exit", function () {
+        console.log("chip calculate finished!!");
+        global.panel.webview.postMessage({ runHandWriterSendInputProcessFinish: "done" });
+
+        // 获取应用运行的结束时间
+        let endTime = new Date();//获取当前时间 
+        global["handWriterEndTime"] = endTime;
+        console.log("应用运行结束时间为：", global.handWriterEndTime);
+        global["handWriterTotalRuntime"] = getAppRuntime(global.handWriterStartTime, global.handWriterEndTime);
+        console.log("应用运行耗时为：", global.handWriterTotalRuntime);
+        global.panel.webview.postMessage({ handWriterRecognitionProcessTime: global.handWriterTotalRuntime });
+        
+    });
+}
+
 
 
 
@@ -1100,9 +1168,9 @@ function getImgFileNum(path: string) {
 }
 
 // 计算时间差
-function getAppRuntime(global) {
-    let start = global.startTime;
-    let end = global.endTime;
+function getAppRuntime(start, end) {
+    // let start = global.startTime;
+    // let end = global.endTime;
     let timeDiff = end.getTime() - start.getTime();//时间差的毫秒数
     let minutes = Math.floor(timeDiff / (60 * 1000))//计算相差分钟数
     let leave1 = timeDiff % (60 * 1000)      //计算分钟数后剩余的毫秒数

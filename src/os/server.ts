@@ -184,19 +184,6 @@ export function startHandWriterServer(context) {
 			handWriterData.currentImgData = obj.img;
 		});
 
-
-
-		// req.on('data', function (data) {
-		// 	console.log(data.toString());
-		// 	console.log(new Date().getTime());
-		// 	// let obj = JSON.parse(data);
-		// 	// let base64Img = obj.img;
-
-		// 	res.send('数据已接收');
-
-		// 	// 发送给工具页面显示
-
-		// })
 	});
 
 	app.listen(port, hostName, function () {

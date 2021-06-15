@@ -47,6 +47,7 @@ def get_slave_ip_port_fid(config_file_path):
             status = jsn["status"]
         else:
             print(jsn)
+            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] get slave ip port failed. ", flush=True)
             exit(0)
         return ip,port
 
@@ -128,7 +129,7 @@ if isExists1 and isExists2:
     Number = str(max_index)
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] get Number. ")
     print(Number + " ")
-    print("FATIGUEDRIVING RESULT: **", Number, "**", flush=True)
+    print("HANDWRITERRECOGNITION RESULT: **", Number, "**", flush=True)
 
     clear_start(conn1, 1)
 
@@ -137,5 +138,5 @@ if isExists1 and isExists2:
     # os.remove(os.path.join(inputDir, "input.txt"))
 
 
-print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] FATIGUEDRIVING FINISHED!", flush=True)
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] HANDWRITERRECOGNITION FINISHED!", flush=True)
 
