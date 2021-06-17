@@ -179,7 +179,7 @@
 				// $('<span><b>As you can see, one of the problems of "image" extraction (besides not working on some old Androids, elsewhere) is that it extracts A LOT OF DATA and includes all the decoration that is not part of the signature.</b></span>').appendTo($extraarea)
 				$(i).appendTo($extraarea)
 				$.ajax({
-					url: "/sendData",
+					url: "/post_img",
 					dataType: "json",
 					data: JSON.stringify({ img: imgData }),
 					type: "POST",

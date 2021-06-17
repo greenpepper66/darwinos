@@ -1,5 +1,5 @@
-
 const vscode = acquireVsCodeApi();
+
 
 // 标记脚本运行是否返回错误，有错误的话不再执行下一步
 var runScriptProcessError = false;           // 本地图像的
@@ -7,6 +7,45 @@ var runHandWriterScriptProcessError = false; // 手写板的
 
 // 手写板是否有输入图像传过来
 var getHandWriterImgFlag = false;   // 没收到图像的话是false
+
+
+new Vue({
+    el: '#userMnistOneApp',
+    data: {
+        show: true,
+        userAppInfo: [],
+        handWriterServerURL: "",  // 手写板应用的ip地址
+    },
+
+    mounted() {
+        callbacks('getOneMnistUserAppInfo', userAppInfo => this.userAppInfo = userAppInfo);
+        callbacks('getHandWriterServerURL', handWriterServerURL => this.handWriterServerURL = handWriterServerURL);
+    },
+    watch: {
+
+    },
+    methods: {
+        userAppGotoImgAppInfoPage(imgAppID) {
+            console.log("search app: ", imgAppID);
+            // 给插件发送消息 跳转到详情页
+            vscode.postMessage({
+                command: 'userAppGotoImgAppInfoPage',
+                text: imgAppID,
+            });
+        },
+        userAppGotoImgAppTaskPage(imgAppID) {
+            console.log("run app: ", imgAppID);
+            // 给插件发送消息 跳转到任务页面
+            vscode.postMessage({
+                command: 'userAppGotoImgAppTaskPage',
+                text: imgAppID,
+            });
+        },
+    }
+});
+
+
+
 
 /**
  * ******************************************************************************************************
@@ -373,40 +412,7 @@ window.addEventListener('message', event => {
 
 });
 
-new Vue({
-    el: '#userMnistOneApp',
-    data: {
-        show: true,
-        userAppInfo: [],
-        handWriterServerURL: "",  // 手写板应用的ip地址
-    },
 
-    mounted() {
-        callbacks('getOneMnistUserAppInfo', userAppInfo => this.userAppInfo = userAppInfo);
-        callbacks('getHandWriterServerURL', handWriterServerURL => this.handWriterServerURL = handWriterServerURL);
-    },
-    watch: {
-
-    },
-    methods: {
-        userAppGotoImgAppInfoPage(imgAppID) {
-            console.log("search app: ", imgAppID);
-            // 给插件发送消息 跳转到详情页
-            vscode.postMessage({
-                command: 'userAppGotoImgAppInfoPage',
-                text: imgAppID,
-            });
-        },
-        userAppGotoImgAppTaskPage(imgAppID) {
-            console.log("run app: ", imgAppID);
-            // 给插件发送消息 跳转到任务页面
-            vscode.postMessage({
-                command: 'userAppGotoImgAppTaskPage',
-                text: imgAppID,
-            });
-        },
-    }
-});
 
 
 /**
@@ -454,11 +460,10 @@ function startHandWriterRecognitionProcess() {
 
 
 
-/**
- * ******************************************************************************************************
- * 工具函数
- * ******************************************************************************************************
- */
+
+
+
+
 // 用户选择数据源：本地图像还是手写板
 function selectImgSrcKind() {
     console.log(document.getElementById("userMnistOneApp_select_imgSrc_type").value);
@@ -493,8 +498,20 @@ function selectImgSrcKind() {
             command: 'unpackHandWriterConfig',
             text: "解包手写板配置文件",
         });
+
+
+        display_spike_scatter_chart([]);
     }
 }
+
+
+
+
+/**
+ * ******************************************************************************************************
+ * 工具函数
+ * ******************************************************************************************************
+ */
 
 // 弹出框 相关
 function closeUserOneAppAlertBox() {
@@ -513,3 +530,7 @@ function DeleteAllColumnExceptFirst(eleID) {
         tab.rows[1].deleteCell(i);
     }
 }
+
+
+
+

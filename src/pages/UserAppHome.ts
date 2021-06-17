@@ -8,6 +8,7 @@ import { IDEPanels } from "../extension";
 import { handWriterData } from '../os/server';
 
 var https = require('http');
+var ip = require('ip');
 
 // 日志输出
 const log_output_channel = vscode.window.createOutputChannel("darwinos output");
@@ -15,7 +16,12 @@ log_output_channel.show();
 
 // 手写板图像保存位置
 const handWriterImgSaveFilePath = "src/static/cache/handWriterImgBase64Data.txt";
-const handWriterPngImgPath = "src/static/cache/tmpHandWriterImg.png";
+
+// 手写板页面访问地址
+const handWriterServerURL = "http://" + ip.address() + ":5003"
+
+
+
 
 
 // html文件路径
@@ -136,14 +142,14 @@ const oneUserAppMessageHandler = {
     // 获取手写板url
     getHandWriterServerURL(global, message) {
         console.log(message);
-        global.panel.webview.postMessage({ cmd: 'getHandWriterServerURLRet', cbid: message.cbid, data: "http://" + handWriterData.localIP + ":5003" });
+        global.panel.webview.postMessage({ cmd: 'getHandWriterServerURLRet', cbid: message.cbid, data: handWriterServerURL });
     },
     // 显示手机上的手写数字
     startGetHandWriterImg(global, message) {
         console.log(message);
         getHandWriterImgLoop(global);
     },
-    // 解包配置文件
+    // 解包配置文件, 用户页面上一选择“手写板输入源”就执行解包
     unpackHandWriterConfig(global, message) {
         console.log(message);
         unpackHandWriterConfigProcess(global);
@@ -305,7 +311,11 @@ export function openOneMnistUserAppPageByID(context, id) {
             console.error("can not found the app: ", id);
         }
 
-        let global = { panel, context, appInfo };
+        let postHandWriterImgTimer = undefined; // 接收手写板数据的计时器
+        let currentHandWriterImgData = "";      // 当前页面显示的手写板图像
+        let currentHandWriterEncodeSpikes = []; // 当前手写板图像的脉冲数据
+
+        let global = { panel, context, appInfo, postHandWriterImgTimer, currentHandWriterImgData, currentHandWriterEncodeSpikes };
         IDEPanels.userImgAppRunPagePanelsMap.set(id, panel);
 
         panel.webview.onDidReceiveMessage(message => {
@@ -318,14 +328,20 @@ export function openOneMnistUserAppPageByID(context, id) {
 
         console.log("IDE openOneMnistUserAppPageByID 2!", global.panel);
 
+        panel.onDidChangeViewState(
+            () => {
+                console.log("切换页面了！");
+            }
+        );
+
         // 面板被关闭后重置
         panel.onDidDispose(
             () => {
                 panel = undefined;
                 IDEPanels.userImgAppRunPagePanelsMap.delete(id);
-                if (postHandWriterImgTimer != undefined) {
-                    clearInterval(postHandWriterImgTimer);
-                    postHandWriterImgTimer = undefined;
+                if (global.postHandWriterImgTimer != undefined) {
+                    clearInterval(global.postHandWriterImgTimer);
+                    global.postHandWriterImgTimer = undefined;
                     console.log("handwriter timer killed！");
                 }
             },
@@ -585,21 +601,34 @@ function runMnistSendInputScript(global) {
  * 手写数字图像识别 —— 移动端手写板
  * ******************************************************************************************************
  */
-var postHandWriterImgTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
-var currentHandWriterImgData: string | undefined = undefined;
+// var postHandWriterImgTimer: NodeJS.Timeout | undefined = undefined;    // 图像编码、芯片发送数据计时器
+// var currentHandWriterImgData: string | undefined = undefined;          // 当前显示的手写板数字
+// var currentHandWriterEncodeSpikes: any | undefined = undefined;
 
 // 1. 将手写板上传的base64编码的手写体数字图像发送给前端页面显示
 function getHandWriterImgLoop(global) {
 
-    postHandWriterImgTimer = setInterval(function encodeAndSendData() {
-        if (handWriterData.currentImgData != "" && handWriterData.currentImgData != undefined && currentHandWriterImgData != handWriterData.currentImgData) {
-            currentHandWriterImgData = handWriterData.currentImgData;
+    let postHandWriterImgTimer = setInterval(function encodeAndSendData() {
+
+        // 显示原始数字图片
+        if (handWriterData.currentImgBs64Data != "" && handWriterData.currentImgBs64Data != undefined && handWriterData.currentImgBs64Data != global.currentHandWriterImgData) {
+            global.currentHandWriterImgData = handWriterData.currentImgBs64Data;
             console.log("发送图片");
-            global.panel.webview.postMessage({ getHandWriterImgRet: handWriterData.currentImgData });
+            global.panel.webview.postMessage({ getHandWriterImgRet: handWriterData.currentImgBs64Data });
             // 保存图片? handWriterImgSaveFilePath
-            saveHandWriterImgToLocal(global.context, currentHandWriterImgData);
+            saveHandWriterImgToLocal(global.context, handWriterData.currentImgBs64Data);
         }
+
+        // 脉冲编码数据发送给前端，绘制echart
+        if (handWriterData.currentImgEncodeSpikes != [] && handWriterData.currentImgEncodeSpikes != global.currentHandWriterEncodeSpikes) {
+            global.currentHandWriterEncodeSpikes = handWriterData.currentImgEncodeSpikes;
+            console.log("发送脉冲", handWriterData.currentImgEncodeSpikes);
+            global.panel.webview.postMessage({ getHandWriterEncodeRet: handWriterData.currentImgEncodeSpikes });
+        }
+
+
     }, 500);
+    global["postHandWriterImgTimer"] = postHandWriterImgTimer;
 }
 
 
@@ -707,50 +736,49 @@ function encodeHandWriterImgProcess(global) {
 function runHandWriterSendInputProcess(global) {
     console.log("给芯片发送数据，执行手写板数字识别");
 
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "hand_writer", "send_input.py");
-    let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
-    let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+    // let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "hand_writer", "send_input.py");
+    // let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
+    // let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
 
-    let command_str = "python3 " + scriptPath + " " + configDir + " " + outputDir;
-    console.log("执行命令为", command_str);
-    let chipCalculateProcess = exec(command_str, {});
+    // let command_str = "python3 " + scriptPath + " " + configDir + " " + outputDir;
+    // console.log("执行命令为", command_str);
+    // let chipCalculateProcess = exec(command_str, {});
 
-    chipCalculateProcess.stdout?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        if (data.indexOf("get slave ip port failed") != -1) {
-            global.panel.webview.postMessage({ handWriterGetIPAndPortFailed: data });
-        }
-        // 解析识别结果的输出
-        if (data.indexOf("HANDWRITERRECOGNITION RESULT") !== -1) {
-            // 图像识别结果
-            let ret = data.split("**")[1];
-            console.log("手写板数字识别结果：", ret);
-            global.panel.webview.postMessage({ runHandWriterSendInputProcessResult: ret });
-        }
-    });
-    chipCalculateProcess.stderr?.on("data", function (data) {
-        log_output_channel.append(data);
-        console.log(data);
-        let formatted_err = data.split("\r\n").join("<br/>");
-        global.panel.webview.postMessage({ runHandWriterSendInputProcessErrorLog: formatted_err });
+    // chipCalculateProcess.stdout?.on("data", function (data) {
+    //     log_output_channel.append(data);
+    //     console.log(data);
+    //     if (data.indexOf("get slave ip port failed") != -1) {
+    //         global.panel.webview.postMessage({ handWriterGetIPAndPortFailed: data });
+    //     }
+    //     // 解析识别结果的输出
+    //     if (data.indexOf("HANDWRITERRECOGNITION RESULT") !== -1) {
+    //         // 图像识别结果
+    //         let ret = data.split("**")[1];
+    //         console.log("手写板数字识别结果：", ret);
+    //         global.panel.webview.postMessage({ runHandWriterSendInputProcessResult: ret });
+    //     }
+    // });
+    // chipCalculateProcess.stderr?.on("data", function (data) {
+    //     log_output_channel.append(data);
+    //     console.log(data);
+    //     let formatted_err = data.split("\r\n").join("<br/>");
+    //     global.panel.webview.postMessage({ runHandWriterSendInputProcessErrorLog: formatted_err });
 
-    });
-    chipCalculateProcess.on("exit", function () {
-        console.log("chip calculate finished!!");
-        global.panel.webview.postMessage({ runHandWriterSendInputProcessFinish: "done" });
+    // });
+    // chipCalculateProcess.on("exit", function () {
+    //     console.log("chip calculate finished!!");
+    //     global.panel.webview.postMessage({ runHandWriterSendInputProcessFinish: "done" });
 
-        // 获取应用运行的结束时间
-        let endTime = new Date();//获取当前时间 
-        global["handWriterEndTime"] = endTime;
-        console.log("应用运行结束时间为：", global.handWriterEndTime);
-        global["handWriterTotalRuntime"] = getAppRuntime(global.handWriterStartTime, global.handWriterEndTime);
-        console.log("应用运行耗时为：", global.handWriterTotalRuntime);
-        global.panel.webview.postMessage({ handWriterRecognitionProcessTime: global.handWriterTotalRuntime });
+    //     // 获取应用运行的结束时间
+    //     let endTime = new Date();//获取当前时间 
+    //     global["handWriterEndTime"] = endTime;
+    //     console.log("应用运行结束时间为：", global.handWriterEndTime);
+    //     global["handWriterTotalRuntime"] = getAppRuntime(global.handWriterStartTime, global.handWriterEndTime);
+    //     console.log("应用运行耗时为：", global.handWriterTotalRuntime);
+    //     global.panel.webview.postMessage({ handWriterRecognitionProcessTime: global.handWriterTotalRuntime });
         
-    });
+    // });
 }
-
 
 
 
@@ -1144,6 +1172,11 @@ export function getHtmlContent(context, templatePath) {
     });
     // 替换登录页面中 style 中 background img 
     html = html.replace(/(.+?)(url\(")(.+?)"/g, (m, $1, $2, $3) => {
+        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
+
+    // 替换script语句中import from
+    html = html.replace(/(import.+?)(from\s+")(.+?)"/g, (m, $1, $2, $3) => {
         return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
     });
 

@@ -1253,20 +1253,31 @@ table.userMnistOneApp_recRetAnaTable td {
   margin-bottom: 15px;
 }
 .userMnistOneApp_handWriter_inputImg {
-  height: 380px;
-  width: 380px;
+  height: 30%;
+  width: 30%;
   margin: 0 auto;
   border: 1px solid #d6d6d6;
   border-radius: 2px;
+  min-height: 300px;
+  min-width: 300px;
+}
+.userMnistOneApp_handWriter_spikesEchart {
+  height: 30%;
+  width: 30%;
+  margin: 0 auto;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+  min-height: 300px;
+  min-width: 300px;
 }
 .userMnistOneApp_handWriter_outputRet {
-  height: 380px;
-  width: 380px;
+  height: 300px;
+  width: 80px;
   margin: 0 auto;
   border: 1px solid #d6d6d6;
   border-radius: 2px;
   font-size: 100px;
-  padding: 90px;
+  float: left;
 }
 .userMnistOneApp_handWriter_startBtn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);

@@ -97,41 +97,64 @@
 
                 <div>
                     <div class="row">
-                        <div class="col-md-1"></div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="userMnistOneApp_handWriter_title">手写板输入</div>
                             <div class="userMnistOneApp_handWriter_inputImg">
-                                <img id="userMnistOneApp_handWriter_imgData" src="" >
+                                <img id="userMnistOneApp_handWriter_imgData" src="">
                             </div>
                         </div>
 
-                        <div class="col-md-2">
-                            <div>
-                                <ul class="cssNav">
-                                    <li>
-                                        <span class="userMnistOneApp_startRun_logo" onclick="handWriterAppStartRun()" >手写体识别</span>
-                                        <div class="userMnistOneApp_startRun_logo">
-                                            <img src="../images/start.png" />
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="col-md-1">
+                            <img src="../images/arrow.png" />
                         </div>
-
 
                         <div class="col-md-4">
-                            <div class="userMnistOneApp_handWriter_title">芯片识别结果</div>
-                            <div class="userMnistOneApp_handWriter_outputRet" id="userMnistOneApp_handWriter_recognitionRet">
-                                
+                            <div class="userMnistOneApp_handWriter_title">图像脉冲编码</div>
+                            <div class="userMnistOneApp_handWriter_spikesEchart" id="handWriter_spikes_charts">
+
                             </div>
                         </div>
 
-                        <div class="col-md-1"></div>
+                        <div class="col-md-1">
+                            <img src="../images/arrow.png" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="userMnistOneApp_handWriter_title">输出层脉冲</div>
+                                <div class="userMnistOneApp_handWriter_inputImg">
+
+                                </div>
+
+                                <div class="userMnistOneApp_handWriter_title">芯片识别结果</div>
+                                <div class="userMnistOneApp_handWriter_outputRet"
+                                    id="userMnistOneApp_handWriter_recognitionRet">
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
                     </div>
                 </div>
             </div>
 
+
+            <div class="row">
+                <div>
+                    <ul class="cssNav">
+                        <li>
+                            <span class="userMnistOneApp_startRun_logo" onclick="handWriterAppStartRun()">手写体识别</span>
+                            <div class="userMnistOneApp_startRun_logo">
+                                <img src="../images/start.png" />
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
             <div class="clearfix thewrap userMnistOneApp_middle_analyse">
                 <div class="row">
@@ -340,6 +363,9 @@
     <script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
     <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
     <script src="../js/userMnistOneApp.js"></script>
+    <script type="module">
+        import { display_spike_scatter_chart } from "../js/drawEcharts";
+    </script>
     <script>Vue.config.ProductionTip = false</script>
 </body>
 

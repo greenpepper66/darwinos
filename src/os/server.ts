@@ -21,7 +21,11 @@ export module allData {
 // 手写板应用数据
 export module handWriterData {
 	export const localIP = ip.address();
-	export let currentImgData: string;
+	export let currentImgBs64Data: string;   // 手写板发送来的图像数据，base64编码
+	export let currentImgEncodeSpikes: [];  // 手写板图像编码数据
+	// // 标志位，标识 当前手写板图像识别是否已经结束
+	// export let handWriterCouldNextRecognition = true;   // true的时候可以显示下一幅， 进入编码流程置为false，芯片识别结果返回后置为true
+
 }
 
 // 本地server，与web页面通信，接收web页面的请求和数据
@@ -164,29 +168,46 @@ export function startHandWriterServer(context) {
 	const port = 5003; //端口
 	const app = express();
 
-	app.use(express.static(path.join(context.extensionPath, 'src/resources/hand-writer'))); //指定静态文件目录
+	// 1. 手写板应用接口
+	// 1.1 提供手写板访问页面
+	app.use('/', express.static(path.join(context.extensionPath, 'src/resources/hand-writer'))); //指定静态文件目录
 
-	// app.get('/', function (req, res) {
+	// app.get('/handwriter', function (req, res) {
 	// 	res.sendfile(path.join(context.extensionPath, 'src/resources/hand-writer') + '/index.html')
 	// });
-	app.post('/sendData', function (req, res) {
+
+	// 1.2 接收手写板页面提交的手写数字
+	app.post('/post_img', function (req, res) {
 		var currentData = ""
 		req.on("data", function (data) {
 			currentData += data;
 		});
 		req.on("end", function (data) {
-			console.log(new Date().getTime());
-			console.log(currentData.toString());
-
+			console.log(new Date().getTime(), " 收到图片");
 			res.send('数据已接收');
-
 			let obj = JSON.parse(currentData);
-			handWriterData.currentImgData = obj.img;
+			handWriterData.currentImgBs64Data = obj.img;
 		});
-
 	});
 
+	// 1.3 接收main.py中的脉冲数据，用于界面上绘制echart图
+	app.post('/spike_tuples', function (req, res) {
+		req.on("data", function (data) {
+			let obj = JSON.parse(data);
+			handWriterData.currentImgEncodeSpikes = obj.spikes;
+		});
+		req.on("end", function (data) {
+			console.log("收到脉冲编码");
+			res.send('脉冲已接收');
+		});
+	});
+
+
+	// 2. 语音识别应用接口
+
+
+
 	app.listen(port, hostName, function () {
-		console.log(`手写板服务器运行在http://${hostName}:${port}`);
+		console.log(`类脑应用服务器运行在http://${hostName}:${port}`);
 	});
 }

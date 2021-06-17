@@ -14,11 +14,16 @@ from data_encode import gen_input
 import sys
 import time
 import datetime
+import json
+import requests
+import socket
+
 
 inputImgFile = sys.argv[1]  # base64编码的用户手写体数字图像文件
 configDir = sys.argv[2]  # 解包后的配置文件路径
 outputDir = sys.argv[3]  # 生成的编码文件所在路径 
 
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "start hand-writer img encode.")
 
 SNN_MODEL_FILE_PATH = os.path.join(configDir, "br2.pkl")
 LAYER_WIDTH_FILE_PATH = os.path.join(configDir, "layerWidth1_1")
@@ -27,6 +32,21 @@ INPUT_LAYER1_FILE_PATH = os.path.join(configDir, "input_to_layer_1.pickle")
 INPUT_TXT_FILE = os.path.join(outputDir, "input.txt")
 ROW_TXT_FILE = os.path.join(outputDir, "row.txt")
 
+
+def get_host_ip():
+    """
+    查询本机ip地址
+    :return:
+    """
+    try:
+        s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8',80))
+        ip=s.getsockname()[0]
+    finally:
+        s.close()
+
+    return ip
+LOCALHOST_IP = get_host_ip()
 
 
 def real_time_snn_detect():
@@ -88,7 +108,22 @@ def real_time_snn_detect():
     input_spike_seqs = []
     for i in range(len(br2_input_spike_monitor.spike_trains().items())):
         input_spike_seqs.append([i, [int(tm/brian2.ms) for tm in list(br2_input_spike_monitor.spike_trains()[i])]])
-    print("out spikes={}, pred label={}".format(out_spikes, np.argmax(out_spikes)))
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "out spikes={}, pred label={}".format(out_spikes, np.argmax(out_spikes)))
+
+
+    # 数据重排，发送给工具，用于显示脉冲图
+    spike_tuples = []
+    for i in range(len(input_spike_seqs)):
+        for j in range(len(input_spike_seqs[i][1])):
+            spike_tuples.append([input_spike_seqs[i][1][j], input_spike_seqs[i][0]])
+
+    print("发送spikes：", spike_tuples)
+    headers = {'Content-Type': 'application/json'}
+    datas = json.dumps({"spikes": spike_tuples})
+    r = requests.post("http://" + LOCALHOST_IP + ":5003/spike_tuples", data=datas, headers=headers)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post spike tuples finish.")
+
+
     br2_net.restore()
     # Encode input data
     input_node_map = {}
