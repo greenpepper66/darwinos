@@ -347,16 +347,31 @@ window.addEventListener('message', event => {
         console.log("message.getHandWriterImgRet 页面接收到图像");
         getHandWriterImgFlag = true;
         document.getElementById("userMnistOneApp_handWriter_imgData").src = message.getHandWriterImgRet;
+        // 开始执行图像编码和识别
+        handWriterAppStartRun();
+
+        // 识别结果清除
+        document.getElementById("userMnistOneApp_handWriter_outputNum").innerHTML = "";
+        // echart图清除
+        clearEchart("handWriter_spikes_charts");
+        clearEchart("handWriter_output_charts");
+        // echart div隐藏
+        document.getElementById("handWriter_spikes_charts").style.display = "none";
+        document.getElementById("handWriter_output_charts").style.display = "none";
+        document.getElementById("handWriter_output_num").style.display = "none";
+        // loading转圈图显示出来
+        document.getElementById("userMnistOneApp_handWriter_encodeEchartLoading").style.display = "block";
+        document.getElementById("userMnistOneApp_handWriter_outputEchartLoading").style.display = "block";
+        document.getElementById("userMnistOneApp_handWriter_outputNumLoading").style.display = "block";
     }
 
     // 解包配置文件失败
     if (message.unpackHandWriterConfigProcessErrorLog != undefined) {
         console.log("run hand-writer unpack script err: ", message.unpackHandWriterConfigProcessErrorLog);
-
         runHandWriterScriptProcessError = true;
     }
 
-    // 解包结束，发送命令执行编码
+    // 解包结束
     if (message.unpackHandWriterConfigProcessFinish != undefined) {
         console.log("run hand-writer unpack script over!", message.unpackHandWriterConfigProcessFinish);
     }
@@ -384,6 +399,10 @@ window.addEventListener('message', event => {
     // 获取编码脉冲数据，绘制echart图
     if (message.getHandWriterEncodeRet != undefined) {
         console.log("get hand-writer encode spikes data to draw echart.", message.getHandWriterEncodeRet);
+        // loading图隐藏
+        document.getElementById('userMnistOneApp_handWriter_encodeEchartLoading').style.display = 'none';
+        // 画图
+        document.getElementById("handWriter_spikes_charts").style.display = "block";
         display_spike_scatter_chart(message.getHandWriterEncodeRet);
     }
 
@@ -403,7 +422,15 @@ window.addEventListener('message', event => {
     // 芯片图像识别结束
     if (message.runHandWriterSendInputProcessResult != undefined) {
         console.log("get hand-writer img recognition result", message.runHandWriterSendInputProcessResult);
-        document.getElementById("userMnistOneApp_handWriter_recognitionRet").innerHTML = message.runHandWriterSendInputProcessResult;
+        // loading图隐藏
+        document.getElementById('userMnistOneApp_handWriter_outputEchartLoading').style.display = 'none';
+        document.getElementById('userMnistOneApp_handWriter_outputNumLoading').style.display = 'none';
+        // 画输出脉冲图
+        document.getElementById("handWriter_output_charts").style.display = "block";
+        document.getElementById("handWriter_output_num").style.display = "block";
+        display_output_scatter_chart(message.runHandWriterSendInputProcessResult[0]);
+        // 显示识别结果
+        document.getElementById("userMnistOneApp_handWriter_outputNum").innerHTML = message.runHandWriterSendInputProcessResult[1];
     }
     // 运行时间
     if (message.handWriterRecognitionProcessTime != undefined) {
@@ -426,17 +453,19 @@ window.addEventListener('message', event => {
  * 手写板应用
  * ******************************************************************************************************
  */
-// 1. 点击中间的按钮 执行图像识别
+// 1. 加载图像后，自动执行图像识别
 function handWriterAppStartRun() {
-    // 检查有没有图像
-    if (getHandWriterImgFlag == false) {
-        document.getElementById("userMnistOneApp_alertContent").innerText = "请先在手机浏览器中绘制要识别的数字并提交！";
-        document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
-        return;
-    }
+    // // 检查有没有图像
+    // if (getHandWriterImgFlag == false) {
+    //     console.log("没图");
+    //     document.getElementById("userMnistOneApp_alertContent").innerText = "请先在手机浏览器中绘制要识别的数字并提交！";
+    //     document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+    //     return;
+    // }
 
-    // 清空结果
-    document.getElementById("userMnistOneApp_handWriter_recognitionRet").innerHTML = "";
+    // // 清空结果
+    // document.getElementById("userMnistOneApp_handWriter_outputNum").innerHTML = "";
+    // document.getElementById('userMnistOneApp_handWriter_outputNumLoading').style.display = 'block';
 
     // 解包没有错误才执行编码
     if (runHandWriterScriptProcessError == false) {
@@ -483,12 +512,19 @@ function selectImgSrcKind() {
         document.getElementById("userMnistOneApp_handWriter_mainPage").style.display = "none";
 
     } else if (imgSrcKind == "handWriter") {
+        // 本地图像相关元素
         document.getElementById("userMnistOneApp_select_local_path").style.display = "none";//隐藏
         document.getElementById("userMnistOneApp_localImg_startBtn").style.display = "none";
         document.getElementById("userMnistOneApp_localImg_mainPage").style.display = "none";
 
+        // 手写板相关元素
         document.getElementById("userMnistOneApp_handWriter_addr").style.display = ""; //显示
         document.getElementById("userMnistOneApp_handWriter_mainPage").style.display = "";
+
+        // loading转圈图 先隐藏
+        // document.getElementById("userMnistOneApp_handWriter_encodeEchartLoading").style.display = "none";
+        // document.getElementById("userMnistOneApp_handWriter_outputEchartLoading").style.display = "none";
+        // document.getElementById("userMnistOneApp_handWriter_outputNumLoading").style.display = "none";
 
         // 给vscode发送消息接收移动端输入的手写体图像
         vscode.postMessage({
@@ -505,7 +541,6 @@ function selectImgSrcKind() {
             text: "解包手写板配置文件",
         });
 
-        display_spike_scatter_chart(testData);
     }
 }
 
@@ -547,8 +582,9 @@ function DeleteAllColumnExceptFirst(eleID) {
  * 画图函数
  * ******************************************************************************************************
  */
-var testData = [[9, 182], [18, 182], [27, 182], [36, 182], [45, 182], [9, 183], [18, 183], [27, 183], [36, 183], [45, 183], [9, 209], [18, 209], [27, 209], [36, 209], [45, 209], [9, 210], [18, 210], [27, 210], [36, 210], [45, 210], [9, 211], [18, 211], [27, 211], [36, 211], [45, 211], [9, 237], [18, 237], [27, 237], [36, 237], [45, 237], [9, 238], [18, 238], [27, 238], [36, 238], [45, 238], [9, 239], [18, 239], [27, 239], [36, 239], [45, 239], [9, 265], [18, 265], [27, 265], [36, 265], [45, 265], [9, 266], [18, 266], [27, 266], [36, 266], [45, 266], [9, 267], [18, 267], [27, 267], [36, 267], [45, 267], [9, 293], [18, 293], [27, 293], [36, 293], [45, 293], [9, 294], [18, 294], [27, 294], [36, 294], [45, 294], [9, 295], [18, 295], [27, 295], [36, 295], [45, 295], [9, 321], [18, 321], [27, 321], [36, 321], [45, 321], [9, 322], [18, 322], [27, 322], [36, 322], [45, 322], [9, 323], [18, 323], [27, 323], [36, 323], [45, 323], [9, 349], [18, 349], [27, 349], [36, 349], [45, 349], [9, 350], [18, 350], [27, 350], [36, 350], [45, 350], [9, 351], [18, 351], [27, 351], [36, 351], [45, 351], [9, 377], [18, 377], [27, 377], [36, 377], [45, 377], [9, 378], [18, 378], [27, 378], [36, 378], [45, 378], [9, 379], [18, 379], [27, 379], [36, 379], [45, 379], [9, 405], [18, 405], [27, 405], [36, 405], [45, 405], [9, 406], [18, 406], [27, 406], [36, 406], [45, 406], [9, 407], [18, 407], [27, 407], [36, 407], [45, 407], [9, 433], [18, 433], [27, 433], [36, 433], [45, 433], [9, 434], [18, 434], [27, 434], [36, 434], [45, 434], [9, 435], [18, 435], [27, 435], [36, 435], [45, 435], [9, 461], [18, 461], [27, 461], [36, 461], [45, 461], [9, 462], [18, 462], [27, 462], [36, 462], [45, 462], [41, 463], [9, 489], [18, 489], [27, 489], [36, 489], [45, 489], [9, 490], [18, 490], [27, 490], [36, 490], [45, 490], [9, 517], [18, 517], [27, 517], [36, 517], [45, 517], [9, 518], [18, 518], [27, 518], [36, 518], [45, 518]];
+// var testData = [[9, 182], [18, 182], [27, 182], [36, 182], [45, 182], [9, 183], [18, 183], [27, 183], [36, 183], [45, 183], [9, 209], [18, 209], [27, 209], [36, 209], [45, 209], [9, 210], [18, 210], [27, 210], [36, 210], [45, 210], [9, 211], [18, 211], [27, 211], [36, 211], [45, 211], [9, 237], [18, 237], [27, 237], [36, 237], [45, 237], [9, 238], [18, 238], [27, 238], [36, 238], [45, 238], [9, 239], [18, 239], [27, 239], [36, 239], [45, 239], [9, 265], [18, 265], [27, 265], [36, 265], [45, 265], [9, 266], [18, 266], [27, 266], [36, 266], [45, 266], [9, 267], [18, 267], [27, 267], [36, 267], [45, 267], [9, 293], [18, 293], [27, 293], [36, 293], [45, 293], [9, 294], [18, 294], [27, 294], [36, 294], [45, 294], [9, 295], [18, 295], [27, 295], [36, 295], [45, 295], [9, 321], [18, 321], [27, 321], [36, 321], [45, 321], [9, 322], [18, 322], [27, 322], [36, 322], [45, 322], [9, 323], [18, 323], [27, 323], [36, 323], [45, 323], [9, 349], [18, 349], [27, 349], [36, 349], [45, 349], [9, 350], [18, 350], [27, 350], [36, 350], [45, 350], [9, 351], [18, 351], [27, 351], [36, 351], [45, 351], [9, 377], [18, 377], [27, 377], [36, 377], [45, 377], [9, 378], [18, 378], [27, 378], [36, 378], [45, 378], [9, 379], [18, 379], [27, 379], [36, 379], [45, 379], [9, 405], [18, 405], [27, 405], [36, 405], [45, 405], [9, 406], [18, 406], [27, 406], [36, 406], [45, 406], [9, 407], [18, 407], [27, 407], [36, 407], [45, 407], [9, 433], [18, 433], [27, 433], [36, 433], [45, 433], [9, 434], [18, 434], [27, 434], [36, 434], [45, 434], [9, 435], [18, 435], [27, 435], [36, 435], [45, 435], [9, 461], [18, 461], [27, 461], [36, 461], [45, 461], [9, 462], [18, 462], [27, 462], [36, 462], [45, 462], [41, 463], [9, 489], [18, 489], [27, 489], [36, 489], [45, 489], [9, 490], [18, 490], [27, 490], [36, 490], [45, 490], [9, 517], [18, 517], [27, 517], [36, 517], [45, 517], [9, 518], [18, 518], [27, 518], [36, 518], [45, 518]];
 
+// 脉冲编码图
 function display_spike_scatter_chart(datas) {
     var opt = {
         tooltip: {
@@ -560,11 +596,63 @@ function display_spike_scatter_chart(datas) {
             min: 0, // 起始
             max: 50, // 终止
             name: "Time(ms)",
+            nameGap: 25,   // 坐标名称距离x轴的距离，默认15
             nameLocation: "center",
             nameTextStyle: {
                 color: "#999999"
             },
+            axisLabel: {
+                textStyle: {
+                    color: "#999999"
+                },
+            }
+        },
+        yAxis: {
+            type: 'value',
+            min: 0,
+            max: 784,  // 手写板的神经元个数 28*28
+            scale: true,
+            name: "Neuron",
+            nameTextStyle: {
+                color: "#999999"
+            },
+            axisLabel: {
+                formatter: '{value}',
+                textStyle: {
+                    color: "#999999"
+                }
+            }
+        },
+        grid: {
+            left: 50, // 图表距离左侧的间距
+        },
+        series: [{
+            symbolSize: 5,
+            data: datas,
+            type: 'scatter'
+        }]
+    };
+    var spike_chart = echarts.init(document.getElementById("handWriter_spikes_charts"));
+    spike_chart.setOption(opt);
+}
 
+// 脉冲输出图
+function display_output_scatter_chart(datas) {
+    var opt = {
+        tooltip: {
+            formatter: '({c})'   // 鼠标悬浮显示坐标
+        },
+        xAxis: {
+            type: 'value',
+            interval: 1, // 步长
+            min: 0, // 起始
+            max: 9, // 终止
+            name: "Time(ms)",
+            nameGap: 25,   // 坐标名称距离x轴的距离，默认15
+            nameLocation: "center",
+            nameTextStyle: {
+                color: "#999999"
+            },
             axisLabel: {
                 textStyle: {
                     color: "#999999"
@@ -585,13 +673,29 @@ function display_spike_scatter_chart(datas) {
                 }
             }
         },
+        grid: {
+            left: 50, // 图表距离左侧的间距
+        },
         series: [{
             symbolSize: 5,
             data: datas,
             type: 'scatter'
         }]
     };
-    var spike_chart = echarts.init(document.getElementById("handWriter_spikes_charts"));
+    var spike_chart = echarts.init(document.getElementById("handWriter_output_charts"));
     spike_chart.setOption(opt);
 }
 
+
+// 清空echart图
+function clearEchart(eleID) {
+    // 重新绘图前先清空
+    let dom = document.getElementById(eleID);
+    let existInstance = echarts.getInstanceByDom(dom);
+    if (existInstance) {
+        if (true) {
+            echarts.dispose(existInstance);
+            console.log("清除echart", eleID);
+        }
+    }
+}

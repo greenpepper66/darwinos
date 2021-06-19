@@ -180,16 +180,18 @@
 				$(i).appendTo($extraarea)
 				$.ajax({
 					url: "/post_img",
-					dataType: "json",
+					// dataType: "json",
 					data: JSON.stringify({ img: imgData }),
 					type: "POST",
 					cache: false,
-					// success: function (data) {
-					// 	alert(data);
-					// },
-					// error: function (data, status, e) {
-					// 	alert("error");
-					// }
+					success: function (data) {
+						if (data == "refuse") {
+							alert("图像识别中，请稍后！");
+						}
+					},
+					error: function (data, status, e) {
+						alert("error: ", data);
+					}
 				});
 
 
