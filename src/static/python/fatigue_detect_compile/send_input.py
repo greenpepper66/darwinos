@@ -1,0 +1,136 @@
+import struct
+import numpy as np
+import time
+import requests
+import hashlib
+from comm import ClientConnection
+import socket
+from convert import Convert
+import threading
+import os
+import sys
+import time
+import datetime
+
+CLIENT_IP = '192.168.1.254'
+TCP_PORT = 10123    
+MODEL_DEPLOY_MASTER = 0
+SPIKE_DEPLOY_MASTER = 0
+SET_TICK = 3
+TCP_CLEAR_PROCESS = 4
+TCP_ENABLE_PROCESS = 5
+TCP_CLEAR_START = 6
+
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+def get_slave_ip_port_fid(config_file_path):
+        ip = ''
+        port = ''
+        file_id = ''
+        md5value = md5(config_file_path)
+        jsn = requests.post(
+            "http://192.168.1.254/get_config_info_by_md5/", {"key1": md5value, }).json()
+        if jsn["code"] == 0:
+            ip = jsn["ip"]
+            port = jsn["port"]
+            file_id = jsn["file_id"]
+            status = jsn["status"]
+        else:
+            print(jsn)
+            exit(0)
+        return ip,port
+
+
+configFile = os.path.join(os.path.dirname(__file__),  "detect_models", "darwin_models", "config.b")
+ip, port = get_slave_ip_port_fid(configFile)
+
+
+conn1 = ClientConnection(ip, port)
+conn1._socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, True)
+def set_tick_time(conn, tick_time):
+    print("set tick time")
+    tick_times = [tick_time]
+    length = len(tick_times)
+    send_bytes = bytearray()
+    for i in range(length):
+        send_bytes += struct.pack('<Q',tick_time)
+    conn.send(SET_TICK,send_bytes)
+    id_, result = conn.receive()
+    while result is None:
+        id_, result = conn.receive()
+    # print(result)
+
+set_tick_time(conn1, 5000000)
+
+def clear_start(conn, clear_enable):
+    clear_enables = [clear_enable]
+    length = len(clear_enables)
+    send_bytes = bytearray()
+    for i in range(length):
+        send_bytes += struct.pack('<Q',clear_enable)
+    conn.send(TCP_CLEAR_START,send_bytes)
+    id_, result = conn.receive()
+    while result is None:
+        id_, result = conn.receive()
+    # print(result)
+
+
+
+isExists1 = os.path.exists(os.path.join(os.path.dirname(__file__), "tmp_input_txts", "row.txt"))
+isExists2 = os.path.exists(os.path.join(os.path.dirname(__file__), "tmp_input_txts", "input.txt"))
+
+
+if isExists1 and isExists2:
+    roxTxt = os.path.join(os.path.dirname(__file__), "tmp_input_txts", "row.txt")
+    inputTxt = os.path.join(os.path.dirname(__file__), "tmp_input_txts", "input.txt")
+    
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] open rowText. ")
+
+    with open(roxTxt, 'r') as row:
+        row_list = row.readlines()
+    with open(inputTxt, 'r') as file:
+        input_list = file.readlines()
+    cheng_conv = Convert()
+    pos = 0
+    idx = 0
+    pr = []
+    result = []
+    spike = [0] * 10
+    while pos < len(input_list):
+        rank = int(row_list[idx].strip(), 16)
+        idx += 1
+        input_tick = input_list[pos:rank]
+        input_tick = cheng_conv.convert(input_tick)
+        conn1.send(SPIKE_DEPLOY_MASTER,input_tick)
+        id_,result = conn1.receive()
+        while result is None:
+            id_,result = conn1.receive()
+        if len(result) > 8:
+            fmt = 'Q' * int(len(result)/8)    # Q: unsigned long long
+            result = struct.unpack(fmt,result)
+            for i in range(0, len(result), 2):
+                spike[int(result[i + 1] % (1 << 32) // (1 << 16))] += 1
+        pos = rank
+
+    spike_str = str(spike)
+
+    max_index = spike.index(max(spike))    
+    Number = str(max_index)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] get Number. ")
+    print(Number + " ")
+    print("FATIGUEDRIVING RESULT: **", Number, "**", flush=True)
+
+    clear_start(conn1, 1)
+
+    # 删除文件
+    os.remove(os.path.join(os.path.dirname(__file__), "tmp_input_txts", "row.txt"))
+    os.remove(os.path.join(os.path.dirname(__file__), "tmp_input_txts", "input.txt"))
+
+
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] FATIGUEDRIVING FINISHED!", flush=True)
+
