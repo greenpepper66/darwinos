@@ -1243,6 +1243,7 @@ table.userMnistOneApp_recRetAnaTable td {
   border: 1px solid #d6d6d6;
   border-radius: 2px;
   min-height: 300px;
+  text-align: center;
 }
 
 .userMnistOneApp_handWriter_spikesEchart {

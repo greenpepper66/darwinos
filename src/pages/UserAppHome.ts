@@ -624,6 +624,7 @@ function clearGlobalHandWriterCache() {
 
 }
 
+
 // 1. 将手写板上传的base64编码的手写体数字图像发送给前端页面显示
 function getHandWriterImgLoop(global) {
 

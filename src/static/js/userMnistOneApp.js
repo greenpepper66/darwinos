@@ -647,7 +647,7 @@ function display_output_scatter_chart(datas) {
             interval: 1, // 步长
             min: 0, // 起始
             max: 9, // 终止
-            name: "Time(ms)",
+            name: "Neuron",
             nameGap: 25,   // 坐标名称距离x轴的距离，默认15
             nameLocation: "center",
             nameTextStyle: {
@@ -662,7 +662,7 @@ function display_output_scatter_chart(datas) {
         yAxis: {
             type: 'value',
             scale: true,
-            name: "Neuron",
+            name: "count",
             nameTextStyle: {
                 color: "#999999"
             },
