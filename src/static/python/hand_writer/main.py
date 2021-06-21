@@ -78,6 +78,7 @@ def real_time_snn_detect():
     br2_net.store()
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Finish initialize snn.")
 
+
     with open(LAYER_WIDTH_FILE_PATH, "rb") as f:
         layerWidth = pickle.load(f)
     with open(NODE_LIST_FILE_PATH, "rb") as f:
@@ -99,17 +100,20 @@ def real_time_snn_detect():
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Fetch one image.")
 
     br2_neurons[0].bias = img.flatten() / brian2.ms
-    print("Running....")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Running....")
     br2_net.run(snn_model["run_dura"]*brian2.ms,
                 namespace={"v_thresh": snn_model["v_thresh"]})
-    print("Finish.")
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Finish.")
+    
+    ## 模拟器运行结果
     out_spikes = br2_output_spike_monitor.spike_trains()
     out_spikes = [len(e) for e in out_spikes.values()]
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "out spikes={}, pred label={}".format(out_spikes, np.argmax(out_spikes)))
+    
+    ## 这里耗时长 1秒半左右
     input_spike_seqs = []
     for i in range(len(br2_input_spike_monitor.spike_trains().items())):
         input_spike_seqs.append([i, [int(tm/brian2.ms) for tm in list(br2_input_spike_monitor.spike_trains()[i])]])
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "out spikes={}, pred label={}".format(out_spikes, np.argmax(out_spikes)))
-
 
     # 数据重排，发送给工具，用于显示脉冲图
     spike_tuples = []
@@ -117,10 +121,10 @@ def real_time_snn_detect():
         for j in range(len(input_spike_seqs[i][1])):
             spike_tuples.append([input_spike_seqs[i][1][j], input_spike_seqs[i][0]])
 
-    print("发送spikes：", spike_tuples)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "start to post spikes data.")
     headers = {'Content-Type': 'application/json'}
     datas = json.dumps({"spikes": spike_tuples})
-    r = requests.post("http://" + LOCALHOST_IP + ":5003/spike_tuples", data=datas, headers=headers)
+    r = requests.post("http://" + LOCALHOST_IP + ":5003/encode_result", data=datas, headers=headers)
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post spike tuples finish.")
 
 

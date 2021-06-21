@@ -197,7 +197,7 @@ export function startHandWriterServer(context) {
 	});
 
 	// 1.3 接收main.py中的脉冲数据，用于界面上绘制echart图
-	app.post('/spike_tuples', function (req, res) {
+	app.post('/encode_result', function (req, res) {
 		req.on("data", function (data) {
 			let obj = JSON.parse(data);
 			handWriterData.currentImgEncodeSpikes = obj.spikes;
@@ -209,7 +209,7 @@ export function startHandWriterServer(context) {
 	});
 
 	// 1.4 接收send_input.py中的芯片识别结果，用于界面画图
-	app.post('/get_result', function (req, res) {
+	app.post('/output_result', function (req, res) {
 		req.on("data", function (data) {
 			let obj = JSON.parse(data);
 			handWriterData.currentImgOutputSpikes = obj.spikes;

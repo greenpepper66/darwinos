@@ -45,7 +45,7 @@ LOCALHOST_IP = get_host_ip()
 # print("发送spikes：", output_tuples)
 # headers = {'Content-Type': 'application/json'}
 # datas = json.dumps({"spikes": output_tuples, "result": max_index})
-# r = requests.post("http://" + LOCALHOST_IP + ":5003/get_result", data=datas, headers=headers)
+# r = requests.post("http://" + LOCALHOST_IP + ":5003/output_result", data=datas, headers=headers)
 # print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post recognition result finish.")
 
 
@@ -168,7 +168,7 @@ if isExists1 and isExists2:
     print("发送spikes：", output_tuples)
     headers = {'Content-Type': 'application/json'}
     datas = json.dumps({"spikes": output_tuples, "result": max_index})
-    r = requests.post("http://" + LOCALHOST_IP + ":5003/get_result", data=datas, headers=headers)
+    r = requests.post("http://" + LOCALHOST_IP + ":5003/output_result", data=datas, headers=headers)
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post recognition result finish.")
 
 

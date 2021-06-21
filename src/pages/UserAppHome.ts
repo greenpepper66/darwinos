@@ -620,7 +620,7 @@ function clearGlobalHandWriterCache() {
     handWriterData.currentImgOutputSpikes = [];
     handWriterData.currentImgRecognitionRet = -1;
     // 清空缓存文件：handWriterImgBase64Data.txt
-
+    
 
 }
 
@@ -641,6 +641,7 @@ function getHandWriterImgLoop(global) {
             saveHandWriterImgToLocal(global.context, handWriterData.currentImgBs64Data);
         }
 
+
         // 脉冲编码数据发送给前端，绘制echart
         if (handWriterData.currentImgEncodeSpikes.length != 0
             && handWriterData.currentImgEncodeSpikes != global.currentHandWriterEncodeSpikes
@@ -649,6 +650,7 @@ function getHandWriterImgLoop(global) {
             console.log("发送脉冲");
             global.panel.webview.postMessage({ getHandWriterEncodeRet: handWriterData.currentImgEncodeSpikes });
         }
+
 
         // 芯片识别结果发送给前端
         if (handWriterData.currentImgOutputSpikes.length != 0

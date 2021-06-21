@@ -8,6 +8,10 @@ var runHandWriterScriptProcessError = false; // 手写板的
 // 手写板是否有输入图像传过来
 var getHandWriterImgFlag = false;   // 没收到图像的话是false
 
+// 进度条计时器
+var handWriterImgEncodeTimer = undefined;
+var handWriterImgRegTimer = undefined;
+
 
 new Vue({
     el: '#userMnistOneApp',
@@ -363,6 +367,9 @@ window.addEventListener('message', event => {
         document.getElementById("userMnistOneApp_handWriter_encodeEchartLoading").style.display = "block";
         document.getElementById("userMnistOneApp_handWriter_outputEchartLoading").style.display = "block";
         document.getElementById("userMnistOneApp_handWriter_outputNumLoading").style.display = "block";
+
+        // 启动计时器 更新进度
+        startEncodeSpeedTimer();
     }
 
     // 解包配置文件失败
@@ -384,6 +391,8 @@ window.addEventListener('message', event => {
         document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
         // 标记脚本运行有误
         runHandWriterScriptProcessError = true;
+        // 清除计时器
+        clearEncodeSpeedTimer();
     }
 
     // 编码结束，发送命令执行芯片识别
@@ -393,7 +402,12 @@ window.addEventListener('message', event => {
         // 解包没有错误才执行下一步
         if (runHandWriterScriptProcessError == false) {
             startHandWriterRecognitionProcess();
+            // 启动识别计时器
+            startRegSpeedTimer();
         }
+
+        // 清除编码计时器
+        clearEncodeSpeedTimer();
     }
 
     // 获取编码脉冲数据，绘制echart图
@@ -418,10 +432,12 @@ window.addEventListener('message', event => {
         console.log("run hand writer img send-input script error, ", message.runHandWriterSendInputProcessErrorLog);
         document.getElementById("userMnistOneApp_alertContent").innerText = "数据发送失败，请查看日志或联系系统管理员！";
         document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
+        clearRegSpeedTimer();
     }
     // 芯片图像识别结束
     if (message.runHandWriterSendInputProcessResult != undefined) {
         console.log("get hand-writer img recognition result", message.runHandWriterSendInputProcessResult);
+        clearRegSpeedTimer();
         // loading图隐藏
         document.getElementById('userMnistOneApp_handWriter_outputEchartLoading').style.display = 'none';
         document.getElementById('userMnistOneApp_handWriter_outputNumLoading').style.display = 'none';
@@ -437,9 +453,6 @@ window.addEventListener('message', event => {
         console.log("get hand writer run time: ", message.handWriterRecognitionProcessTime);
         document.getElementById("userMnistOneApp_handWriter_runtime").innerHTML = message.handWriterRecognitionProcessTime;
     }
-
-
-
 
 
 
@@ -520,11 +533,6 @@ function selectImgSrcKind() {
         // 手写板相关元素
         document.getElementById("userMnistOneApp_handWriter_addr").style.display = ""; //显示
         document.getElementById("userMnistOneApp_handWriter_mainPage").style.display = "";
-
-        // loading转圈图 先隐藏
-        // document.getElementById("userMnistOneApp_handWriter_encodeEchartLoading").style.display = "none";
-        // document.getElementById("userMnistOneApp_handWriter_outputEchartLoading").style.display = "none";
-        // document.getElementById("userMnistOneApp_handWriter_outputNumLoading").style.display = "none";
 
         // 给vscode发送消息接收移动端输入的手写体图像
         vscode.postMessage({
@@ -698,4 +706,46 @@ function clearEchart(eleID) {
             console.log("清除echart", eleID);
         }
     }
+}
+
+// 编码进度计时器
+function startEncodeSpeedTimer() {
+    let tmpSpeed = 0;
+    handWriterImgEncodeTimer = setInterval(function setEncodeSpeed() {
+        let curSpeed = document.getElementById("handWriter_encode_processBar").innerHTML;
+        console.log("现在的进度为： ", curSpeed);
+        if (curSpeed != "80%") {
+            tmpSpeed += 20;
+            document.getElementById("handWriter_encode_processBar").innerHTML = tmpSpeed + "%";
+        }
+    }, 800); 
+}
+function clearEncodeSpeedTimer() {
+    if(handWriterImgEncodeTimer != undefined) {
+        clearInterval(handWriterImgEncodeTimer);
+        handWriterImgEncodeTimer = undefined;
+        console.log("encodeSpeed timer killed!");
+    }
+    document.getElementById("handWriter_encode_processBar").innerHTML = "0%";
+}
+
+// 芯片识别进度计时器
+function startRegSpeedTimer() {
+    let tmpSpeed = 0;
+    handWriterImgRegTimer = setInterval(function setEncodeSpeed() {
+        let curSpeed = document.getElementById("handWriter_output_processBar").innerHTML;
+        console.log("现在的进度为： ", curSpeed);
+        if (curSpeed != "80%") {
+            tmpSpeed += 20;
+            document.getElementById("handWriter_output_processBar").innerHTML = tmpSpeed + "%";
+        }
+    }, 600); 
+}
+function clearRegSpeedTimer() {
+    if(handWriterImgRegTimer != undefined) {
+        clearInterval(handWriterImgRegTimer);
+        handWriterImgRegTimer = undefined;
+        console.log("regSpeed timer killed!");
+    }
+    document.getElementById("handWriter_output_processBar").innerHTML = "0%";
 }
