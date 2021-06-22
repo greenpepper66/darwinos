@@ -17,6 +17,12 @@ const newFDAppHtmlFilePath = "src/static/views/newFatigueDrivingApp.html";
 const fatigueDrivingHomeHtmlFilePath = "src/static/views/fatigueDrivingAppHome.html";
 const fatigueDrivingAppInfoHtmlFilePath = "src/static/views/fatigueDrivingAppInfo.html";
 
+// 语音识别应用
+const speechAppHomeHtmlFilePath = "src/static/views/speechAppHome.html";
+const newSpeechAppHtmlFilePath = "src/static/views/newSpeechApp.html";
+
+
+
 /**
  * ******************************************************************************************************
  * 消息通信

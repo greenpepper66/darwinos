@@ -21,12 +21,10 @@ export module allData {
 // 手写板应用数据
 export module handWriterData {
 	export const localIP = ip.address();
-	export let currentImgBs64Data = "";   // 手写板发送来的图像数据，base64编码
-	export let currentImgEncodeSpikes = [];  // 手写板图像编码数据
-	export let currentImgOutputSpikes = [];   // 手写板图像的芯片识别脉冲输出
-	export let currentImgRecognitionRet = -1; // 手写板图像的芯片识别结果
+	export let currentImgBs64Data = "";       // 手写板发送来的图像数据，base64编码
 	// 标志位，标识 当前手写板图像识别是否已经结束
 	export let handWriterCouldNextRegFlag = true;   // true的时候可以显示下一幅， 进入编码流程置为false，芯片识别结果返回后置为true
+	export let handWriterImgShowedFlag = true;   // 标记这幅图是否已经在前端显示，true表示已经显示，其他页面不得再显示
 }
 
 // 本地server，与web页面通信，接收web页面的请求和数据
@@ -189,35 +187,13 @@ export function startHandWriterServer(context) {
 			if (handWriterData.handWriterCouldNextRegFlag == true) {
 				res.send("success");
 				let obj = JSON.parse(currentData);
+				// // 数据写入json
+				// updataHandWriterBase64Data(context, obj.img);
 				handWriterData.currentImgBs64Data = obj.img;
+				handWriterData.handWriterImgShowedFlag = false;
 			} else {
 				res.send("refuse");
 			}
-		});
-	});
-
-	// 1.3 接收main.py中的脉冲数据，用于界面上绘制echart图
-	app.post('/encode_result', function (req, res) {
-		req.on("data", function (data) {
-			let obj = JSON.parse(data);
-			handWriterData.currentImgEncodeSpikes = obj.spikes;
-		});
-		req.on("end", function (data) {
-			console.log("收到脉冲编码");
-			res.send('脉冲已接收');
-		});
-	});
-
-	// 1.4 接收send_input.py中的芯片识别结果，用于界面画图
-	app.post('/output_result', function (req, res) {
-		req.on("data", function (data) {
-			let obj = JSON.parse(data);
-			handWriterData.currentImgOutputSpikes = obj.spikes;
-			handWriterData.currentImgRecognitionRet = obj.result;
-		});
-		req.on("end", function (data) {
-			console.log("收到识别结果");
-			res.send('结果已接收');
 		});
 	});
 

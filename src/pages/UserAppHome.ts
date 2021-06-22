@@ -2,10 +2,11 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ChildProcess, exec, spawn } from "child_process";
-import { searchAllJson, updateImgAppInfo, searchImgAppByID } from '../DataProvider/ImgAppJsonDataProvider';
+import { searchAllJson, updateImgAppInfo, searchImgAppByID, updateImgAppStatusToTask } from '../DataProvider/ImgAppJsonDataProvider';
 import { openImgAppInfoPage, openImgAppRunTaskPage } from './ImgAppHome';
 import { IDEPanels } from "../extension";
 import { handWriterData } from '../os/server';
+import { getOnlyHandWriterData, updataHandWriterAppID } from "../DataProvider/HandWriterImgJsonDataProvider";
 
 var https = require('http');
 var ip = require('ip');
@@ -143,14 +144,18 @@ const oneUserAppMessageHandler = {
     getHandWriterServerURL(global, message) {
         console.log(message);
         global.panel.webview.postMessage({ cmd: 'getHandWriterServerURLRet', cbid: message.cbid, data: handWriterServerURL });
+        // 该应用成为一条任务
+
     },
     // 显示手机上的手写数字
     startGetHandWriterImg(global, message) {
         console.log(message);
         // 先清除缓存
         clearGlobalHandWriterCache();
-
+        // 循环
         getHandWriterImgLoop(global);
+        // 成为一条任务
+        updateImgAppStatusToTask(global.context, message.text[0]);
     },
     // 解包配置文件, 用户页面上一选择“手写板输入源”就执行解包
     unpackHandWriterConfig(global, message) {
@@ -315,16 +320,8 @@ export function openOneMnistUserAppPageByID(context, id) {
         }
 
         let postHandWriterImgTimer = undefined; // 接收手写板数据的计时器
-        let currentHandWriterImgData = "";      // 当前页面显示的手写板图像
-        let currentHandWriterEncodeSpikes = []; // 当前手写板图像的脉冲数据
-        let currentHandWriterOutputSpikes = []; // 当前手写板芯片脉冲输出数据
-        let currentHandWriterOutputNum = -1;    // 当前手写板芯片识别结果
 
-        let global = {
-            panel, context, appInfo, postHandWriterImgTimer,
-            currentHandWriterImgData, currentHandWriterEncodeSpikes,
-            currentHandWriterOutputSpikes, currentHandWriterOutputNum,
-        };
+        let global = { panel, context, appInfo, postHandWriterImgTimer };
         IDEPanels.userImgAppRunPagePanelsMap.set(id, panel);
 
         panel.webview.onDidReceiveMessage(message => {
@@ -340,8 +337,8 @@ export function openOneMnistUserAppPageByID(context, id) {
         panel.onDidChangeViewState(
             () => {
                 console.log("切换页面了！");
-                // 页面切换的时候需要清除手写板的缓存，防止同时打开多个手写板应用，界面呈现上一个应用输入的手写数字
-                clearGlobalHandWriterCache();
+                // // 页面切换的时候需要清除手写板的缓存，防止同时打开多个手写板应用，界面呈现上一个应用输入的手写数字
+                // clearGlobalHandWriterCache();
             }
         );
 
@@ -608,6 +605,17 @@ function runMnistSendInputScript(global) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /**
  * ******************************************************************************************************
  * 手写数字图像识别 —— 移动端手写板
@@ -615,56 +623,25 @@ function runMnistSendInputScript(global) {
  */
 // 0. 清除手写板缓存
 function clearGlobalHandWriterCache() {
-    handWriterData.currentImgBs64Data = "";
-    handWriterData.currentImgEncodeSpikes = [];
-    handWriterData.currentImgOutputSpikes = [];
-    handWriterData.currentImgRecognitionRet = -1;
+    handWriterData.handWriterCouldNextRegFlag = true;
     // 清空缓存文件：handWriterImgBase64Data.txt
-    
-
 }
 
 
 // 1. 将手写板上传的base64编码的手写体数字图像发送给前端页面显示
+// 参数id：应用的id
 function getHandWriterImgLoop(global) {
 
     let postHandWriterImgTimer = setInterval(function encodeAndSendData() {
 
         // 显示原始数字图片
-        if (handWriterData.currentImgBs64Data != "" && handWriterData.currentImgBs64Data != undefined
-            && handWriterData.currentImgBs64Data != global.currentHandWriterImgData
-            && global.panel.visible == true) {
-            global.currentHandWriterImgData = handWriterData.currentImgBs64Data;
-            console.log("发送图片");
+        if (handWriterData.handWriterImgShowedFlag == false && global.panel.visible == true) {
+            console.log("发送图片", handWriterData.currentImgBs64Data);
             global.panel.webview.postMessage({ getHandWriterImgRet: handWriterData.currentImgBs64Data });
-            // 保存图片? handWriterImgSaveFilePath
+            handWriterData.handWriterImgShowedFlag = true; // 其他app页面不能再显示
+            // 保存文件，用于图像编码
             saveHandWriterImgToLocal(global.context, handWriterData.currentImgBs64Data);
         }
-
-
-        // 脉冲编码数据发送给前端，绘制echart
-        if (handWriterData.currentImgEncodeSpikes.length != 0
-            && handWriterData.currentImgEncodeSpikes != global.currentHandWriterEncodeSpikes
-            && global.panel.visible == true) {
-            global.currentHandWriterEncodeSpikes = handWriterData.currentImgEncodeSpikes;
-            console.log("发送脉冲");
-            global.panel.webview.postMessage({ getHandWriterEncodeRet: handWriterData.currentImgEncodeSpikes });
-        }
-
-
-        // 芯片识别结果发送给前端
-        if (handWriterData.currentImgOutputSpikes.length != 0
-            && handWriterData.currentImgOutputSpikes != global.currentHandWriterOutputSpikes
-            && global.panel.visible == true) {
-            global.currentHandWriterOutputSpikes = handWriterData.currentImgOutputSpikes;
-            console.log("发送结果", handWriterData.currentImgOutputSpikes, handWriterData.currentImgRecognitionRet);
-            global.panel.webview.postMessage({
-                runHandWriterSendInputProcessResult:
-                    [handWriterData.currentImgOutputSpikes, handWriterData.currentImgRecognitionRet]
-            });
-        }
-
-
     }, 500);
     global["postHandWriterImgTimer"] = postHandWriterImgTimer;
 }
@@ -759,12 +736,20 @@ function encodeHandWriterImgProcess(global) {
     scriptProcess.stdout?.on("data", function (data) {
         log_output_channel.append(data);
         console.log(data);
+        // 发送脉冲编码数据
+        if (data.indexOf("ENCODE RESULT") !== -1) {
+            // 输出是字符串，需要转成数组
+            let ret = data.split("**")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("*************encode ", JSON.parse(ret));
+            console.log("发送脉冲");
+            global.panel.webview.postMessage({ getHandWriterEncodeRet: JSON.parse(ret) });
+        }
     });
     scriptProcess.stderr?.on("data", function (data) {
         log_output_channel.append(data);
         console.log(data);
         let formatted_err = data.split("\r\n").join("<br/>");
-        // global.panel.webview.postMessage({ encodeHandWriterImgProcessErrorLog: formatted_err });
+        // global.panel.webview.postMessage({ encodeHandWriterImgProcessErrorLog: formatted_err });  // 有个告警，忽略
     });
     scriptProcess.on("exit", function () {
         console.log("done!!");
@@ -792,13 +777,18 @@ function runHandWriterSendInputProcess(global) {
         if (data.indexOf("get slave ip port failed") != -1) {
             global.panel.webview.postMessage({ handWriterGetIPAndPortFailed: data });
         }
-        // // 解析识别结果的输出
-        // if (data.indexOf("HANDWRITERRECOGNITION RESULT") !== -1) {
-        //     // 图像识别结果
-        //     let ret = data.split("**")[1];
-        //     console.log("手写板数字识别结果：", ret);
-        //     global.panel.webview.postMessage({ runHandWriterSendInputProcessResult: ret });
-        // }
+        // 解析识别结果的输出
+        if (data.indexOf("OUTPUT SPIKES RESULT") !== -1) {
+            let ret = data.split("**")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("*************output ", JSON.parse(ret));
+            console.log("发送输出脉冲");
+            global.panel.webview.postMessage({ getHandWriterOutputSpikesRet: JSON.parse(ret) });
+        }
+        if (data.indexOf("HANDWRITERRECOGNITION RESULT") !== -1) {
+            let numRet = data.split("$$")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("发送识别结果：", numRet);
+            global.panel.webview.postMessage({ getHandWriterRegRet: numRet });
+        }
     });
     chipCalculateProcess.stderr?.on("data", function (data) {
         log_output_channel.append(data);
@@ -820,7 +810,10 @@ function runHandWriterSendInputProcess(global) {
         global.panel.webview.postMessage({ handWriterRecognitionProcessTime: global.handWriterTotalRuntime });
 
         // 可以执行下一个图像识别
-        handWriterData.handWriterCouldNextRegFlag = true;
+        clearGlobalHandWriterCache();
+
+
+
     });
 }
 

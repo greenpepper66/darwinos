@@ -27,29 +27,37 @@ export module LocalHttpServer {
 
 // 工具的tab页面，以下panel要保持唯一性
 export module IDEPanels {
+	// 登录视图
 	export let loginPanel: vscode.WebviewPanel | undefined = undefined;
+
 	// 模型视图
 	export let uploadModelPanel: vscode.WebviewPanel | undefined = undefined;
 	export let modelHomePanel: vscode.WebviewPanel | undefined = undefined;
+
 	// 资源视图
 	export let resourceHomePanel: vscode.WebviewPanel | undefined = undefined;
 	export let nodePagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map();  // map类型, key值为panel的title
 	export let chipPagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map();
+
 	// 应用视图
 	export let appHomePanel: vscode.WebviewPanel | undefined = undefined;
 	export let imgAppListPanel: vscode.WebviewPanel | undefined = undefined;
 	export let newImgAppPanel: vscode.WebviewPanel | undefined = undefined;  // 手写体应用
 	export let imgAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	// 疲劳检测
 	export let newFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined;  // 疲劳检测应用 
 	export let fatigueDrivingAppListPanel: vscode.WebviewPanel | undefined = undefined; // 疲劳检测应用列表页
 	export let fatigueDrivingAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+
 	// 用户视图
 	export let userHomePanel: vscode.WebviewPanel | undefined = undefined;
 	export let userImgAppSquarePanel: vscode.WebviewPanel | undefined = undefined;
 	export let userImgAppRunPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	// 疲劳检测
 	export let userFatigueDrivingAppHomePanel: vscode.WebviewPanel | undefined = undefined;  // 疲劳检测首页九宫格页面
 	export let userFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined;      // 疲劳检测应用运行页面
 	export let userFatigueDrivingAppAfterPanel: vscode.WebviewPanel | undefined = undefined;      // 疲劳检测应用运行页面
+
 	// 任务视图
 	export let taskHomeImgAppListPanel: vscode.WebviewPanel | undefined = undefined;
 	export let taskInfoImgAppPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为任务的id

@@ -33,20 +33,20 @@ INPUT_TXT_FILE = os.path.join(outputDir, "input.txt")
 ROW_TXT_FILE = os.path.join(outputDir, "row.txt")
 
 
-def get_host_ip():
-    """
-    查询本机ip地址
-    :return:
-    """
-    try:
-        s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8',80))
-        ip=s.getsockname()[0]
-    finally:
-        s.close()
+# def get_host_ip():
+#     """
+#     查询本机ip地址
+#     :return:
+#     """
+#     try:
+#         s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+#         s.connect(('8.8.8.8',80))
+#         ip=s.getsockname()[0]
+#     finally:
+#         s.close()
 
-    return ip
-LOCALHOST_IP = get_host_ip()
+#     return ip
+# LOCALHOST_IP = get_host_ip()
 
 
 def real_time_snn_detect():
@@ -115,17 +115,18 @@ def real_time_snn_detect():
     for i in range(len(br2_input_spike_monitor.spike_trains().items())):
         input_spike_seqs.append([i, [int(tm/brian2.ms) for tm in list(br2_input_spike_monitor.spike_trains()[i])]])
 
-    # 数据重排，发送给工具，用于显示脉冲图
+    # 数据重排，写入缓存文件，用于显示脉冲图
     spike_tuples = []
     for i in range(len(input_spike_seqs)):
         for j in range(len(input_spike_seqs[i][1])):
             spike_tuples.append([input_spike_seqs[i][1][j], input_spike_seqs[i][0]])
+    print("ENCODE RESULT: **", spike_tuples, "**", flush=True)
 
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "start to post spikes data.")
-    headers = {'Content-Type': 'application/json'}
-    datas = json.dumps({"spikes": spike_tuples})
-    r = requests.post("http://" + LOCALHOST_IP + ":5003/encode_result", data=datas, headers=headers)
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post spike tuples finish.")
+    # print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "start to post spikes data.")
+    # headers = {'Content-Type': 'application/json'}
+    # datas = json.dumps({"spikes": spike_tuples})
+    # r = requests.post("http://" + LOCALHOST_IP + ":5003/encode_result", data=datas, headers=headers)
+    # print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post spike tuples finish.")
 
 
     br2_net.restore()

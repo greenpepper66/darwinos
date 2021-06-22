@@ -220,7 +220,7 @@ export function searchImgAppByName(context, name) {
 
 // 6. 更新一条应用的状态，应用生成一条任务： 根据id  将默认的状态0变为1
 export function updateImgAppStatusToTask(context, id) {
-    console.log("json update...");
+    console.log("json update status...");
     let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     try {
         let data = fs.readFileSync(resourcePath, 'utf-8');

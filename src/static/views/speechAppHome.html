@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title>数字图像识别应用</title>
+    <link href="../css/vs-light.css" rel="stylesheet" />
+
+    <style>
+        .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix { 
+            *zoom: 1;
+        }
+
+        .thewrap {
+            padding-left: 20px;
+            padding-right: 20px;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+    </style>
+
+    <script></script>
+</head>
+
+<body>
+    <div id="speechAppHome" class="imgAppHome_page">
+        <div class="clearfix thewrap imgAppHome_top">
+
+            <div class="row">
+                <table class="imgAppHome_page_table-search">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="imgAppHome_search_title">按应用搜索：</div>
+                            </td>
+                            <td>
+                                <div class="">
+                                    <input type="text" id="searchByAppName" class="imgAppHome_inputBox"
+                                        placeholder="请输入应用名称" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="imgAppHome_search_title">按模型搜索：</div>
+                            </td>
+                            <td>
+                                <div>
+                                    <input type="text" id="searchByModelID" class="imgAppHome_inputBox"
+                                        placeholder="请输入模型ID" />
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <button class="imgAppHome_search_btn" @click="searchImgApp()" >
+                                        搜索
+                                    </button>
+                                </div>
+                            </td>
+                            <td colspan="2">
+                                <div>
+                                    <button type="button" @click="gotoNewSpeechAppPage()" class="imgAppHome_newApp_btn">
+                                        新建应用
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="clearfix thewrap imgAppHome_middle">
+            <div class="imgAppHome_title">最近使用的应用</div>
+
+            <div class="row">
+                <table class="imgAppHome_page_table-list" id="speechAppsTable">
+                    <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>应用ID</th>
+                            <th>应用名称</th>
+                            <th>应用类型</th>
+                            <th>模型ID</th>
+                            <th>编码方法</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-if="appsShowedList.length == 0">
+                            <tr>
+                                <template v-for="j in 8">
+                                    <td :key="j">-</td>
+                                </template>
+                            </tr>
+                        </template>
+                        <template>
+                            <tr v-for="(item, index) in appsShowedList" :key="item.id">
+                                <td>{{ index + 1 }}</td>
+                                <td>{{ item.id }}</td>
+                                <td>{{ item.name }}</td>
+                                <td>数字图像识别</td>
+                                <td>{{ item.modeFileID }}</td>
+                                <td>
+                                    <template v-if="item.encodeMethodID == 0">
+                                        频率编码
+                                    </template>
+                                    <template v-else-if="item.encodeMethodID == 1">
+                                        泊松编码
+                                    </template>
+                                </td>
+
+
+                                <td>{{ item.createTime }}</td>
+                                <td>
+                                    <button type="button" class="imgAppHome_detail_btn"
+                                        @click="gotoSpeechAppInfoPage(item.id)">详情</button>
+                                   
+                                    <button type="button" class="imgAppHome_delete_btn"
+                                        @click="deleteSpeechAppConfig(item.id)">删除</button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
+    <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../js/speechAppHome.js"></script>
+    <script>Vue.config.ProductionTip = false</script>
+</body>
+
+</html>

@@ -333,9 +333,9 @@ window.addEventListener('message', event => {
 
 
     /**
-     * *************************
+     * ****************************************************************************************************
      * 手写板应用
-     * *************************
+     * ****************************************************************************************************
      */
     // 获取网页地址
     if (message.cmd == 'getHandWriterServerURLRet') {
@@ -369,6 +369,8 @@ window.addEventListener('message', event => {
         document.getElementById("userMnistOneApp_handWriter_outputNumLoading").style.display = "block";
 
         // 启动计时器 更新进度
+        clearRegSpeedTimer();
+        clearEncodeSpeedTimer();
         startEncodeSpeedTimer();
     }
 
@@ -434,20 +436,24 @@ window.addEventListener('message', event => {
         document.getElementById('userMnistOneApp_alert_result').style.display = 'block';
         clearRegSpeedTimer();
     }
-    // 芯片图像识别结束
-    if (message.runHandWriterSendInputProcessResult != undefined) {
-        console.log("get hand-writer img recognition result", message.runHandWriterSendInputProcessResult);
+    // 芯片图像识别结束，输出脉冲
+    if (message.getHandWriterOutputSpikesRet != undefined) {
+        console.log("get hand-writer img output spikes result", message.getHandWriterOutputSpikesRet);
         clearRegSpeedTimer();
         // loading图隐藏
         document.getElementById('userMnistOneApp_handWriter_outputEchartLoading').style.display = 'none';
-        document.getElementById('userMnistOneApp_handWriter_outputNumLoading').style.display = 'none';
         // 画输出脉冲图
         document.getElementById("handWriter_output_charts").style.display = "block";
-        document.getElementById("handWriter_output_num").style.display = "block";
-        display_output_scatter_chart(message.runHandWriterSendInputProcessResult[0]);
-        // 显示识别结果
-        document.getElementById("userMnistOneApp_handWriter_outputNum").innerHTML = message.runHandWriterSendInputProcessResult[1];
+        display_output_scatter_chart(message.getHandWriterOutputSpikesRet);
     }
+    if (message.getHandWriterRegRet != undefined) {
+        console.log("get hand-writer img reg result", message.getHandWriterRegRet);
+        document.getElementById('userMnistOneApp_handWriter_outputNumLoading').style.display = 'none';
+        document.getElementById("handWriter_output_num").style.display = "block";
+        // 显示识别结果
+        document.getElementById("userMnistOneApp_handWriter_outputNum").innerHTML = message.getHandWriterRegRet;
+    }
+
     // 运行时间
     if (message.handWriterRecognitionProcessTime != undefined) {
         console.log("get hand writer run time: ", message.handWriterRecognitionProcessTime);
@@ -537,7 +543,7 @@ function selectImgSrcKind() {
         // 给vscode发送消息接收移动端输入的手写体图像
         vscode.postMessage({
             command: 'startGetHandWriterImg',
-            text: "接收手机手写体图像",
+            text: [this.userAppInfo.id],
         });
 
         // 标志值初始化
@@ -618,7 +624,7 @@ function display_spike_scatter_chart(datas) {
         yAxis: {
             type: 'value',
             min: 0,
-            max: 784,  // 手写板的神经元个数 28*28
+            max: 800,  // 手写板的神经元个数 28*28
             scale: true,
             name: "Neuron",
             nameTextStyle: {
@@ -712,40 +718,40 @@ function clearEchart(eleID) {
 function startEncodeSpeedTimer() {
     let tmpSpeed = 0;
     handWriterImgEncodeTimer = setInterval(function setEncodeSpeed() {
-        let curSpeed = document.getElementById("handWriter_encode_processBar").innerHTML;
-        console.log("现在的进度为： ", curSpeed);
-        if (curSpeed != "80%") {
+        let curSpeed = Number(document.getElementById("handWriter_encode_processBar").innerHTML.replace(/(^\s*)|(\s*$)/g, ""));
+        console.log("现在的编码进度为： ", curSpeed);
+        if (curSpeed < 80) {
             tmpSpeed += 20;
-            document.getElementById("handWriter_encode_processBar").innerHTML = tmpSpeed + "%";
+            document.getElementById("handWriter_encode_processBar").innerHTML = tmpSpeed;
         }
-    }, 800); 
+    }, 800);
 }
 function clearEncodeSpeedTimer() {
-    if(handWriterImgEncodeTimer != undefined) {
+    if (handWriterImgEncodeTimer != undefined) {
         clearInterval(handWriterImgEncodeTimer);
         handWriterImgEncodeTimer = undefined;
         console.log("encodeSpeed timer killed!");
     }
-    document.getElementById("handWriter_encode_processBar").innerHTML = "0%";
+    document.getElementById("handWriter_encode_processBar").innerHTML = "0";
 }
 
 // 芯片识别进度计时器
 function startRegSpeedTimer() {
     let tmpSpeed = 0;
     handWriterImgRegTimer = setInterval(function setEncodeSpeed() {
-        let curSpeed = document.getElementById("handWriter_output_processBar").innerHTML;
-        console.log("现在的进度为： ", curSpeed);
-        if (curSpeed != "80%") {
+        let curSpeed = Number(document.getElementById("handWriter_output_processBar").innerHTML.replace(/(^\s*)|(\s*$)/g, ""));
+        console.log("现在的识别进度为： ", curSpeed);
+        if (curSpeed < 80) {
             tmpSpeed += 20;
-            document.getElementById("handWriter_output_processBar").innerHTML = tmpSpeed + "%";
+            document.getElementById("handWriter_output_processBar").innerHTML = "" + tmpSpeed;
         }
-    }, 600); 
+    }, 600);
 }
 function clearRegSpeedTimer() {
-    if(handWriterImgRegTimer != undefined) {
+    if (handWriterImgRegTimer != undefined) {
         clearInterval(handWriterImgRegTimer);
         handWriterImgRegTimer = undefined;
         console.log("regSpeed timer killed!");
     }
-    document.getElementById("handWriter_output_processBar").innerHTML = "0%";
+    document.getElementById("handWriter_output_processBar").innerHTML = "0";
 }

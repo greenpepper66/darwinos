@@ -19,36 +19,6 @@ configDir = sys.argv[1]        # 用户指定的配置文件所在目录
 inputDir = sys.argv[2]         # input.txt row.txt数据所在目录
 print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "start hand-writer send input data.")
 
-def get_host_ip():
-    """
-    查询本机ip地址
-    :return:
-    """
-    try:
-        s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8',80))
-        ip=s.getsockname()[0]
-    finally:
-        s.close()
-
-    return ip
-LOCALHOST_IP = get_host_ip()
-
-
-# # test
-# spike = [0,1,2,30,4,5,6,7,8,9]
-# max_index = spike.index(max(spike)) 
-# # 数据重排，发送给工具，用于显示脉冲图
-# output_tuples = []
-# for i in range(len(spike)):
-#     output_tuples.append([i, spike[i]])
-# print("发送spikes：", output_tuples)
-# headers = {'Content-Type': 'application/json'}
-# datas = json.dumps({"spikes": output_tuples, "result": max_index})
-# r = requests.post("http://" + LOCALHOST_IP + ":5003/output_result", data=datas, headers=headers)
-# print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post recognition result finish.")
-
-
 
 CLIENT_IP = '192.168.1.254'
 TCP_PORT = 10123    
@@ -165,18 +135,12 @@ if isExists1 and isExists2:
     output_tuples = []
     for i in range(len(spike)):
         output_tuples.append([i, spike[i]])
-    print("发送spikes：", output_tuples)
-    headers = {'Content-Type': 'application/json'}
-    datas = json.dumps({"spikes": output_tuples, "result": max_index})
-    r = requests.post("http://" + LOCALHOST_IP + ":5003/output_result", data=datas, headers=headers)
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post recognition result finish.")
-
+    print("OUTPUT SPIKES RESULT: **", output_tuples, "**", flush=True)
 
 
     Number = str(max_index)
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] get Number. ")
-    print(Number + " ")
-    print("HANDWRITERRECOGNITION RESULT: **", Number, "**", flush=True)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] get Number ", Number)
+    print("HANDWRITERRECOGNITION RESULT: $$", Number, "$$", flush=True)
 
     clear_start(conn1, 1)
 
