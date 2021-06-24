@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title>新建语音识别应用</title>
+
+    <script type="text/javascript">
+    </script>
+</head>
+
+<body>
+    <div id="newSpeechApp" class="newImgApp_page">
+        <div class="newImgApp_title">
+            新建语音识别应用
+        </div>
+        <div>
+            <table class="newImgApp_table">
+                <tr>
+                    <td>
+                        <div>应用名称:</div>
+                    </td>
+                    <td>
+                        <div><input type="text" class="form-control newImgApp_app_name" id="newSpeechApp_appName"></div>
+                    </td>
+                </tr>
+
+              
+                <tr>
+                    <td>
+                        <div>绑定模型文件:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <select class="form-control newImgApp_select_model" id="newSpeechApp_select_model">
+                                <option volue="none" style="display: none;"></option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <div>选择脉冲编码方法:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <select class="form-control newImgApp_select_encodeMethod" id="newSpeechApp_encodeMethod">
+                                <option volue="none" style="display: none;"></option>
+                                <option value="0">频率编码方法</option>
+                                <option value="1">泊松编码方法</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <div>选择配置文件:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <button type="button" class="newImgApp_btn" onclick="selectSpeechEncodeConfFile()">选择文件</button>
+                            <input type="text" class="form-control newImgApp_configFile" id="newSpeechApp_encodeConfig_file" />
+                        </div>
+                    </td>
+                </tr>
+
+
+
+                <tr>
+                    <td>
+                        <div>选择应用文件保存路径:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <button type="button" class="newImgApp_btn" onclick="selectSpeechOutputDir()">选择文件夹</button>
+                            <input type="text" class="form-control newImgApp_output_dir" id="newSpeechApp_outputDir" />
+                        </div>
+                    </td>
+                </tr>
+
+
+
+                <tr>
+                    <td>
+                        <div>选择识别结果输出方式:</div>
+                    </td>
+                    <td>
+                        <div>
+                            <select class="form-control newImgApp_select_retShow_way" id="newSpeechApp_retShow_way"
+                                onchange="selectSpeechRetShowWay()">
+                                <option volue="none" style="display: none;"></option>
+                                <option value="localShow">本地展示</option>
+                                <option value="remoteShow">远程输出</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+
+
+
+                <tr id="newSpeechApp_remoteIP_forRet" style="display: none;">
+                    <td>
+                        <div>请输入远程IP地址:</div>
+                    </td>
+                    <td>
+                        <div><input type="text" class="form-control newImgApp_remoteIP_forRet"
+                                id="newSpeechApp_remoteIP"></div>
+                    </td>
+                </tr>
+            </table>
+
+
+            <div class="newImgApp_btnBox">
+                <div>
+                    <button type="button" class="newImgApp_btn_saveApp" id="newSpeechApp_saveConfig"
+                        onclick="saveSpeechAppConfig()">保存应用
+                    </button>
+                    
+                </div>
+            </div>
+        </div>
+
+
+
+        <div>
+            <div id="newSpeechApp_alert_result" class="newImgApp_alert-box">
+                <p align="center" class="newImgApp_alert-txt" id="saveSpeechAppInfoModalContent"></p>
+                <button class="newImgApp_alert-btn" onclick="closeNewSpeechAppAlertBox()">关闭</button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+<link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="../lib/jquery/jquery.min.js"></script>
+<script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+<!-- 自定义样式放在后面加载 -->
+<link href="../css/vs-light.css" rel="stylesheet" />
+<script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/newSpeechApp.js"></script>
+<script>Vue.config.ProductionTip = false</script>
+
+</html>

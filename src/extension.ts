@@ -40,14 +40,19 @@ export module IDEPanels {
 	export let chipPagePanelsMap: Map<string, vscode.WebviewPanel> | undefined = new Map();
 
 	// 应用视图
-	export let appHomePanel: vscode.WebviewPanel | undefined = undefined;
+	export let appHomePanel: vscode.WebviewPanel | undefined = undefined;   // 视图首页
+	// 图像识别
 	export let imgAppListPanel: vscode.WebviewPanel | undefined = undefined;
-	export let newImgAppPanel: vscode.WebviewPanel | undefined = undefined;  // 手写体应用
+	export let newImgAppPanel: vscode.WebviewPanel | undefined = undefined;  
 	export let imgAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
 	// 疲劳检测
-	export let newFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined;  // 疲劳检测应用 
 	export let fatigueDrivingAppListPanel: vscode.WebviewPanel | undefined = undefined; // 疲劳检测应用列表页
+	export let newFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined; 
 	export let fatigueDrivingAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	// 语音识别
+	export let speechAppListPanel: vscode.WebviewPanel | undefined = undefined;
+	export let newSpeechAppPanel: vscode.WebviewPanel | undefined = undefined;  
+	export let speechAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
 
 	// 用户视图
 	export let userHomePanel: vscode.WebviewPanel | undefined = undefined;

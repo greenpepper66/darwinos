@@ -1,1 +1,47 @@
-{"data":[{"id":1624328401528,"name":"hand-writer","createTime":"2021-06-22 10:20","modeFileID":"13","modelFileName":"config.b","modelFileNodeID":"1","modelFileNodeIP":"192.168.1.254","encodeMethodID":"0","encodeConfigFile":"d:\\workspace\\lab-work\\darwinos-test-data\\hand-writer\\packed_bin_files.dat","outputDir":"d:\\workspace\\lab-work\\darwinos-test-data\\output","status":1,"appType":0},{"id":1624328878374,"name":"t2","createTime":"2021-06-22 10:27","modeFileID":"13","modelFileName":"config.b","modelFileNodeID":"1","modelFileNodeIP":"192.168.1.254","encodeMethodID":"1","encodeConfigFile":"d:\\workspace\\lab-work\\darwinos-test-data\\hand-writer\\packed_bin_files.dat","outputDir":"d:\\workspace\\lab-work\\darwinos-test-data\\output2","status":1,"appType":0}],"total":2}
+{
+    "data": [
+        {
+            "id": 1624328401528,
+            "name": "hand-writer",
+            "createTime": "2021-06-22 10:20",
+            "modeFileID": "13",
+            "modelFileName": "config.b",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.254",
+            "encodeMethodID": "0",
+            "encodeConfigFile": "d:\\workspace\\lab-work\\darwinos-test-data\\hand-writer\\packed_bin_files.dat",
+            "outputDir": "d:\\workspace\\lab-work\\darwinos-test-data\\output",
+            "status": 1,
+            "appType": 0
+        },
+        {
+            "id": 1624328878374,
+            "name": "t2",
+            "createTime": "2021-06-22 10:27",
+            "modeFileID": "13",
+            "modelFileName": "config.b",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.254",
+            "encodeMethodID": "1",
+            "encodeConfigFile": "d:\\workspace\\lab-work\\darwinos-test-data\\hand-writer\\packed_bin_files.dat",
+            "outputDir": "d:\\workspace\\lab-work\\darwinos-test-data\\output2",
+            "status": 1,
+            "appType": 0
+        },
+        {
+            "id": 1624515710956,
+            "name": "zhz-train-test",
+            "createTime": "2021-06-24 14:21",
+            "modeFileID": "14",
+            "modelFileName": "config.b",
+            "modelFileNodeID": "1",
+            "modelFileNodeIP": "192.168.1.254",
+            "encodeMethodID": "1",
+            "encodeConfigFile": "d:\\workspace\\lab-work\\darwinos-test-data\\train-hand-writer\\packed_bin_files.dat",
+            "outputDir": "d:\\workspace\\lab-work\\darwinos-test-data\\output-train",
+            "status": 1,
+            "appType": 0
+        }
+    ],
+    "total": 3
+}

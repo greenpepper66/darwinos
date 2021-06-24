@@ -49,8 +49,7 @@ ROW_TXT_FILE = os.path.join(outputDir, "row.txt")
 # LOCALHOST_IP = get_host_ip()
 
 
-def real_time_snn_detect_from_convert():
-    
+def real_time_snn_detect():
     with open(SNN_MODEL_FILE_PATH, "rb") as f:
         snn_model = pickle.load(f)
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Loading snn model finish.")
@@ -123,6 +122,13 @@ def real_time_snn_detect_from_convert():
             spike_tuples.append([input_spike_seqs[i][1][j], input_spike_seqs[i][0]])
     print("ENCODE RESULT: **", spike_tuples, "**", flush=True)
 
+    # print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "start to post spikes data.")
+    # headers = {'Content-Type': 'application/json'}
+    # datas = json.dumps({"spikes": spike_tuples})
+    # r = requests.post("http://" + LOCALHOST_IP + ":5003/encode_result", data=datas, headers=headers)
+    # print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "post spike tuples finish.")
+
+
     br2_net.restore()
     # Encode input data
     input_node_map = {}
@@ -140,70 +146,9 @@ def real_time_snn_detect_from_convert():
     gen_input.gen_inputdata(in_layer1, input_spike_seqs, input_node_map,
                             snn_model["run_dura"], INPUT_TXT_FILE, ROW_TXT_FILE)
 
-def real_time_snn_detect_from_train():
-    
-    with open(LAYER_WIDTH_FILE_PATH, "rb") as f:
-        layerWidth = pickle.load(f)
-    with open(NODE_LIST_FILE_PATH, "rb") as f:
-        nodeList = pickle.load(f)
-    with open(INPUT_LAYER1_FILE_PATH, "rb") as f:
-        in_layer1 = pickle.load(f)
 
-    # 获取图像
-    with open(inputImgFile, "r") as f:
-        png_bs64 = f.read()
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Loading img finish.")
-
-    img = base64.b64decode(png_bs64)
-    img = cv2.imdecode(np.fromstring(img, np.uint8), cv2.IMREAD_COLOR)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, img = cv2.threshold(img, 40, 255, cv2.THRESH_BINARY)
-    img = cv2.resize(img, (28, 28))
-    img = np.array(img, dtype="float32") / 255.0
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Fetch one image.")
-
-    ## TODO 
-    dt=0.1
-    run_dura=20
-    time_step=200
-    
-    flatten_image=img.reshape(img.shape[0]*img.shape[1])            
-    spikes = np.random.rand(time_step,flatten_image.size).__le__(flatten_image * dt).astype(float)
-
-    spikes = spikes.transpose()
-    input_spike_seqs=[]
-    for i in range(spikes.shape[0]):
-        time=np.where(spikes[i])
-        #if time[0].size!=0:  
-        input_spike_seqs.append([i,time[0].tolist()])
-
-    # 数据重排，写入缓存文件，用于显示脉冲图
-    spike_tuples = []
-    for i in range(len(input_spike_seqs)):
-        for j in range(len(input_spike_seqs[i][1])):
-            spike_tuples.append([input_spike_seqs[i][1][j], input_spike_seqs[i][0]])
-    print("ENCODE RESULT: **", spike_tuples, "**", flush=True)
-    
-    # Encode input data
-    input_node_map = {}
-    neuron_num = int(np.math.ceil(layerWidth[1] / len(nodeList[0])))
-    for line in in_layer1:
-        dst = int(line[1])
-        node_x = nodeList[0][dst // neuron_num][0]
-        node_y = nodeList[0][dst // neuron_num][1]
-        node_number = node_x * 64 + node_y
-        if not node_number in input_node_map.keys():
-            input_node_map[node_number] = {}
-        input_node_map[node_number].update({dst % neuron_num: dst})
-
-    gen_input.change_format(in_layer1)
-    gen_input.gen_inputdata(in_layer1, input_spike_seqs, input_node_map,
-                            run_dura, INPUT_TXT_FILE, ROW_TXT_FILE)
 
 if __name__ == '__main__':
-    if(os.path.exists(SNN_MODEL_FILE_PATH)):
-        real_time_snn_detect_from_convert()
-    else:
-        real_time_snn_detect_from_train()
+    real_time_snn_detect()
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "encode img finish.")
 

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title>语音识别应用详情</title>
+
+    <script>
+        // <tr onmouseover="test2(this)" onmouseout="test(this)">
+        function test(tr) {
+            tr.style.backgroundColor = '#7B7B7B';
+        }
+        function test2(tr) {
+            tr.style.backgroundColor = '#9D9D9D';
+        }
+    </script>
+</head>
+
+<body>
+    <div id="speechAppInfo" class="imgAppInfo_page">
+        <div class="imgAppInfo_title">
+            应用详情
+        </div>
+        <div>
+            <table class="imgAppInfo_table">
+                <tr>
+                    <td>应用ID</td>
+                    <td>{{ speechAppInformation.id }}</td>
+                </tr>
+                <tr>
+                    <td>应用名称</td>
+                    <td>{{ speechAppInformation.name }}</td>
+                </tr>
+                <tr>
+                    <td>应用类型</td>
+                    <td>语音识别</td>
+                </tr>
+                <tr>
+                    <td>应用创建时间</td>
+                    <td>{{ speechAppInformation.createTime }}</td>
+                </tr>
+                <tr>
+                    <td>模型ID</td>
+                    <td>{{ speechAppInformation.modeFileID }}</td>
+                </tr>
+                <tr>
+                    <td>模型名称</td>
+                    <td>{{ speechAppInformation.modelFileName }}</td>
+                </tr>
+                <tr>
+                    <td>模型所在节点名称</td>
+                    <td>节点{{ speechAppInformation.modelFileNodeID }}</td>
+                </tr>
+                <tr>
+                    <td>模型所在节点IP</td>
+                    <td>{{ speechAppInformation.modelFileNodeIP }}</td>
+                </tr>
+                <tr>
+                    <td>图像编码方法</td>
+                    <template v-if="speechAppInformation.encodeMethodID == 0">
+                        <td>频率编码</td>
+                    </template>
+                    <template v-if="speechAppInformation.encodeMethodID == 1">
+                        <td>泊松编码</td>
+                    </template>
+                </tr>
+                <tr>
+                    <td>图像编码所需配置文件所在文件夹</td>
+                    <td>{{ speechAppInformation.encodeConfigFile }}</td>
+                </tr>
+                <tr>
+                    <td>图像编码过程中输出文件所在文件夹</td>
+                    <td>{{ speechAppInformation.outputDir }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <link href="../css/vs-light.css" rel="stylesheet" />
+    <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/speechAppInfo.js"></script>
+    <script>Vue.config.ProductionTip = false</script>
+</body>
+
+</html>

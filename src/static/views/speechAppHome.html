@@ -60,7 +60,7 @@
                             </td>
                             <td>
                                 <div>
-                                    <button class="imgAppHome_search_btn" @click="searchImgApp()" >
+                                    <button class="imgAppHome_search_btn" @click="searchSpeechApp()" >
                                         搜索
                                     </button>
                                 </div>
@@ -109,7 +109,7 @@
                                 <td>{{ index + 1 }}</td>
                                 <td>{{ item.id }}</td>
                                 <td>{{ item.name }}</td>
-                                <td>数字图像识别</td>
+                                <td>语音识别</td>
                                 <td>{{ item.modeFileID }}</td>
                                 <td>
                                     <template v-if="item.encodeMethodID == 0">

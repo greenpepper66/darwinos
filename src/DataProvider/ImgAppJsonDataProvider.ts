@@ -2,9 +2,10 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-
+// 根据函数参数类型处理对应的json文件：0-手写体图像识别, 1-疲劳检测, 2-语音识别
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
 const fatigueDrivingAppsConfigFile = "src/static/cache/fatigueDrivingAppsConfig.json";
+const speechAppsConfigFile = "src/static/cache/speechAppsConfig.json";
 
 /**
  * ******************************************************************************************************
@@ -38,7 +39,7 @@ export class ImgAppConfigData {
     public encodeConfigFile: string; // 编码和运行任务所需的配置文件 - 打包成一个文件packed_bin_files.dat
     public outputDir: string;       // 应用文件保存路径，也是编码过程中间输出文件所在目录
 
-    public appType: number;         // 应用类型： 0-手写体图像识别， 1-疲劳检测
+    public appType: number;         // 应用类型： 0-手写体图像识别， 1-疲劳检测， 2-语音识别
 
     constructor(id: number, name: string) {  // 构造函数 实例化类的时候触发的方法
         this.id = id;
@@ -63,6 +64,8 @@ export function writeJson(context, imgAppConfig) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (imgAppConfig.appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    } else if (imgAppConfig.appType == 2) {
+        var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
     //现将json文件读出来
@@ -129,6 +132,8 @@ export function deleteJson(context, id, appType) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    } else if (appType == 2) {
+        var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
     try {
@@ -165,6 +170,8 @@ export function searchAllJson(context, appType) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }else if (appType == 2) {
+        var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
     let data = fs.readFileSync(resourcePath, 'utf-8');
@@ -182,11 +189,13 @@ export function searchAllJson(context, appType) {
 
 // 4. 查一个：根据应用id
 export function searchImgAppByID(context, id, appType) {
-    console.log("json searching ...", id);
+    console.log("json searchImgAppByID ...", id);
     if (appType == 0) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }else if (appType == 2) {
+        var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
     let data = fs.readFileSync(resourcePath, 'utf-8');
@@ -203,9 +212,16 @@ export function searchImgAppByID(context, id, appType) {
 }
 
 // 5. 查一个： 根据应用名字
-export function searchImgAppByName(context, name) {
-    console.log("json searching ...", name);
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+export function searchImgAppByName(context, name, appType) {
+    console.log("json searchImgAppByName ...", name);
+    if (appType == 0) {
+        var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    } else if (appType == 1) {
+        var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }else if (appType == 2) {
+        var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    }
+
     let data = fs.readFileSync(resourcePath, 'utf-8');
     let stringContent = data.toString();//将二进制的数据转换为字符串
     let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
@@ -219,9 +235,16 @@ export function searchImgAppByName(context, name) {
 }
 
 // 6. 更新一条应用的状态，应用生成一条任务： 根据id  将默认的状态0变为1
-export function updateImgAppStatusToTask(context, id) {
+export function updateImgAppStatusToTask(context, id, appType) {
     console.log("json update status...");
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    if (appType == 0) {
+        var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    } else if (appType == 1) {
+        var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }else if (appType == 2) {
+        var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    }
+
     try {
         let data = fs.readFileSync(resourcePath, 'utf-8');
         var stringContent = data.toString();
@@ -247,13 +270,20 @@ export function updateImgAppStatusToTask(context, id) {
 
 // 7. 检查一条应用是否存在，匹配各个字段是否相同
 // message = [appName, imgSrcKind, imgDir, modelFileID, encodeMethodID, encodeConfDir, outputDir]
-export function checkImgAppExist(context, message) {
+export function checkImgAppExist(context, message, appType) {
     // 先查名字 名字不存在 肯定没保存
     // 名字存在 检查其他所有项目是否相同
     // 所有项目都相同 表示已经保存了 跳转到任务页面
     // 有的项目不同 表示是同名的不同应用 报错重名
     console.log("json check exist...");
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    if (appType == 0) {
+        var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    } else if (appType == 1) {
+        var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }else if (appType == 2) {
+        var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    }
+
     try {
         let data = fs.readFileSync(resourcePath, 'utf-8');
         var stringContent = data.toString();
@@ -311,9 +341,16 @@ export function searchAllImgAppTasks(context) {
 }
 
 // 6. 更新一条应用的状态，将任务的status 1 恢复为默认值0
-export function updateImgAppStatusToApp(context, id) {
+export function updateImgAppStatusToApp(context, id, appType) {
     console.log("json update...");
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    if (appType == 0) {
+        var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
+    } else if (appType == 1) {
+        var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
+    }else if (appType == 2) {
+        var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    }
+    
     try {
         let data = fs.readFileSync(resourcePath, 'utf-8');
         var stringContent = data.toString();

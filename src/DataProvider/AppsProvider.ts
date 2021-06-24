@@ -45,9 +45,9 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 			AppsProvider.getIconUriForLabel("语音识别.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
-				command: '',
+				command: 'extension.gotoAppPage',
 				title: '',
-				arguments: []
+				arguments: ["speechApp", 2]
 			}
 		);
 		this.appKinds.push(voiceApp);
@@ -69,7 +69,7 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 			{
 				command: 'extension.gotoAppPage',
 				title: '',
-				arguments: ["imgApp", 4]
+				arguments: ["fatigueDrivingApp", 4]
 			}
 		);
 		this.appKinds.push(otherApp);

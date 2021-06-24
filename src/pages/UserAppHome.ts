@@ -155,7 +155,7 @@ const oneUserAppMessageHandler = {
         // 循环
         getHandWriterImgLoop(global);
         // 成为一条任务
-        updateImgAppStatusToTask(global.context, message.text[0]);
+        updateImgAppStatusToTask(global.context, message.text[0], 0);
     },
     // 解包配置文件, 用户页面上一选择“手写板输入源”就执行解包
     unpackHandWriterConfig(global, message) {
