@@ -56,12 +56,16 @@ export module IDEPanels {
 
 	// 用户视图
 	export let userHomePanel: vscode.WebviewPanel | undefined = undefined;
+	// 图像识别
 	export let userImgAppSquarePanel: vscode.WebviewPanel | undefined = undefined;
 	export let userImgAppRunPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
 	// 疲劳检测
 	export let userFatigueDrivingAppHomePanel: vscode.WebviewPanel | undefined = undefined;  // 疲劳检测首页九宫格页面
 	export let userFatigueDrivingAppPanel: vscode.WebviewPanel | undefined = undefined;      // 疲劳检测应用运行页面
 	export let userFatigueDrivingAppAfterPanel: vscode.WebviewPanel | undefined = undefined;      // 疲劳检测应用运行页面
+	// 语音识别
+	export let userSpeechAppSquarePanel: vscode.WebviewPanel | undefined = undefined;
+	export let userSpeechAppRunPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
 
 	// 任务视图
 	export let taskHomeImgAppListPanel: vscode.WebviewPanel | undefined = undefined;

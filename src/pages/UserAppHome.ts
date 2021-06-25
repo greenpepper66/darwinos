@@ -17,12 +17,8 @@ log_output_channel.show();
 
 // 手写板图像保存位置
 const handWriterImgSaveFilePath = "src/static/cache/handWriterImgBase64Data.txt";
-
 // 手写板页面访问地址
 const handWriterServerURL = "http://" + ip.address() + ":5003"
-
-
-
 
 
 // html文件路径
@@ -35,7 +31,122 @@ const userFatigueDrivingAppHtmlPath = "src/static/views/fatigueDrivingApp.html";
 const userFatigueDrivingAppAfterHtmlPath = "src/static/views/fatigueDrivingAppAfter.html";
 const userFatigueDrivingAppHomeHtmlPath = "src/static/views/userFatigueDrivingAppHome.html";
 
+const userSpeechAppHomeHtmlFilePath = "src/static/views/userSpeechAppHome.html";
 
+
+
+
+/********************************************************************************************
+ * 工具函数
+ ********************************************************************************************/
+// 1. html页面处理
+export function getHtmlContent(context, templatePath) {
+    const resourcePath = path.join(context.extensionPath, templatePath);
+    const dirPath = path.dirname(resourcePath);
+    let html = fs.readFileSync(resourcePath, 'utf-8');
+
+    html = html.replace(/(<link.+?href="|<script.+?src="|<img.+?src=")(.+?)"/g, (m, $1, $2) => {
+        return $1 + vscode.Uri.file(path.resolve(dirPath, $2)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
+    // 替换登录页面中 style 中 background img 
+    html = html.replace(/(.+?)(url\(")(.+?)"/g, (m, $1, $2, $3) => {
+        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
+
+    // 替换script语句中import from
+    html = html.replace(/(import.+?)(from\s+")(.+?)"/g, (m, $1, $2, $3) => {
+        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
+    });
+
+    // 任务输入执行页面样式
+    let vscodeColorTheme = vscode.window.activeColorTheme.kind;
+    if (vscodeColorTheme == 2) {
+        html = html.replace(/vs-light.css/, "vs-dark.css");
+    } else if (vscodeColorTheme == 1) {
+        html = html.replace(/vs-dark.css/, "vs-light.css");
+    }
+
+    return html;
+}
+
+// 2. 获取文件夹下图像文件的数量
+function getImgFileNum(path: string) {
+    // 根据文件路径读取文件，返回一个文件列表
+    //读取文件夹下内容
+    let files = fs.readdirSync(path);
+    console.log("getFiles list =--------", files);
+    return files.length;
+}
+
+// 3. 计算时间差
+function getAppRuntime(start, end) {
+    // let start = global.startTime;
+    // let end = global.endTime;
+    let timeDiff = end.getTime() - start.getTime();//时间差的毫秒数
+    let minutes = Math.floor(timeDiff / (60 * 1000))//计算相差分钟数
+    let leave1 = timeDiff % (60 * 1000)      //计算分钟数后剩余的毫秒数
+    let seconds = Math.floor(leave1 / 1000) //计算秒数
+    let leave2 = leave1 % 1000; // 剩余毫秒数
+    let runtime = minutes + "分钟" + seconds + "秒" + leave2 + "毫秒";
+    return runtime;
+}
+
+// 4. 等待
+function sleep(numberMillis) {
+    var start = new Date().getTime();
+    while (true) {
+        if (new Date().getTime() - start > numberMillis) {
+            break;
+        }
+    }
+}
+
+
+
+
+
+
+/**
+ * ******************************************************************************************************
+ * 导航栏相关函数
+ * ******************************************************************************************************
+ */
+// 1. 单击导航栏的分类，进入相应类别页面
+export function openOneKindUserAppPage(context, num) {
+    if (num == 1) {  // 数字图像识别应用
+        openMnistUserAppHomePage(context);
+    } else if (num == 2) {
+        openUserSpeechAppHomePage(context);
+    } else if (num == 4) {
+        openFatigueDrivingAppHomePage(context);
+    }
+    else {
+        openOtherUserAppHomePage(context);
+    }
+}
+
+// 2. 打开其他应用页面
+export function openOtherUserAppHomePage(context) {
+    const panel = vscode.window.createWebviewPanel(
+        'OtherAppWelcome',
+        "其他应用",
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true,
+        }
+    );
+    panel.webview.html = getHtmlContent(context, otherAppHomeHtmlFilePath);
+}
+
+
+
+
+
+
+
+/********************************************************************************************
+ * 用户视图首页相关 四类应用入口图示
+ ********************************************************************************************/
 // 1. 与应用视图首页webview的交互
 const messageHandler = {
     // 单击首页图标
@@ -46,7 +157,65 @@ const messageHandler = {
 
 };
 
-// 2. 手写体用户应用首页-九宫格页面
+// 2.overView按钮单击后显示应用视图首页 - 4个类型框图
+export function UserAppHomePageProvide(context) {
+    console.log("IDE UserAppHomePageProvide!", IDEPanels.userHomePanel);
+    if (IDEPanels.userHomePanel) {
+        console.log("打开用户视图首页：", IDEPanels.userHomePanel.visible);
+        IDEPanels.userHomePanel.reveal();
+    } else {
+        console.log("新建用户视图首页");
+
+        IDEPanels.userHomePanel = vscode.window.createWebviewPanel(
+            'userHomePage',
+            "用户视图",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+
+        IDEPanels.userHomePanel.webview.html = getHtmlContent(context, userAppHomeHtmlFilePath);
+
+        let panel = IDEPanels.userHomePanel;
+        let global = { panel, context };
+
+        IDEPanels.userHomePanel.webview.onDidReceiveMessage(message => {
+            if (messageHandler[message.command]) {
+                messageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE UserAppHomePageProvide 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userHomePanel.onDidDispose(
+            () => {
+                IDEPanels.userHomePanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/********************************************************************************************
+ * 数字图像识别应用 - 用户视图
+ ********************************************************************************************/
+// 1. 首页信息交互，手写体用户应用首页-九宫格页面
 const mnistMessageHandler = {
     // 查询所有图像识别应用列表
     getUserAppsList(global, message) {
@@ -63,7 +232,50 @@ const mnistMessageHandler = {
 
 }
 
-// 3. 单个应用页面
+// 2 打开用户视图 数字图像识别首页 - 手写体九宫格
+export function openMnistUserAppHomePage(context) {
+    console.log("IDE openMnistUserAppHomePage!", IDEPanels.userImgAppSquarePanel);
+    if (IDEPanels.userImgAppSquarePanel) {
+        console.log("打开用户视图数字图像识别九宫格首页：", IDEPanels.userImgAppSquarePanel.visible);
+        IDEPanels.userImgAppSquarePanel.reveal();
+    } else {
+        console.log("新建用户视图数字图像识别九宫格首页");
+
+        IDEPanels.userImgAppSquarePanel = vscode.window.createWebviewPanel(
+            'userMnistAppPage',
+            "数字图像识别",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        IDEPanels.userImgAppSquarePanel.webview.html = getHtmlContent(context, userMnistAppHomeHtmlFilePath);
+
+        let panel = IDEPanels.userImgAppSquarePanel;
+        let global = { panel, context };
+
+        IDEPanels.userImgAppSquarePanel.webview.onDidReceiveMessage(message => {
+            if (mnistMessageHandler[message.command]) {
+                mnistMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openMnistUserAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userImgAppSquarePanel.onDidDispose(
+            () => {
+                IDEPanels.userImgAppSquarePanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+// 3. 图像识别信息交互，单个应用页面
 const oneUserAppMessageHandler = {
     // 返回单个应用信息
     getOneMnistUserAppInfo(global, message) {
@@ -175,126 +387,7 @@ const oneUserAppMessageHandler = {
 
 };
 
-
-
-
-/********************************************************************************************
- * 打开页面
- ********************************************************************************************/
-// 1.overView按钮单击后显示应用视图首页 - 4个类型框图
-export function UserAppHomePageProvide(context) {
-    console.log("IDE UserAppHomePageProvide!", IDEPanels.userHomePanel);
-    if (IDEPanels.userHomePanel) {
-        console.log("打开用户视图首页：", IDEPanels.userHomePanel.visible);
-        IDEPanels.userHomePanel.reveal();
-    } else {
-        console.log("新建用户视图首页");
-
-        IDEPanels.userHomePanel = vscode.window.createWebviewPanel(
-            'userHomePage',
-            "用户视图",
-            vscode.ViewColumn.One,
-            {
-                enableScripts: true,
-            }
-        );
-
-        IDEPanels.userHomePanel.webview.html = getHtmlContent(context, userAppHomeHtmlFilePath);
-
-        let panel = IDEPanels.userHomePanel;
-        let global = { panel, context };
-
-        IDEPanels.userHomePanel.webview.onDidReceiveMessage(message => {
-            if (messageHandler[message.command]) {
-                messageHandler[message.command](global, message);
-            } else {
-                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-            }
-        }, undefined, context.subscriptions);
-
-        console.log("IDE UserAppHomePageProvide 2!", global.panel);
-
-        // 面板被关闭后重置
-        IDEPanels.userHomePanel.onDidDispose(
-            () => {
-                IDEPanels.userHomePanel = undefined;
-            },
-            null,
-            context.subscriptions
-        );
-    }
-}
-
-// 2. 单击导航栏的分类，进入相应类别页面
-export function openOneKindUserAppPage(context, num) {
-    if (num == 1) {  // 数字图像识别应用
-        openMnistUserAppHomePage(context);
-    } else if (num == 4) {
-        openFatigueDrivingAppHomePage(context);
-    }
-    else {
-        openOtherUserAppHomePage(context);
-    }
-}
-
-// 2.1 打开用户视图 数字图像识别首页 - 手写体九宫格
-export function openMnistUserAppHomePage(context) {
-    console.log("IDE openMnistUserAppHomePage!", IDEPanels.userImgAppSquarePanel);
-    if (IDEPanels.userImgAppSquarePanel) {
-        console.log("打开用户视图数字图像识别九宫格首页：", IDEPanels.userImgAppSquarePanel.visible);
-        IDEPanels.userImgAppSquarePanel.reveal();
-    } else {
-        console.log("新建用户视图数字图像识别九宫格首页");
-
-        IDEPanels.userImgAppSquarePanel = vscode.window.createWebviewPanel(
-            'userMnistAppPage',
-            "数字图像识别",
-            vscode.ViewColumn.One,
-            {
-                enableScripts: true,
-            }
-        );
-        IDEPanels.userImgAppSquarePanel.webview.html = getHtmlContent(context, userMnistAppHomeHtmlFilePath);
-
-        let panel = IDEPanels.userImgAppSquarePanel;
-        let global = { panel, context };
-
-        IDEPanels.userImgAppSquarePanel.webview.onDidReceiveMessage(message => {
-            if (mnistMessageHandler[message.command]) {
-                mnistMessageHandler[message.command](global, message);
-            } else {
-                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
-            }
-        }, undefined, context.subscriptions);
-
-        console.log("IDE openMnistUserAppHomePage 2!", global.panel);
-
-        // 面板被关闭后重置
-        IDEPanels.userImgAppSquarePanel.onDidDispose(
-            () => {
-                IDEPanels.userImgAppSquarePanel = undefined;
-            },
-            null,
-            context.subscriptions
-        );
-    }
-}
-
-// 2.2 其他应用
-export function openOtherUserAppHomePage(context) {
-    const panel = vscode.window.createWebviewPanel(
-        'OtherAppWelcome',
-        "其他应用",
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true,
-        }
-    );
-    panel.webview.html = getHtmlContent(context, otherAppHomeHtmlFilePath);
-}
-
-
-// 3. 单击用户图像识别应用首页九宫格中的按钮，进入某个应用运行页面
+// 4. 单击用户图像识别应用首页九宫格中的按钮，进入单个应用页面，执行图像识别
 export function openOneMnistUserAppPageByID(context, id) {
     console.log("IDE openOneMnistUserAppPageByID!", IDEPanels.userImgAppRunPagePanelsMap);
     if (IDEPanels.userImgAppRunPagePanelsMap.has(id)) {
@@ -360,8 +453,6 @@ export function openOneMnistUserAppPageByID(context, id) {
     }
 
 }
-
-
 
 
 
@@ -607,18 +698,9 @@ function runMnistSendInputScript(global) {
 
 
 
-
-
-
-
-
-
-
-
-
 /**
  * ******************************************************************************************************
- * 手写数字图像识别 —— 移动端手写板
+ * 手写数字图像识别 —— 移动端手写板 执行识别操作的函数
  * ******************************************************************************************************
  */
 // 0. 清除手写板缓存
@@ -626,7 +708,6 @@ function clearGlobalHandWriterCache() {
     handWriterData.handWriterCouldNextRegFlag = true;
     // 清空缓存文件：handWriterImgBase64Data.txt
 }
-
 
 // 1. 将手写板上传的base64编码的手写体数字图像发送给前端页面显示
 // 参数id：应用的id
@@ -816,17 +897,6 @@ function runHandWriterSendInputProcess(global) {
 
     });
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1195,67 +1265,86 @@ function finishDrivingProcess() {
 
 
 
+
+
+
+
+
+
+
 /********************************************************************************************
- * 工具函数
+ * 语音识别应用开发
  ********************************************************************************************/
-// 1. html页面处理
-export function getHtmlContent(context, templatePath) {
-    const resourcePath = path.join(context.extensionPath, templatePath);
-    const dirPath = path.dirname(resourcePath);
-    let html = fs.readFileSync(resourcePath, 'utf-8');
+// 1. 首页信息交互， 语音识别用户应用首页-九宫格页面
+const userSpeechHomeMessageHandler = {
+    // 查询所有图像识别应用列表
+    getUserSpeechAppsList(global, message) {
+        console.log(message);
+        let allImgTasks = searchAllJson(global.context, 2);
+        global.panel.webview.postMessage({ cmd: 'getUserSpeechAppsListRet', cbid: message.cbid, data: allImgTasks });
+    },
 
-    html = html.replace(/(<link.+?href="|<script.+?src="|<img.+?src=")(.+?)"/g, (m, $1, $2) => {
-        return $1 + vscode.Uri.file(path.resolve(dirPath, $2)).with({ scheme: 'vscode-resource' }).toString() + '"';
-    });
-    // 替换登录页面中 style 中 background img 
-    html = html.replace(/(.+?)(url\(")(.+?)"/g, (m, $1, $2, $3) => {
-        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
-    });
-
-    // 替换script语句中import from
-    html = html.replace(/(import.+?)(from\s+")(.+?)"/g, (m, $1, $2, $3) => {
-        return $1 + $2 + vscode.Uri.file(path.resolve(dirPath, $3)).with({ scheme: 'vscode-resource' }).toString() + '"';
-    });
-
-    // 任务输入执行页面样式
-    let vscodeColorTheme = vscode.window.activeColorTheme.kind;
-    if (vscodeColorTheme == 2) {
-        html = html.replace(/vs-light.css/, "vs-dark.css");
-    } else if (vscodeColorTheme == 1) {
-        html = html.replace(/vs-dark.css/, "vs-light.css");
-    }
-
-    return html;
+    // 单击九宫格的按钮进入应用运行页面
+    gotoOneMnistUserAppPage(global, message) {
+        console.log(message);
+        openOneMnistUserAppPageByID(global.context, message.text);
+    },
 }
 
-// 获取文件夹下图像文件的数量
-function getImgFileNum(path: string) {
-    // 根据文件路径读取文件，返回一个文件列表
-    //读取文件夹下内容
-    let files = fs.readdirSync(path);
-    console.log("getFiles list =--------", files);
-    return files.length;
-}
 
-// 计算时间差
-function getAppRuntime(start, end) {
-    // let start = global.startTime;
-    // let end = global.endTime;
-    let timeDiff = end.getTime() - start.getTime();//时间差的毫秒数
-    let minutes = Math.floor(timeDiff / (60 * 1000))//计算相差分钟数
-    let leave1 = timeDiff % (60 * 1000)      //计算分钟数后剩余的毫秒数
-    let seconds = Math.floor(leave1 / 1000) //计算秒数
-    let leave2 = leave1 % 1000; // 剩余毫秒数
-    let runtime = minutes + "分钟" + seconds + "秒" + leave2 + "毫秒";
-    return runtime;
-}
+// 2. 打开语音识别应用首页 - 九宫格页面
+export function openUserSpeechAppHomePage(context) {
+    console.log("IDE openUserSpeechAppHomePage!", IDEPanels.userSpeechAppSquarePanel);
+    if (IDEPanels.userSpeechAppSquarePanel) {
+        console.log("打开用户视图语音识别九宫格首页：", IDEPanels.userSpeechAppSquarePanel.visible);
+        IDEPanels.userSpeechAppSquarePanel.reveal();
+    } else {
+        console.log("新建用户视图语音识别九宫格首页");
 
-// 等待
-function sleep(numberMillis) {
-    var start = new Date().getTime();
-    while (true) {
-        if (new Date().getTime() - start > numberMillis) {
-            break;
-        }
+        IDEPanels.userSpeechAppSquarePanel = vscode.window.createWebviewPanel(
+            'userSpeechAppHomePage',
+            "语音识别",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        IDEPanels.userSpeechAppSquarePanel.webview.html = getHtmlContent(context, userSpeechAppHomeHtmlFilePath);
+
+        let panel = IDEPanels.userSpeechAppSquarePanel;
+        let global = { panel, context };
+
+        IDEPanels.userSpeechAppSquarePanel.webview.onDidReceiveMessage(message => {
+            if (userSpeechHomeMessageHandler[message.command]) {
+                userSpeechHomeMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openUserSpeechAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userSpeechAppSquarePanel.onDidDispose(
+            () => {
+                IDEPanels.userSpeechAppSquarePanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

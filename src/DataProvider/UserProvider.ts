@@ -30,9 +30,9 @@ export class UserProvider implements vscode.TreeDataProvider<UserAppKind> {
 			UserProvider.getIconUriForLabel("语音识别.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
-				command: '',
+				command: 'extension.gotoOneKindUserAppPage',
 				title: '',
-				arguments: []
+				arguments: ["speechApp", 2]
 			}
 		);
 		this.userAppKinds.push(voiceApp);
