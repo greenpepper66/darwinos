@@ -1,4 +1,5 @@
 var http = require('http');
+var https = require('https');
 var path = require('path');
 var fs = require('fs');
 var url = require('url');
@@ -27,7 +28,14 @@ export module handWriterData {
 	export let handWriterImgShowedFlag = true;   // 标记这幅图是否已经在前端显示，true表示已经显示，其他页面不得再显示
 }
 
-// 本地server，与web页面通信，接收web页面的请求和数据
+/**
+ * 本地server
+ * 功能1：与vue_darwinos web页面通信，接收web页面的请求和数据
+ * 
+ * @param ResDataProvider 
+ * @param ModelDataProvider 
+ * @param context 
+ */
 export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider: ModelProvider, context) {
 	var routes = {
 		'/post': function (req, res) {
@@ -128,37 +136,41 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 	LocalHttpServer.server.listen(5002);
 
 
-	// test for newApp page
-	let model_dep = {
-		id: 11,
-		name: "model_name",
-		nodeID: 1,
-		nodeIP: "192.168.1.1"
-	}
-	allData.deployedModelList = [model_dep];
+	// // test for newApp page
+	// let model_dep = {
+	// 	id: 11,
+	// 	name: "model_name",
+	// 	nodeID: 1,
+	// 	nodeIP: "192.168.1.1"
+	// }
+	// allData.deployedModelList = [model_dep];
 
-	// test for 导航栏
-	let model = {
-		id: 11,
-		name: "model_name",
-		nodeID: 1,
-		nodeIP: "192.168.1.1"
-	}
-	ModelDataProvider.updateModels([model]);
+	// // test for 导航栏
+	// let model = {
+	// 	id: 11,
+	// 	name: "model_name",
+	// 	nodeID: 1,
+	// 	nodeIP: "192.168.1.1"
+	// }
+	// ModelDataProvider.updateModels([model]);
 
-	let node = {
-		id: 1,
-		name: "node-test",
-		chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		usedNeureNums: [],
-	}
-	ResDataProvider.updateNodes([node]);
+	// let node = {
+	// 	id: 1,
+	// 	name: "node-test",
+	// 	chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	// 	usedNeureNums: [],
+	// }
+	// ResDataProvider.updateNodes([node]);
 }
 
 
 
 
-// 手写体应用，本地server
+/**
+ * 本地http server
+ * 功能1：客户端手写板应用server
+ * @param context 
+ */
 export function startHandWriterServer(context) {
 
 	// 获取本机ip
@@ -168,7 +180,7 @@ export function startHandWriterServer(context) {
 	const app = express();
 
 	// 1. 手写板应用接口
-	// 1.1 提供手写板访问页面
+	// 1.1 提供手写板访问页面：pc端和手机端都可访问，用于输入手写数字
 	app.use('/', express.static(path.join(context.extensionPath, 'src/resources/hand-writer'))); //指定静态文件目录
 
 	// app.get('/handwriter', function (req, res) {
@@ -198,12 +210,60 @@ export function startHandWriterServer(context) {
 	});
 
 
-	// 2. 语音识别应用接口
-	
-
-
-
 	app.listen(port, hostName, function () {
 		console.log(`类脑应用服务器运行在http://${hostName}:${port}`);
 	});
 }
+
+
+
+// 语音识别应用 本地https server
+export function startRecorderHttpsServer(context) {
+	// 获取本机ip
+	const hostName = handWriterData.localIP;
+	console.log("本机ip地址为：", hostName);
+	const port = 5004; //端口
+	const app = express();
+
+	const WAVFile = path.join(context.extensionPath, 'src/static/cache/audio.wav');
+
+	// ssl证书文件
+	const sslKeyFile = path.join(context.extensionPath, 'src/resources/certs/server.key');
+	const sslCertFile = path.join(context.extensionPath, 'src/resources/certs/server.cert');
+
+	app.use('/', express.static(path.join(context.extensionPath, 'src/resources/recorder'))); //指定静态文件目录
+
+	app.post('/post_audio', function (req, res) {
+		var currentData = ""
+		req.on("data", function (data) {
+			currentData += data;
+		});
+		req.on("end", function (data) {
+			console.log(new Date().getTime(), "收到音频");
+
+			let obj = JSON.parse(currentData);
+			var buf = new Buffer(obj.blob, 'base64'); // decode
+			fs.writeFile(WAVFile, buf, function (err) {
+				if (err) {
+					console.log("err", err);
+				} else {
+					console.log("保存成功");
+				}
+			})
+
+
+			res.send("success");
+		});
+	});
+
+
+	https.createServer({
+		key: fs.readFileSync(sslKeyFile),
+		cert: fs.readFileSync(sslCertFile)
+	}, app)
+		.listen(port, function () {
+			console.log(`Recorder app running on https://${hostName}:${port}/`)
+		})
+
+}
+

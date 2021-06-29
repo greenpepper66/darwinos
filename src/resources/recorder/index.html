@@ -21,7 +21,7 @@
 
 
     </div>
-
+    <script src="./lib/jquery.min.js"></script>
     <script type="text/babel">
 
         let recorder = null;
@@ -305,6 +305,43 @@
                 }
             }
 
+            // 将数据发送给server
+            sendWavBlobToServer = () => {
+                if (recorder) {
+                    // converts blob to base64
+                    var blobToBase64 = function (blob, cb) {
+                        var reader = new FileReader();
+                        reader.onload = function () {
+                            var dataUrl = reader.result;
+                            var base64 = dataUrl.split(',')[1];
+                            cb(base64);
+                        };
+                        reader.readAsDataURL(blob);
+                    };
+
+                    blobToBase64(recorder.getWAVBlob(), function (base64) { // encode
+                        var update = { 'blob': base64 };
+
+                        $.ajax({
+                            url: "/post_audio",
+                            // dataType: "json",
+                            data: JSON.stringify(update),
+                            type: "POST",
+                            cache: false,
+                            success: function (data) {
+                                if (data == "refuse") {
+                                    alert("语音识别中，请稍后！");
+                                }
+                            },
+                            error: function (data, status, e) {
+                                alert("error: ", data);
+                            }
+                        });
+
+                    })
+                }
+            }
+
             componentDidMount() {
                 oCanvas = document.getElementById('canvas');
                 ctx = oCanvas.getContext("2d");
@@ -321,7 +358,7 @@
                         <br />
                         <br />
                         <div>
-                        
+
                             <button onClick={this.startRecord}>
                                 录音开启
                             </button>
@@ -360,8 +397,8 @@
                             <button onClick={this.stopPlay}>
                                 停止播放
                             </button>
-                            <button onClick={this.destroyRecord}>
-                                销毁实例
+                            <button onClick={this.sendWavBlobToServer}>
+                                发送音频
                             </button>
                         </div>
                         <br />

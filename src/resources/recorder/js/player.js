@@ -1,15 +1,15 @@
 "use strict";
 // exports.__esModule = true;
-var source = null;
-var playTime = 0; // 相对时间，记录暂停位置
-var playStamp = 0; // 开始或暂停后开始的时间戳(绝对)
-var context = null;
-var analyser = null;
-var audioData = null;
+let source = null;
+let playTime = 0; // 相对时间，记录暂停位置
+let playStamp = 0; // 开始或暂停后开始的时间戳(绝对)
+let playContext = null;
+let analyser = null;
+let audioData = null;
 // let hasInit: boolean = false;           // 是否已经初始化了
-var isPaused = false;
-var totalTime = 0;
-var endplayFn = function () { };
+let isPaused = false;
+let totalTime = 0;
+let endplayFn = function () { };
 
 
 function throwError(message) {
@@ -21,8 +21,8 @@ function throwError(message) {
  * 初始化
  */
 function init() {
-    context = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = context.createAnalyser();
+    playContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = playContext.createAnalyser();
     analyser.fftSize = 2048; // 表示存储频域的大小
 }
 /**
@@ -31,13 +31,13 @@ function init() {
  */
 function playAudio() {
     isPaused = false;
-    return context.decodeAudioData(audioData.slice(0), function (buffer) {
-        source = context.createBufferSource();
+    return playContext.decodeAudioData(audioData.slice(0), function (buffer) {
+        source = playContext.createBufferSource();
         // 播放结束的事件绑定
         source.onended = function () {
             if (!isPaused) { // 暂停的时候也会触发该事件
                 // 计算音频总时长
-                totalTime = context.currentTime - playStamp + playTime;
+                totalTime = playContext.currentTime - playStamp + playTime;
                 endplayFn();
             }
         };
@@ -45,10 +45,10 @@ function playAudio() {
         source.buffer = buffer;
         // connect到分析器，还是用录音的，因为播放时不能录音的
         source.connect(analyser);
-        analyser.connect(context.destination);
+        analyser.connect(playContext.destination);
         source.start(0, playTime);
         // 记录当前的时间戳，以备暂停时使用
-        playStamp = context.currentTime;
+        playStamp = playContext.currentTime;
     }, function (e) {
         throwError(e);
     });
@@ -70,7 +70,7 @@ var Player = /** @class */ (function () {
      * @memberof Player
      */
     Player.play = function (arraybuffer) {
-        if (!context) {
+        if (!playContext) {
             // 第一次播放要初始化
             init();
         }
@@ -87,7 +87,7 @@ var Player = /** @class */ (function () {
     Player.pausePlay = function () {
         destroySource();
         // 多次暂停需要累加
-        playTime += context.currentTime - playStamp;
+        playTime += playContext.currentTime - playStamp;
         isPaused = true;
     };
     /**
@@ -128,7 +128,7 @@ var Player = /** @class */ (function () {
     };
     // 获取已经播放的时长
     Player.getPlayTime = function () {
-        var pTime = isPaused ? playTime : context.currentTime - playStamp + playTime;
+        var pTime = isPaused ? playTime : playContext.currentTime - playStamp + playTime;
         return totalTime || pTime;
     };
     return Player;

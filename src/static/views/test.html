@@ -3,239 +3,136 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
-
-        /*transparent 为透明*/
-
-        /*箭头向下*/
-        .box-down {
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-right: 30px solid transparent;
-            border-left: 30px solid transparent;
-            border-bottom: 50px solid red;
-        }
-
-        /*箭头向上*/
-        .box-up {
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-left: 30px solid transparent;
-            border-right: 30px solid transparent;
-            border-top: 50px solid green;
-        }
-
-
-
-        /*箭头向右*/
-        .box-right {
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-top: 30px solid transparent;
-            border-right: 50px solid orange;
-            border-bottom: 30px solid transparent;
-        }
-
-
-        /*箭头向左*/
-        .box-left {
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-top: 10px solid transparent;
-            border-left: 30px solid pink;
-            border-bottom: 10px solid transparent;
-            padding: 0px;
-            margin: 0px;
-        }
-
-        .line {
-            display: inline-block;
-            height: 15px;
-            width: 50px;
-            background: #ffa73c;
-            padding: 0px;
-            margin: 0px;
-        }
-
-
-        .userMnistOneApp_handWriter_spikesEchart {
-            height: 30%;
-            width: 30%;
-            margin: 0 auto;
-            border: 1px solid #d6d6d6;
-            border-radius: 2px;
-            min-height: 300px;
-            min-width: 400px;
-        }
-
-
-
-
-
-        .loading {
-            /* position: absolute; */
-            top: 100px;
-            left: 100px;
-            transform: translate(-50%, -50%) rotate(75deg);
-            width: 15px;
-            height: 15px;
-        }
-
-        .loading::before,
-        .loading::after {
-            content: "";
-            position: absolute;
-            top: 100px;
-            left: 100px;
-            transform: translate(-50%, -50%);
-            width: 15px;
-            height: 15px;   
-            border-radius: 15px;
-            animation: loading 1.5s infinite linear;
-        }
-
-        .loading::before {
-            box-shadow: 15px 15px rgb(190, 226, 243), -15px -15px rgb(195, 241, 201);
-        }
-
-        .loading::after {
-            box-shadow: 15px 15px rgb(180, 183, 190), -15px -15px rgb(199, 159, 159);
-            transform: translate(-50%, -50%) rotate(90deg);
-        }
-
-        @keyframes loading {
-            50% {
-                height: 45px;
-            }
-        }
-
-        .userMnistOneApp_loading_img {
-            width: 50px;
-            height: 50px;
-            margin-top: 100px;
-        }
-    </style>
+    <title></title>
+    <link href="test.css" type="text/css" rel="stylesheet">
+    <script src="../lib/jquery-1.10.2.js"></script> //可自行下载jquery包
 </head>
 
 <body>
-    <!-- <div class="box-up"></div>
-    <div class="box-down"></div>
-    <div class="box-right"></div>
-    <div class="box-left"></div>
+    <h1> ZX test demo Wavesurfer.js</h1>
+    <br /> <br /> <br /> <br /> <br />
+
+    <script src="../lib/wavesurfer/wavesurfer.min.js"></script>
+    <script src="../lib/wavesurfer/wavesurfer.timeline.js"></script> 
+    <script src="../lib/wavesurfer/wavesurfer.cursor.js"></script> 
+    <script src="../lib/wavesurfer/wavesurfer.spectrogram.js"></script> 
 
 
-    <br>
-    <br>
-    <div class="line"></div>
-    <div class="box-left"></div> -->
-
-    <div>
-        <div class="row">
-
-            <div class="col-md-3">
-                <div class="userMnistOneApp_handWriter_spikesEchart">
-                    <img class="userMnistOneApp_loading_img" src="../images/loading.gif">
-                </div>
-               
-            </div>
-
-            <div class="col-md-1">
-
-            </div>
-
-            <div class="col-md-4">
-                <div class="userMnistOneApp_handWriter_title">图像脉冲编码</div>
-                <div class="userMnistOneApp_handWriter_spikesEchart" id="handWriter_spikes_charts">
-
-                </div>
-            </div>
-
-            <div class="col-md-1">
-
-            </div>
-
-            <div class="col-md-3">
-                <div class="userMnistOneApp_handWriter_spikesEchart">
-                    <div class="loading"></div>
-                </div>
-            </div>
-
-
-
-
-        </div>
+    <div id="waveform" class="waveform"></div>
+    <br />
+    <div id="wave-timeline" class="wave-timeline"></div>
+    <div class="zoom">
+        <!-- <input data-action="zoom" type="range" min="1" max="200" value="0" style="width: 100%" />    -->
+        <input data-action="zoom" type="range" min="1" max="200" value="0" />
     </div>
+    <div id="wave-spectrogram" class="wave-spectrogram"></div>
+    <br /> <br />
+    <div class="box">
+        <button id="playPause">
+            <span id="play">
+                <i class=""></i>
+                Play
+            </span>
 
-    <link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="../css/vs-light.css" rel="stylesheet" />
-    <script src="../lib/jquery/jquery.min.js"></script>
-    <script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
-    <script src="../lib/echarts.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
-    <script>Vue.config.ProductionTip = false</script>
+            <span id="pause" style="display: none">
+                <i class=""></i>
+                Pause
+            </span>
+        </button>
+
+        <button id="btnStop">Stop</button>
+    </div>
     <script>
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            var wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                barHeight: 2,
+                cursorColor: '#ff0000',
+                progressColor: '#0000ff',
+                scrollParent: true,
+                height: 160,
+                cursorWidth: 2,
+                autoCenter: false,
+                fillParent: true,
+                hideScrollbar: false,
 
 
-
-
-            var testData = [[9, 182], [18, 182], [27, 182], [36, 182], [45, 182], [9, 183], [18, 183], [27, 183], [36, 183], [45, 183], [9, 209], [18, 209], [27, 209], [36, 209], [45, 209], [9, 210], [18, 210], [27, 210], [36, 210], [45, 210], [9, 211], [18, 211], [27, 211], [36, 211], [45, 211], [9, 237], [18, 237], [27, 237], [36, 237], [45, 237], [9, 238], [18, 238], [27, 238], [36, 238], [45, 238], [9, 239], [18, 239], [27, 239], [36, 239], [45, 239], [9, 265], [18, 265], [27, 265], [36, 265], [45, 265], [9, 266], [18, 266], [27, 266], [36, 266], [45, 266], [9, 267], [18, 267], [27, 267], [36, 267], [45, 267], [9, 293], [18, 293], [27, 293], [36, 293], [45, 293], [9, 294], [18, 294], [27, 294], [36, 294], [45, 294], [9, 295], [18, 295], [27, 295], [36, 295], [45, 295], [9, 321], [18, 321], [27, 321], [36, 321], [45, 321], [9, 322], [18, 322], [27, 322], [36, 322], [45, 322], [9, 323], [18, 323], [27, 323], [36, 323], [45, 323], [9, 349], [18, 349], [27, 349], [36, 349], [45, 349], [9, 350], [18, 350], [27, 350], [36, 350], [45, 350], [9, 351], [18, 351], [27, 351], [36, 351], [45, 351], [9, 377], [18, 377], [27, 377], [36, 377], [45, 377], [9, 378], [18, 378], [27, 378], [36, 378], [45, 378], [9, 379], [18, 379], [27, 379], [36, 379], [45, 379], [9, 405], [18, 405], [27, 405], [36, 405], [45, 405], [9, 406], [18, 406], [27, 406], [36, 406], [45, 406], [9, 407], [18, 407], [27, 407], [36, 407], [45, 407], [9, 433], [18, 433], [27, 433], [36, 433], [45, 433], [9, 434], [18, 434], [27, 434], [36, 434], [45, 434], [9, 435], [18, 435], [27, 435], [36, 435], [45, 435], [9, 461], [18, 461], [27, 461], [36, 461], [45, 461], [9, 462], [18, 462], [27, 462], [36, 462], [45, 462], [41, 463], [9, 489], [18, 489], [27, 489], [36, 489], [45, 489], [9, 490], [18, 490], [27, 490], [36, 490], [45, 490], [9, 517], [18, 517], [27, 517], [36, 517], [45, 517], [9, 518], [18, 518], [27, 518], [36, 518], [45, 518]];
-            display_spike_scatter_chart(testData);
-
-            function display_spike_scatter_chart(datas) {
-                var opt = {
-                    tooltip: {
-                        formatter: '({c})'   // 鼠标悬浮显示坐标
-                    },
-                    xAxis: {
-                        type: 'value',
-                        interval: 5, // 步长
-                        min: 0, // 起始
-                        max: 50, // 终止
-                        name: "Time(ms)",
-                        nameLocation: "center",
-                        nameTextStyle: {
-                            color: "#999999"
-                        },
-
-                        axisLabel: {
-                            textStyle: {
-                                color: "#999999"
-                            },
+                plugins: [
+                    WaveSurfer.timeline.create({                             //timeline plugin
+                        container: "#wave-timeline",
+                        height: 10,
+                    }),
+                    WaveSurfer.cursor.create({                              //cursor plugin
+                        container: "#wave-cursor",
+                        showTime: true,
+                        opacity: 1,
+                        customShowTimeStyle: {
+                            'background-color': '#000',
+                            color: '#fff',
+                            padding: '2px',
+                            'font-size': '10px'
                         }
-                    },
-                    yAxis: {
-                        type: 'value',
-                        scale: true,
-                        name: "Neuron",
-                        nameTextStyle: {
-                            color: "#999999"
-                        },
-                        axisLabel: {
-                            formatter: '{value}',
-                            textStyle: {
-                                color: "#999999"
-                            }
-                        }
-                    },
-                    series: [{
-                        symbolSize: 5,
-                        data: datas,
-                        type: 'scatter'
-                    }]
-                };
-                var spike_chart = echarts.init(document.getElementById("handWriter_spikes_charts"));
-                spike_chart.setOption(opt);
-            }
+                    }),
+                    WaveSurfer.spectrogram.create({
+                        wavesurfer: wavesurfer,
+                        container: "#wave-spectrogram",
+                        labels: true,
+                        fftSamples: 512
+                    })
+                ]
+
+
+            });
+
+            //TimeLine
+            wavesurfer.on('ready', function () {
+                var timeline = Object.create(WaveSurfer.timeline);
+
+                timeline.create({
+                    wavesurfer: wavesurfer,
+                    container: '#wave-timeline'
+                });
+            });
+
+            // load 音频
+            wavesurfer.load('../cache/audio.wav');      //此处添加自己的音频路径（可将音频存入前端可访问的文件夹内，避免跨域）
+
+            console.log(wavesurfer.getDuration());                 //test
+            console.log(wavesurfer.getVolume());                   // test
+            setTimeout(function () {                                //test
+                console.log(wavesurfer.getDuration());
+            }, 500)
+
+            //Stop
+            btnStop.addEventListener('click', function () {
+                wavesurfer.stop();
+            });
+            // PlayPause
+            var playPause = document.querySelector('#playPause');
+            playPause.addEventListener('click', function () {
+                wavesurfer.playPause();
+            });
+            // Toggle play/pause text
+            wavesurfer.on('play', function () {
+                document.querySelector('#play').style.display = 'none';
+                document.querySelector('#pause').style.display = '';
+            });
+            wavesurfer.on('pause', function () {
+                document.querySelector('#play').style.display = '';
+                document.querySelector('#pause').style.display = 'none';
+            });
+
+            var d1 = new Date();                          //test
+            console.log(d1.toLocaleString());               //test
+            console.log('test');                            //test
+
+            // Zoom slider
+            var slider = document.querySelector('[data-action="zoom"]');
+            slider.value = wavesurfer.params.minPxPerSec;
+            slider.min = wavesurfer.params.minPxPerSec;
+            slider.addEventListener('input', function () {
+                wavesurfer.zoom(Number(this.value));
+            });
 
         });
     </script>
