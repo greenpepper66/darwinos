@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title>手写体应用</title>
+    <style>
+        .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix {
+            *zoom: 1;
+        }
+
+        .thewrap {
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+    </script>
+</head>
+
+<body>
+    <div id="userSpeechOneApp" class="userMnistOneApp_page">
+        <div class="clearfix thewrap userMnistOneApp_top">
+            <table class="userMnistOneApp_imgSrc_table">
+                <tr>
+                    <td>请选择音频输入源：</td>
+
+                    <td>
+                        <div>
+                            <select class="form-control userMnistOneApp_select_imgSrc" id="userSpeechOneApp_select_src"
+                                onchange="selectImgSrcKind()">
+                                <option value="mobileAudio">移动端录音</option>
+                                <!-- <option value="localAudio">本地音频</option> -->
+                                <!-- <option value="networkImg">以太网</option> -->
+                            </select>
+                        </div>
+                    </td>
+
+                    <td id="userSpeechOneApp_mobileServer_addr" class="userMnistOneApp_handWriter_desc">
+                        <div>
+                            请在手机浏览器中打开
+                            <span class="userMnistOneApp_handWriter_url">{{recorderServerURL}}</span>
+                            , 进行录音并发送。
+                            <br>
+                            提示：录音内容为英文0-9,如果页面访问有问题,请尝试其他浏览器或下载最新版的Chrome浏览器。
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+
+        <!-- 手机录音输入，语音识别流程展示 -->
+        <div id="userSpeechOneApp_mobile_mainPage">
+            <div class="clearfix thewrap userMnistOneApp_handWriter_middle">
+                <div class="row">
+                    <div class="userMnistOneApp_title">移动端语音识别</div>
+                </div>
+
+                <div>
+                    <div class="row" style="margin: auto;">
+
+                        <div class="col-md-2">
+                            <div class="userMnistOneApp_handWriter_title">手写板输入</div>
+                            <div class="userMnistOneApp_handWriter_inputImg">
+
+                                <div id="userSpeechOneApp_recorder_audioData" class="userMnistOneApp_waveform"></div>
+                                <a href="javascript:" id="btnPlay" role="button" >播放</a>
+                                <a href="javascript:" id="btnPause" role="button">暂停</a>
+
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-md-1">
+                            <img class="userMnistOneApp_handWriter_arrow" src="../images/arrow.png" />
+                        </div> -->
+
+                        <div class="col-md-4">
+                            <div class="userMnistOneApp_handWriter_title">图像脉冲编码</div>
+                            <div class="userMnistOneApp_handWriter_spikesEchart" id="mobileAudio_spikes_charts">
+
+                            </div>
+                            <div id="userSpeechOneApp_recorder_encodeEchartLoading" style="display: none;"
+                                class="userMnistOneApp_handWriter_spikesEchart">
+                                <img src="../images/loading.gif" class="userMnistOneApp_loading_img">
+                                <div>
+                                    <span id="mobileAudio_encode_processBar">0</span>
+                                    <span>%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-md-1">
+                            <img class="userMnistOneApp_handWriter_arrow" src="../images/arrow.png" />
+                        </div> -->
+
+                        <div class="col-md-4">
+                            <div class="userMnistOneApp_handWriter_title">输出层脉冲</div>
+                            <div class="userMnistOneApp_handWriter_outputEchart" id="mobileAudio_output_charts">
+
+                            </div>
+                            <div id="userSpeechOneApp_handWriter_outputEchartLoading"
+                                class="userMnistOneApp_handWriter_outputEchart" style="display: none;">
+                                <img src="../images/loading.gif" class="userMnistOneApp_loading_img">
+                                <div>
+                                    <span id="mobileAudio_output_processBar">0</span>
+                                    <span>%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="userMnistOneApp_handWriter_title">芯片识别结果</div>
+                            <div class="userMnistOneApp_handWriter_outputRet" id="mobileAudio_output_num">
+                                <div class="userMnistOneApp_handWriter_outputNum"
+                                    id="userSpeechOneApp_recorder_outputNum"></div>
+                            </div>
+                            <div id="userSpeechOneApp_recorder_outputNumLoading"
+                                class="userMnistOneApp_handWriter_outputRet" style="display: none;">
+                                <img src="../images/loading.gif" class="userMnistOneApp_loading_img">
+                                <div>
+                                    <span>0</span>
+                                    <span>%</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="clearfix thewrap userMnistOneApp_middle_analyse">
+                <div class="row">
+                    <div class="userMnistOneApp_title">结果分析</div>
+                </div>
+
+                <div class="row">
+                    <div>
+                        <table class="userMnistOneApp_recRetAnaTable">
+                            <tr>
+                                <td>应用名称</td>
+                                <td>{{userAppInfo.name}}</td>
+                                <td>音频大小</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>应用ID</td>
+                                <td>{{userAppInfo.id}}</td>
+                                <td>语音识别耗时</td>
+                                <td id="userSpeechOneApp_recorder_runtime"></td>
+                            </tr>
+                            <tr>
+                                <td>应用详情</td>
+                                <td>
+                                    <button type="button" class="userMnistOneApp_detail_btn"
+                                        @click="userAppGotoSpeechAppInfoPage(userAppInfo.id)">应用详情</button>
+                                </td>
+
+
+                                <td>任务详情</td>
+                                <td>
+                                    <button type="button" class="userMnistOneApp_detail_btn"
+                                        @click="userAppGotoSpeechAppTaskPage(userAppInfo.id)">任务详情</button>
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+        <div>
+            <div id="userSpeechOneApp_alert_result" class="userMnistOneApp_alert-box">
+                <p align="center" class="userMnistOneApp_alert-txt" id="userSpeechOneApp_alertContent"></p>
+                <button class="userMnistOneApp_alert-btn" onclick="closeUserOneAppAlertBox()">关闭</button>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <!-- js引用要放在body体中，否则vue找不到要挂载的元素-->
+    <link href="../lib/bootstrap-3.3.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../css/vs-light.css" rel="stylesheet" />
+    <script src="../lib/jquery/jquery.min.js"></script>
+    <script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+    <script src="../lib/echarts.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/wavesurfer/wavesurfer.min.js"></script>
+    <script src="../lib/wavesurfer/wavesurfer.timeline.js"></script>
+    <script src="../lib/wavesurfer/wavesurfer.cursor.js"></script>
+    <script src="../lib/wavesurfer/wavesurfer.spectrogram.js"></script>
+    <script src="../js/useSpeechOneApp.js"></script>
+    <script>Vue.config.ProductionTip = false</script>
+</body>
+
+</html>

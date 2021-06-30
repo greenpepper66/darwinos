@@ -5,7 +5,7 @@ import { ChildProcess, exec, spawn } from "child_process";
 import { searchAllJson, updateImgAppInfo, searchImgAppByID, updateImgAppStatusToTask } from '../DataProvider/ImgAppJsonDataProvider';
 import { openImgAppInfoPage, openImgAppRunTaskPage } from './ImgAppHome';
 import { IDEPanels } from "../extension";
-import { handWriterData } from '../os/server';
+import { handWriterData, recorderAudioData } from '../os/server';
 import { getOnlyHandWriterData, updataHandWriterAppID } from "../DataProvider/HandWriterImgJsonDataProvider";
 
 var https = require('http');
@@ -19,6 +19,8 @@ log_output_channel.show();
 const handWriterImgSaveFilePath = "src/static/cache/handWriterImgBase64Data.txt";
 // 手写板页面访问地址
 const handWriterServerURL = "http://" + ip.address() + ":5003"
+// 页面录音器访问地址
+const recorderHttpsServerURL = "https://" + ip.address() + ":5004"
 
 
 // html文件路径
@@ -32,7 +34,7 @@ const userFatigueDrivingAppAfterHtmlPath = "src/static/views/fatigueDrivingAppAf
 const userFatigueDrivingAppHomeHtmlPath = "src/static/views/userFatigueDrivingAppHome.html";
 
 const userSpeechAppHomeHtmlFilePath = "src/static/views/userSpeechAppHome.html";
-
+const userOneSpeechAppHtmlFilePath = "src/static/views/userSpeechOneApp.html";
 
 
 
@@ -617,7 +619,7 @@ function runMnistSendInputScript(global) {
     console.log("start mnist image recognition: ", global.appInfo.name);
 
     // 脚本位置 mnist_send_input_back.py
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "mnist_send_input_back.py");
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "test.py");
     let imgSrcDir = global.appInfo.imgSrcDir;            // 图像源目录
 
     // 文件夹选择器返回的路径如 /D:/workspace/lab-work/input整合/data_input_encode 需要去掉第一个/  并将/转为\  路径里不能带中文
@@ -731,7 +733,7 @@ function getHandWriterImgLoop(global) {
 // 保存手写板图像的base64数据
 function saveHandWriterImgToLocal(context, bs64_img: string) {
     let resourcePath = path.join(context.extensionPath, handWriterImgSaveFilePath);
-    let base64 = bs64_img.replace(/^data:image\/\w+;base64,/, "");
+    let base64 = bs64_img.replace(/^data:image\/\w+;base64,/, ""); // 去掉图片base64码前面部分data:image/png;base64
     fs.writeFile(resourcePath, base64, function (err) {
         if (err) {
             console.error(err);
@@ -1285,12 +1287,11 @@ const userSpeechHomeMessageHandler = {
     },
 
     // 单击九宫格的按钮进入应用运行页面
-    gotoOneMnistUserAppPage(global, message) {
+    gotoOneUserSpeechAppPage(global, message) {
         console.log(message);
-        openOneMnistUserAppPageByID(global.context, message.text);
+        openOneUserSpeechAppPageByID(global.context, message.text);
     },
 }
-
 
 // 2. 打开语音识别应用首页 - 九宫格页面
 export function openUserSpeechAppHomePage(context) {
@@ -1336,15 +1337,127 @@ export function openUserSpeechAppHomePage(context) {
 }
 
 
+// 3. 单个语音识别页面信息交互
+const oneUserSpeechAppMessageHandler = {
+    // 返回单个应用信息
+    getOneUserSpeechAppInfo(global, message) {
+        console.log(message);
+        global.panel.webview.postMessage({ cmd: 'getOneUserSpeechAppInfoRet', cbid: message.cbid, data: global.appInfo });
+    },
+
+    // 获取录音url
+    getRecorderHttpsServerURL(global, message) {
+        console.log(message);
+        global.panel.webview.postMessage({ cmd: 'getRecorderHttpsServerURLRet', cbid: message.cbid, data: recorderHttpsServerURL });
+        // 该应用成为一条任务
+
+    },
+
+    // 显示手机上的音频
+    startGetRecorderAudio(global, message) {
+        console.log(message);
+        // 先清除缓存
+        clearGlobalRecorderCache();
+        // 循环
+        getRecorderAudioLoop(global);
+        // 成为一条任务
+        updateImgAppStatusToTask(global.context, message.text[0], 2);
+    },
+
+
+};
+
+
+// 4. 单击用户语音识别应用首页九宫格中的按钮，进入单个应用页面，执行语音识别
+export function openOneUserSpeechAppPageByID(context, id) {
+    console.log("IDE openOneUserSpeechAppPageByID!", IDEPanels.userSpeechAppRunPagePanelsMap);
+    if (IDEPanels.userSpeechAppRunPagePanelsMap.has(id)) {
+        console.log("打开用户视图语音识别应用运行页面：", IDEPanels.userSpeechAppRunPagePanelsMap.get(id).visible);
+        IDEPanels.userSpeechAppRunPagePanelsMap.get(id).reveal();
+    } else {
+        console.log("新建用户视图语音识别应用运行页面");
+
+        let panel = vscode.window.createWebviewPanel(
+            'userSpeechAppRunPage',
+            "用户应用",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
+        panel.webview.html = getHtmlContent(context, userOneSpeechAppHtmlFilePath);
+
+        var appInfo = searchImgAppByID(context, id, 2);
+        if (appInfo == "none") {
+            console.error("can not found the app: ", id);
+        }
+
+        let postRecorderAudioTimer = undefined; // 接收手写板数据的计时器
+
+        let global = { panel, context, appInfo, postRecorderAudioTimer };
+        IDEPanels.userSpeechAppRunPagePanelsMap.set(id, panel);
+
+        panel.webview.onDidReceiveMessage(message => {
+            if (oneUserSpeechAppMessageHandler[message.command]) {
+                oneUserSpeechAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openOneUserSpeechAppPageByID 2!", global.panel);
+
+        panel.onDidChangeViewState(
+            () => {
+                console.log("语音识别切换页面了！");
+            }
+        );
+
+        // 面板被关闭后重置
+        panel.onDidDispose(
+            () => {
+                panel = undefined;
+                IDEPanels.userSpeechAppRunPagePanelsMap.delete(id);
+                if (global.postRecorderAudioTimer != undefined) {
+                    clearInterval(global.postRecorderAudioTimer);
+                    global.postRecorderAudioTimer = undefined;
+                    console.log("recorder timer killed！");
+                }
+                clearGlobalRecorderCache();
+            },
+            null,
+            context.subscriptions
+        );
+    }
+
+}
 
 
 
+// 语音识别相关流程
+// 0. 清除语音识别缓存
+function clearGlobalRecorderCache() {
+    recorderAudioData.recorderCouldReceiveNextAudioFlag = true;
+    // 清空缓存文件：
+}
 
+// 1. 将手写板上传的base64编码的手写体数字图像发送给前端页面显示
+// 参数id：应用的id
+function getRecorderAudioLoop(global) {
+    const WAVFile = path.join(global.context.extensionPath, 'src/static/cache/audio.wav');
 
+    let postRecorderAudioTimer = setInterval(function encodeAndSendData() {
+        // 显示原始音频信息
+        if (recorderAudioData.recorderAudioShowedFlag == false && global.panel.visible == true) {
+            // 获取音频文件
+            fs.
 
-
-
-
-
-
+            console.log("发送音频",);
+            global.panel.webview.postMessage({ getRecorderAudioFileRet: 0 });
+            recorderAudioData.recorderAudioShowedFlag = true; // 其他app页面不能再显示
+        }
+    }, 500);
+    global["postRecorderAudioTimer"] = postRecorderAudioTimer;
+}
 

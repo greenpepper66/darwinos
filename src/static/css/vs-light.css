@@ -3,7 +3,8 @@
 ** 0. common style
 **********************************************************************************************/
 
-table, td {
+table,
+td {
   border-collapse: collapse;
   /** 合并单元格边框 */
 }
@@ -50,12 +51,15 @@ table.imgAppHome_page_table-search tr {
   height: 70px;
 }
 
-table.imgAppHome_page_table-search tr td:nth-child(1), table.imgAppHome_page_table-search tr td:nth-child(3) {
+table.imgAppHome_page_table-search tr td:nth-child(1),
+table.imgAppHome_page_table-search tr td:nth-child(3) {
   text-align: right;
   padding-right: 20px;
 }
 
-table.imgAppHome_page_table-search tr td:nth-child(2), table.imgAppHome_page_table-search tr td:nth-child(4), table.imgAppHome_page_table-search tr td:nth-child(5) {
+table.imgAppHome_page_table-search tr td:nth-child(2),
+table.imgAppHome_page_table-search tr td:nth-child(4),
+table.imgAppHome_page_table-search tr td:nth-child(5) {
   text-align: left;
 }
 
@@ -118,7 +122,8 @@ table.imgAppHome_page_table-search tr td:nth-child(2), table.imgAppHome_page_tab
   margin-bottom: 30px;
 }
 
-.imgAppHome_detail_btn, .imgAppHome_runApp_btn {
+.imgAppHome_detail_btn,
+.imgAppHome_runApp_btn {
   background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
   border-radius: 2px;
   background-color: Transparent;
@@ -243,12 +248,15 @@ table.imgAppTasks_page_table-search tr {
   height: 70px;
 }
 
-table.imgAppTasks_page_table-search tr td:nth-child(1), table.imgAppTasks_page_table-search tr td:nth-child(3) {
+table.imgAppTasks_page_table-search tr td:nth-child(1),
+table.imgAppTasks_page_table-search tr td:nth-child(3) {
   text-align: right;
   padding-right: 20px;
 }
 
-table.imgAppTasks_page_table-search tr td:nth-child(2), table.imgAppTasks_page_table-search tr td:nth-child(4), table.imgAppTasks_page_table-search tr td:nth-child(5) {
+table.imgAppTasks_page_table-search tr td:nth-child(2),
+table.imgAppTasks_page_table-search tr td:nth-child(4),
+table.imgAppTasks_page_table-search tr td:nth-child(5) {
   text-align: left;
 }
 
@@ -512,7 +520,14 @@ table.newImgApp_table td {
   padding: 8px;
 }
 
-.newImgApp_app_name, .newImgApp_imgSrc_type, .newImgApp_configSrc_type, .newImgApp_remoteIP_addr, .newImgApp_select_model, .newImgApp_select_encodeMethod, .newImgApp_select_retShow_way, .newImgApp_remoteIP_forRet {
+.newImgApp_app_name,
+.newImgApp_imgSrc_type,
+.newImgApp_configSrc_type,
+.newImgApp_remoteIP_addr,
+.newImgApp_select_model,
+.newImgApp_select_encodeMethod,
+.newImgApp_select_retShow_way,
+.newImgApp_remoteIP_forRet {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -537,7 +552,9 @@ table.newImgApp_table td {
   border-style: none;
 }
 
-.newImgApp_ImgSrc_dir, .newImgApp_configFile, .newImgApp_output_dir {
+.newImgApp_ImgSrc_dir,
+.newImgApp_configFile,
+.newImgApp_output_dir {
   background: #eeeeee;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
@@ -662,7 +679,8 @@ table.newImgApp_table td {
   text-align: center;
 }
 
-.imgAppRunTask_probar_title, .imgAppRunTask_ret_title {
+.imgAppRunTask_probar_title,
+.imgAppRunTask_ret_title {
   font-size: 20px;
   color: #333333;
   letter-spacing: 1.14px;
@@ -677,7 +695,9 @@ table.newImgApp_table td {
   font-family: "Material Icons";
   font-style: normal;
   font-weight: 400;
-  src: local("Material Icons"), local("MaterialIcons-Regular"), url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2) format("woff2");
+  src: local("Material Icons"), local("MaterialIcons-Regular"),
+    url(https://fonts.gstatic.com/s/materialicons/v7/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2)
+      format("woff2");
 }
 
 .material-icons {
@@ -1512,11 +1532,15 @@ table.fatigueDrivingApp_page_table tr {
   height: 70px;
 }
 
-table.fatigueDrivingApp_page_table tr td:nth-child(1), table.fatigueDrivingApp_page_table tr td:nth-child(3), table.fatigueDrivingApp_page_table tr td:nth-child(5) {
+table.fatigueDrivingApp_page_table tr td:nth-child(1),
+table.fatigueDrivingApp_page_table tr td:nth-child(3),
+table.fatigueDrivingApp_page_table tr td:nth-child(5) {
   text-align: center;
 }
 
-table.fatigueDrivingApp_page_table tr td:nth-child(2), table.fatigueDrivingApp_page_table tr td:nth-child(4), table.fatigueDrivingApp_page_table tr td:nth-child(6) {
+table.fatigueDrivingApp_page_table tr td:nth-child(2),
+table.fatigueDrivingApp_page_table tr td:nth-child(4),
+table.fatigueDrivingApp_page_table tr td:nth-child(6) {
   text-align: left;
 }
 
@@ -1540,4 +1564,14 @@ table.fatigueDrivingApp_page_table tr td:nth-child(2), table.fatigueDrivingApp_p
 .fatigueDrivingApp_result_show {
   color: red;
   font-size: 26px;
+}
+
+/****************************************************************************
+  **** 10. 语音识别页面
+  ****************************************************************************/
+.userMnistOneApp_waveform {
+  max-width: 300px;
+  height: 200px;
+  margin: auto;
+  margin-top: 30px;
 }

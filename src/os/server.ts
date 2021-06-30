@@ -28,6 +28,14 @@ export module handWriterData {
 	export let handWriterImgShowedFlag = true;   // 标记这幅图是否已经在前端显示，true表示已经显示，其他页面不得再显示
 }
 
+// 移动端录音数据
+export module recorderAudioData {
+	export let recorderCouldReceiveNextAudioFlag = true;
+	export let recorderAudioShowedFlag = true;
+}
+
+
+
 /**
  * 本地server
  * 功能1：与vue_darwinos web页面通信，接收web页面的请求和数据
@@ -136,31 +144,31 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 	LocalHttpServer.server.listen(5002);
 
 
-	// // test for newApp page
-	// let model_dep = {
-	// 	id: 11,
-	// 	name: "model_name",
-	// 	nodeID: 1,
-	// 	nodeIP: "192.168.1.1"
-	// }
-	// allData.deployedModelList = [model_dep];
+	// test for newApp page
+	let model_dep = {
+		id: 11,
+		name: "model_name",
+		nodeID: 1,
+		nodeIP: "192.168.1.1"
+	}
+	allData.deployedModelList = [model_dep];
 
-	// // test for 导航栏
-	// let model = {
-	// 	id: 11,
-	// 	name: "model_name",
-	// 	nodeID: 1,
-	// 	nodeIP: "192.168.1.1"
-	// }
-	// ModelDataProvider.updateModels([model]);
+	// test for 导航栏
+	let model = {
+		id: 11,
+		name: "model_name",
+		nodeID: 1,
+		nodeIP: "192.168.1.1"
+	}
+	ModelDataProvider.updateModels([model]);
 
-	// let node = {
-	// 	id: 1,
-	// 	name: "node-test",
-	// 	chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	// 	usedNeureNums: [],
-	// }
-	// ResDataProvider.updateNodes([node]);
+	let node = {
+		id: 1,
+		name: "node-test",
+		chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		usedNeureNums: [],
+	}
+	ResDataProvider.updateNodes([node]);
 }
 
 
@@ -240,19 +248,21 @@ export function startRecorderHttpsServer(context) {
 		});
 		req.on("end", function (data) {
 			console.log(new Date().getTime(), "收到音频");
-
-			let obj = JSON.parse(currentData);
-			var buf = new Buffer(obj.blob, 'base64'); // decode
-			fs.writeFile(WAVFile, buf, function (err) {
-				if (err) {
-					console.log("err", err);
-				} else {
-					console.log("保存成功");
-				}
-			})
-
-
-			res.send("success");
+			if (recorderAudioData.recorderCouldReceiveNextAudioFlag == true) {
+				let obj = JSON.parse(currentData);
+				var buf = new Buffer(obj.blob, 'base64'); // decode
+				// 保存音频
+				fs.writeFile(WAVFile, buf, function (err) {
+					if (err) {
+						console.log("err", err);
+					} else {
+						console.log("保存成功");
+					}
+				})
+				res.send("success");
+			} else {
+				res.send("refuse");
+			}
 		});
 	});
 

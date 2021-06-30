@@ -72,7 +72,7 @@ function callbacks(data, cb) {
         data.cbid = cbid;
     }
     vscode.postMessage(data);
-    console.log("call vscode to get task list information", data.command, data.cbid);
+    console.log("call vscode to get information", data.command, data.cbid);
 }
 
 function userAppSelectImgDir() {
