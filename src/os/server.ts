@@ -5,6 +5,7 @@ var fs = require('fs');
 var url = require('url');
 var express = require('express'); //express框架模块
 var ip = require('ip');
+var multiparty = require('multiparty');
 
 import { ResProvider } from "../DataProvider/ResProvider";
 import { ModelProvider, Model } from "../DataProvider/ModelProvider";
@@ -30,6 +31,7 @@ export module handWriterData {
 
 // 移动端录音数据
 export module recorderAudioData {
+	export let currentAudioBs64Data = "";
 	export let recorderCouldReceiveNextAudioFlag = true;
 	export let recorderAudioShowedFlag = true;
 }
@@ -122,7 +124,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 			chipPageProvideByPort(context, name, 5001, route);
 		},
 
-	}
+	};
 
 	LocalHttpServer.server = http.createServer(function (req, res) {
 		var pathObj = url.parse(req.url, true);
@@ -150,7 +152,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 		name: "model_name",
 		nodeID: 1,
 		nodeIP: "192.168.1.1"
-	}
+	};
 	allData.deployedModelList = [model_dep];
 
 	// test for 导航栏
@@ -159,7 +161,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 		name: "model_name",
 		nodeID: 1,
 		nodeIP: "192.168.1.1"
-	}
+	};
 	ModelDataProvider.updateModels([model]);
 
 	let node = {
@@ -167,7 +169,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 		name: "node-test",
 		chips: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		usedNeureNums: [],
-	}
+	};
 	ResDataProvider.updateNodes([node]);
 }
 
@@ -234,6 +236,7 @@ export function startRecorderHttpsServer(context) {
 	const app = express();
 
 	const WAVFile = path.join(context.extensionPath, 'src/static/cache/audio.wav');
+	const testPath = path.join(context.extensionPath, 'src/static/cache');
 
 	// ssl证书文件
 	const sslKeyFile = path.join(context.extensionPath, 'src/resources/certs/server.key');
@@ -242,28 +245,66 @@ export function startRecorderHttpsServer(context) {
 	app.use('/', express.static(path.join(context.extensionPath, 'src/resources/recorder'))); //指定静态文件目录
 
 	app.post('/post_audio', function (req, res) {
-		var currentData = ""
-		req.on("data", function (data) {
-			currentData += data;
-		});
-		req.on("end", function (data) {
-			console.log(new Date().getTime(), "收到音频");
-			if (recorderAudioData.recorderCouldReceiveNextAudioFlag == true) {
-				let obj = JSON.parse(currentData);
-				var buf = new Buffer(obj.blob, 'base64'); // decode
-				// 保存音频
-				fs.writeFile(WAVFile, buf, function (err) {
-					if (err) {
-						console.log("err", err);
-					} else {
-						console.log("保存成功");
-					}
-				})
-				res.send("success");
-			} else {
-				res.send("refuse");
-			}
-		});
+		console.log(new Date().getTime(), "收到音频");
+		if (recorderAudioData.recorderCouldReceiveNextAudioFlag === true) {
+			// 	// 接收FormData
+			// 	//生成multiparty对象，并配置上传目标路径
+			// 	var form = new multiparty.Form({ uploadDir: testPath });
+			// 	form.parse(req, function (err, fields, files) {
+			// 		console.log(fields, files, ' fields2');
+			// 		if (err) {
+			// 			console.log("保存失败", err);
+			// 		} else {
+			// 			// 重命名
+			// 			var inputFile = files.data[0];
+			// 			var uploadedPath = inputFile.path;
+			// 			var dstPath = WAVFile;
+			// 			//重命名为真实文件名
+			// 			fs.rename(uploadedPath, dstPath, function (err) {
+			// 				if (err) {
+			// 					console.log('rename error: ' + err);
+			// 				} else {
+			// 					files.data[0].path = dstPath;
+			// 					console.log('rename ok',files.data[0]);
+			// 				}
+			// 			});
+			// 			console.log("保存成功", files);
+			// 		}
+			// 	});
+			// 	recorderAudioData.recorderAudioShowedFlag = false;
+			// 	res.send("success");
+			// } else {
+			// 	res.send("refuse");
+			// }
+
+
+
+			var currentData = ""
+			req.on("data", function (data) {
+				currentData += data;
+			});
+			req.on("end", function (data) {
+				console.log(new Date().getTime(), "收到音频");
+				if (recorderAudioData.recorderCouldReceiveNextAudioFlag == true) {
+					// 接收blob经过base64编码后的音频
+					let obj = JSON.parse(currentData);
+					let buf = new Buffer(obj.blob, 'base64'); // decode
+					// 保存音频
+					fs.writeFile(WAVFile, buf, function (err) {
+						if (err) {
+							console.log("err", err);
+						} else {
+							console.log("保存成功");
+						}
+					});
+					recorderAudioData.recorderAudioShowedFlag = false;
+					recorderAudioData.currentAudioBs64Data = obj.blob;
+					res.send("success");
+				} else {
+					res.send("refuse");
+				}
+			});
+		}
 	});
 
 

@@ -39,7 +39,10 @@
             if (file) {
                 var reader = new FileReader();
                 reader.onload = function (evt) {
-                    var blob = new window.Blob([new Uint8Array(evt.target.result)]);
+                    // var blob = new window.Blob([new Uint8Array(evt.target.result)]);
+                    
+                    
+                    console.log("blob", blob);
                     wavesurfer.loadBlob(blob);
                 };
                 reader.onerror = function (evt) {
@@ -47,6 +50,9 @@
                 };
                 reader.readAsArrayBuffer(file);
             }
+
+            // wavesurfer.load(require("../cache/audio.wav"));
+
         });
 
         // wavesurfer.load('./zxx-comic-01.mp3');
@@ -57,6 +63,30 @@
         btnPause.addEventListener('click', function () {
             wavesurfer.pause();
         });
+
+
+
+
+        function base64ToBlob(base64, fileType) {
+            let typeHeader = 'data:application/' + fileType + ';base64,'; // 定义base64 头部文件类型
+            let audioSrc = typeHeader + base64; // 拼接最终的base64
+            let arr = audioSrc.split(',');
+            let array = arr[0].match(/:(.*?);/);
+            let mime = (array && array.length > 1 ? array[1] : type) || type;
+            // 去掉url的头，并转化为byte
+            let bytes = window.atob(arr[1]);
+            // 处理异常,将ascii码小于0的转换为大于0
+            let ab = new ArrayBuffer(bytes.length);
+            // 生成视图（直接针对内存）：8位无符号整数，长度1个字节
+            let ia = new Uint8Array(ab);
+            for (let i = 0; i < bytes.length; i++) {
+                ia[i] = bytes.charCodeAt(i);
+            }
+            console.log("base64转为blob");
+            return new Blob([ab], {
+                type: mime
+            });
+        }
     </script>
 </body>
 

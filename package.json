@@ -252,6 +252,7 @@
 		"ip": "^1.1.5",
 		"jquery": "^3.5.1",
 		"jsdom": "^16.4.0",
+		"multiparty": "^4.2.2",
 		"node-rtsp-stream": "0.0.9",
 		"serve": "^11.3.2",
 		"shelljs": "^0.8.4",

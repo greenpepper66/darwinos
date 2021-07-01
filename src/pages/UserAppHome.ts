@@ -1446,15 +1446,13 @@ function clearGlobalRecorderCache() {
 // 参数id：应用的id
 function getRecorderAudioLoop(global) {
     const WAVFile = path.join(global.context.extensionPath, 'src/static/cache/audio.wav');
+    const CacheDir = path.join(global.context.extensionPath, 'src/static/cache');
 
     let postRecorderAudioTimer = setInterval(function encodeAndSendData() {
         // 显示原始音频信息
         if (recorderAudioData.recorderAudioShowedFlag == false && global.panel.visible == true) {
-            // 获取音频文件
-            fs.
 
-            console.log("发送音频",);
-            global.panel.webview.postMessage({ getRecorderAudioFileRet: 0 });
+            global.panel.webview.postMessage({ getRecorderAudioFileRet: recorderAudioData.currentAudioBs64Data });
             recorderAudioData.recorderAudioShowedFlag = true; // 其他app页面不能再显示
         }
     }, 500);

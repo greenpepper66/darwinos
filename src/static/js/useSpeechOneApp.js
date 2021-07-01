@@ -13,6 +13,7 @@ new Vue({
         show: true,
         userAppInfo: [],
         recorderServerURL: "",  // 手写板应用的ip地址
+        WAVFIle: "",
     },
 
     mounted() {
@@ -133,27 +134,27 @@ window.addEventListener('message', event => {
 
 
 
-        // 开始执行图像编码和识别
-        handWriterAppStartRun();
+        // // 开始执行图像编码和识别
+        // handWriterAppStartRun();
 
-        // 识别结果清除
-        document.getElementById("userMnistOneApp_handWriter_outputNum").innerHTML = "";
-        // echart图清除
-        clearEchart("handWriter_spikes_charts");
-        clearEchart("handWriter_output_charts");
-        // echart div隐藏
-        document.getElementById("handWriter_spikes_charts").style.display = "none";
-        document.getElementById("handWriter_output_charts").style.display = "none";
-        document.getElementById("handWriter_output_num").style.display = "none";
-        // loading转圈图显示出来
-        document.getElementById("userMnistOneApp_handWriter_encodeEchartLoading").style.display = "block";
-        document.getElementById("userMnistOneApp_handWriter_outputEchartLoading").style.display = "block";
-        document.getElementById("userMnistOneApp_handWriter_outputNumLoading").style.display = "block";
+        // // 识别结果清除
+        // document.getElementById("userMnistOneApp_handWriter_outputNum").innerHTML = "";
+        // // echart图清除
+        // clearEchart("handWriter_spikes_charts");
+        // clearEchart("handWriter_output_charts");
+        // // echart div隐藏
+        // document.getElementById("handWriter_spikes_charts").style.display = "none";
+        // document.getElementById("handWriter_output_charts").style.display = "none";
+        // document.getElementById("handWriter_output_num").style.display = "none";
+        // // loading转圈图显示出来
+        // document.getElementById("userMnistOneApp_handWriter_encodeEchartLoading").style.display = "block";
+        // document.getElementById("userMnistOneApp_handWriter_outputEchartLoading").style.display = "block";
+        // document.getElementById("userMnistOneApp_handWriter_outputNumLoading").style.display = "block";
 
-        // 启动计时器 更新进度
-        clearRegSpeedTimer();
-        clearEncodeSpeedTimer();
-        startEncodeSpeedTimer();
+        // // 启动计时器 更新进度
+        // clearRegSpeedTimer();
+        // clearEncodeSpeedTimer();
+        // startEncodeSpeedTimer();
     }
 
 });
@@ -165,24 +166,60 @@ window.addEventListener('message', event => {
  * ******************************************************************************************************
  */
 
-function startPlayRecorderAudio(file) {
-    console.log(file);
-    if (file) {
-        var reader = new FileReader();
-        reader.onload = function (evt) {
-            var blob = new window.Blob([new Uint8Array(evt.target.result)]);
-            wavesurfer.loadBlob(blob);
-        };
-        reader.onerror = function (evt) {
-            console.error("An error ocurred reading the file: ", evt);
-        };
-        reader.readAsArrayBuffer(file);
-    }
+function startPlayRecorderAudio(bs64) {
+    console.log("this.WAVFIle", bs64);
+    // base64 转blob
+    let audioBlob = base64ToBlob(bs64, "wav");
+    console.log("DDDD", audioBlob);
+    wavesurfer.loadBlob(audioBlob);
+
+
+    // console.log(file);
+    // if (file) {
+    //     var reader = new FileReader();
+    //     reader.onload = function (evt) {
+    //         var blob = new window.Blob([new Uint8Array(evt.target.result)]);
+    //         wavesurfer.loadBlob(blob);
+    //     };
+    //     reader.onerror = function (evt) {
+    //         console.error("An error ocurred reading the file: ", evt);
+    //     };
+    //     reader.readAsArrayBuffer(file);
+    // }
     // 播放和暂停
     btnPlay.addEventListener('click', function () {
+        console.log("播放");
         wavesurfer.play();
     });
     btnPause.addEventListener('click', function () {
+        console.log("暂停");
         wavesurfer.pause();
+    });
+}
+
+/**
+  * desc: base64对象转blob文件对象
+  * @param base64  ：数据的base64对象
+  * @param fileType  ：文件类型 mp3等;
+  * @returns {Blob}：Blob文件对象
+  */
+function base64ToBlob(base64, fileType) {
+    let typeHeader = 'data:application/' + fileType + ';base64,'; // 定义base64 头部文件类型
+    let audioSrc = typeHeader + base64; // 拼接最终的base64
+    let arr = audioSrc.split(',');
+    let array = arr[0].match(/:(.*?);/);
+    let mime = (array && array.length > 1 ? array[1] : type) || type;
+    // 去掉url的头，并转化为byte
+    let bytes = window.atob(arr[1]);
+    // 处理异常,将ascii码小于0的转换为大于0
+    let ab = new ArrayBuffer(bytes.length);
+    // 生成视图（直接针对内存）：8位无符号整数，长度1个字节
+    let ia = new Uint8Array(ab);
+    for (let i = 0; i < bytes.length; i++) {
+        ia[i] = bytes.charCodeAt(i);
+    }
+    console.log("base64转为blob");
+    return new Blob([ab], {
+        type: mime
     });
 }

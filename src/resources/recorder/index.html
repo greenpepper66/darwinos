@@ -338,9 +338,30 @@
                             }
                         });
 
-                    })
+                    });
+
+
+                    // var fd = new FormData();
+                    // fd.append('fname', 'test.wav');
+                    // fd.append('data', recorder.getWAVBlob());
+                    // $.ajax({
+                    //     url: "/post_audio",
+                    //     data: fd,
+                    //     type: "POST",
+                    //     processData: false,
+                    //     contentType: false,
+                    //     success: function (data) {
+                    //         if (data == "refuse") {
+                    //             alert("语音识别中，请稍后！");
+                    //         }
+                    //     },
+                    //     error: function (data, status, e) {
+                    //         alert("error: ", data);
+                    //     }
+                    // });
                 }
             }
+
 
             componentDidMount() {
                 oCanvas = document.getElementById('canvas');
