@@ -170,7 +170,7 @@ export function searchAllJson(context, appType) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
-    }else if (appType == 2) {
+    } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
@@ -194,7 +194,7 @@ export function searchImgAppByID(context, id, appType) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
-    }else if (appType == 2) {
+    } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
@@ -218,7 +218,7 @@ export function searchImgAppByName(context, name, appType) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
-    }else if (appType == 2) {
+    } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
@@ -241,7 +241,7 @@ export function updateImgAppStatusToTask(context, id, appType) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
-    }else if (appType == 2) {
+    } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
@@ -280,7 +280,7 @@ export function checkImgAppExist(context, message, appType) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
-    }else if (appType == 2) {
+    } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
 
@@ -317,21 +317,23 @@ export function checkImgAppExist(context, message, appType) {
 }
 
 
-// 8. 查所有任务：status 值为1的返回
+// 8. 查所有任务：status 值为1的返回， 所有类型的应用
 export function searchAllImgAppTasks(context) {
     console.log("json searching all task...");
-    let resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
 
-    let data = fs.readFileSync(resourcePath, 'utf-8');
-
-    let stringContent = data.toString();//将二进制的数据转换为字符串
-    let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
-    //把数据读出来
-
+    let appFiles = [imgAppsConfigFile, speechAppsConfigFile];
     let allImgTasks = [];
-    for (var i = 0; i < jsonContent.data.length; i++) {
-        if (jsonContent.data[i].status == 1) {
-            allImgTasks.push(jsonContent.data[i]);
+
+    for (let j = 0; j < appFiles.length; j++) {
+        let resourcePath = path.join(context.extensionPath, appFiles[j]);
+        let data = fs.readFileSync(resourcePath, 'utf-8');
+        let stringContent = data.toString();//将二进制的数据转换为字符串
+        let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
+        //把数据读出来
+        for (var i = 0; i < jsonContent.data.length; i++) {
+            if (jsonContent.data[i].status == 1) {
+                allImgTasks.push(jsonContent.data[i]);
+            }
         }
     }
 
@@ -347,10 +349,10 @@ export function updateImgAppStatusToApp(context, id, appType) {
         var resourcePath = path.join(context.extensionPath, imgAppsConfigFile);
     } else if (appType == 1) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
-    }else if (appType == 2) {
+    } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
     }
-    
+
     try {
         let data = fs.readFileSync(resourcePath, 'utf-8');
         var stringContent = data.toString();

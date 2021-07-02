@@ -345,7 +345,7 @@ export function registAllCommands(context: vscode.ExtensionContext) {
 		if (allCommands.indexOf("extension.gotoImgAppTaskPage") == -1) {
 			// 任务视图导航栏子选项单击命令
 			taskViewOpenTaskHttpPageDisposable = vscode.commands.registerCommand('extension.gotoImgAppTaskPage', (name, id, type) => {
-				openImgAppRunTaskPage(context, id);
+				openImgAppRunTaskPage(context, id, type);
 			});
 			context.subscriptions.push(taskViewOpenTaskHttpPageDisposable);
 		}

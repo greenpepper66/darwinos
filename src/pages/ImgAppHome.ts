@@ -434,25 +434,25 @@ const imgAppTasksMessageHandler = {
         global.panel.webview.postMessage({ cmd: 'getImgAppTasksListRet', cbid: message.cbid, data: allImgTasks });
     },
 
-    // 跳转到任务详情页面
+    // 跳转到任务详情页面  text: [imgAppID, appType],
     gotoImgAppTaskPage(global, message) {
         console.log(message);
-        openImgAppRunTaskPage(global.context, message.text);
+        openImgAppRunTaskPage(global.context, message.text[0], message.text[1]);
     },
 
     // 删除一个任务，也就是将json文件中应用的status恢复为默认值0 
     deleteImgAppTask(global, message) {
         console.log(message);
-        let ret = updateImgAppStatusToApp(global.context, message.text, 0);
+        let ret = updateImgAppStatusToApp(global.context, message.text[0], message.text[1]);
         console.log("deleteImgAppTask ret: ", ret);
-        global.panel.webview.postMessage({ deleteImgAppTaskRet: message.text });
+        global.panel.webview.postMessage({ deleteImgAppTaskRet: message.text[0] });
     }
 }
 
 // 4. 打开任务详情页面 —— 显示板子芯片信息 
-export function openImgAppRunTaskPage(context, appID) {
+export function openImgAppRunTaskPage(context, appID, appType) {
     // 查询应用信息
-    let appInfo = searchImgAppByID(context, appID, 0);
+    let appInfo = searchImgAppByID(context, appID, appType);
     if (appInfo == "none") {
         console.error("can not found the app: ", appID);
     }

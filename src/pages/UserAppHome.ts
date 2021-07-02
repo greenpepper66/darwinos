@@ -3,10 +3,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { ChildProcess, exec, spawn } from "child_process";
 import { searchAllJson, updateImgAppInfo, searchImgAppByID, updateImgAppStatusToTask } from '../DataProvider/ImgAppJsonDataProvider';
-import { openImgAppInfoPage, openImgAppRunTaskPage } from './ImgAppHome';
+import { openImgAppInfoPage, openImgAppRunTaskPage, openSpeechAppInfoPage } from './ImgAppHome';
 import { IDEPanels } from "../extension";
 import { handWriterData, recorderAudioData } from '../os/server';
 import { getOnlyHandWriterData, updataHandWriterAppID } from "../DataProvider/HandWriterImgJsonDataProvider";
+
+const decode = require('audio-decode');
+const WavDecoder = require("wav-decoder");
 
 var https = require('http');
 var ip = require('ip');
@@ -21,6 +24,8 @@ const handWriterImgSaveFilePath = "src/static/cache/handWriterImgBase64Data.txt"
 const handWriterServerURL = "http://" + ip.address() + ":5003"
 // 页面录音器访问地址
 const recorderHttpsServerURL = "https://" + ip.address() + ":5004"
+// 录音文件地址
+const recorderWavFilePath = "src/static/cache/audio.wav";
 
 
 // html文件路径
@@ -213,7 +218,6 @@ export function UserAppHomePageProvide(context) {
 
 
 
-
 /********************************************************************************************
  * 数字图像识别应用 - 用户视图
  ********************************************************************************************/
@@ -345,7 +349,7 @@ const oneUserAppMessageHandler = {
     // 跳转到任务详情页面
     userAppGotoImgAppTaskPage(global, message) {
         console.log(message);
-        openImgAppRunTaskPage(global.context, message.text);
+        openImgAppRunTaskPage(global.context, message.text, 0);
     },
 
 
@@ -846,7 +850,7 @@ function encodeHandWriterImgProcess(global) {
 function runHandWriterSendInputProcess(global) {
     console.log("给芯片发送数据，执行手写板数字识别");
 
-    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "hand_writer", "send_input.py");
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "send_input.py");
     let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
     let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
 
@@ -867,7 +871,7 @@ function runHandWriterSendInputProcess(global) {
             console.log("发送输出脉冲");
             global.panel.webview.postMessage({ getHandWriterOutputSpikesRet: JSON.parse(ret) });
         }
-        if (data.indexOf("HANDWRITERRECOGNITION RESULT") !== -1) {
+        if (data.indexOf("NUMBERRECOGNITION RESULT") !== -1) {
             let numRet = data.split("$$")[1].replace(/(^\s*)|(\s*$)/g, "");
             console.log("发送识别结果：", numRet);
             global.panel.webview.postMessage({ getHandWriterRegRet: numRet });
@@ -1349,8 +1353,12 @@ const oneUserSpeechAppMessageHandler = {
     getRecorderHttpsServerURL(global, message) {
         console.log(message);
         global.panel.webview.postMessage({ cmd: 'getRecorderHttpsServerURLRet', cbid: message.cbid, data: recorderHttpsServerURL });
-        // 该应用成为一条任务
+    },
 
+    // 解包配置文件, 用户页面上一选择“手写板输入源”就执行解包
+    unpackSpeechRegConfig(global, message) {
+        console.log(message);
+        unpackSpeechRegConfigProcess(global);
     },
 
     // 显示手机上的音频
@@ -1361,9 +1369,31 @@ const oneUserSpeechAppMessageHandler = {
         // 循环
         getRecorderAudioLoop(global);
         // 成为一条任务
-        updateImgAppStatusToTask(global.context, message.text[0], 2);
+        updateImgAppStatusToTask(global.context, global.appInfo.id, 2);
     },
 
+    // 音频编码
+    speechAppStartEncode(global, message) {
+        console.log(message);
+        encodeMobileSpeechAppProcess(global);
+    },
+
+    // 音频芯片识别
+    startMobileSpeechRecognitionProcess(global, message) {
+        console.log(message);
+        runMobileSpeechSendInputProcess(global);
+    },
+
+    // 查询应用  显示详情页
+    userAppGotoSpeechAppInfoPage(global, message) {
+        console.log(message);
+        openSpeechAppInfoPage(global.context, message.text);
+    },
+    // 跳转到任务详情页面
+    userAppGotoSpeechAppTaskPage(global, message) {
+        console.log(message);
+        openImgAppRunTaskPage(global.context, message.text, 2);
+    },
 
 };
 
@@ -1435,15 +1465,17 @@ export function openOneUserSpeechAppPageByID(context, id) {
 
 
 
-// 语音识别相关流程
+
+/* ******************************************************************************************************
+* 语音识别 —— 移动端录音 执行识别操作的函数
+* ******************************************************************************************************/
 // 0. 清除语音识别缓存
 function clearGlobalRecorderCache() {
     recorderAudioData.recorderCouldReceiveNextAudioFlag = true;
     // 清空缓存文件：
 }
 
-// 1. 将手写板上传的base64编码的手写体数字图像发送给前端页面显示
-// 参数id：应用的id
+// 1. 传递音频
 function getRecorderAudioLoop(global) {
     const WAVFile = path.join(global.context.extensionPath, 'src/static/cache/audio.wav');
     const CacheDir = path.join(global.context.extensionPath, 'src/static/cache');
@@ -1452,10 +1484,174 @@ function getRecorderAudioLoop(global) {
         // 显示原始音频信息
         if (recorderAudioData.recorderAudioShowedFlag == false && global.panel.visible == true) {
 
-            global.panel.webview.postMessage({ getRecorderAudioFileRet: recorderAudioData.currentAudioBs64Data });
+            const readFile = (filepath) => {
+                return new Promise((resolve, reject) => {
+                    fs.readFile(filepath, (err, buffer) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        return resolve(buffer);
+                    });
+                });
+            };
+
+            readFile(WAVFile).then((buffer) => {
+                return WavDecoder.decode(buffer);
+            }).then(function (audioData) {
+                console.log(audioData.sampleRate);
+                // console.log(audioData.channelData[0]); // Float32Array   // 单声道的
+                console.log(audioData.numberOfChannels);
+                console.log(audioData.length);
+
+                console.log("发送音频数据给前端。", audioData);
+                global.panel.webview.postMessage({ getRecorderAudioFileRet: audioData });
+
+            });
+
             recorderAudioData.recorderAudioShowedFlag = true; // 其他app页面不能再显示
         }
     }, 500);
     global["postRecorderAudioTimer"] = postRecorderAudioTimer;
+}
+
+// 2. 解包配置文件
+function unpackSpeechRegConfigProcess(global) {
+    console.log("start unpack config files for speech app: ", global.appInfo.name);
+
+    // 脚本位置
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "pack_bin_files.py");
+
+    let configFile = global.appInfo.encodeConfigFile;      // 配置文件
+    let outputDir = global.appInfo.outputDir;            // 输出路径,脚本里会新建一个文件夹unpack_target
+
+    let command_str = "python3 " + scriptPath + " " + configFile + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let scriptProcess = exec(command_str, {});
+
+    scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+    });
+
+    scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        let formatted_err = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({ unpackSpeechRegConfigProcessErrorLog: formatted_err });
+    });
+
+    scriptProcess.on("exit", function () {
+        console.log("done!!");
+        let unpackPath = path.join(outputDir, "unpack_target");
+        let str = "Unpack hand-writer config files finished, the result is saved in " + unpackPath;
+        global.panel.webview.postMessage({ unpackSpeechRegConfigProcessFinish: str });
+    });
+}
+
+// 3. 音频编码
+function encodeMobileSpeechAppProcess(global) {
+    console.log("start encode for speech app: ", global.appInfo);
+
+    // 防止识别中提交新的录音，造成音频和输出不一样
+    recorderAudioData.recorderCouldReceiveNextAudioFlag = false;
+
+    // 获取应用运行的起始时间
+    let startTime = new Date();//获取当前时间 
+    global["mobileSpeechStartTime"] = startTime;
+    console.log("语音识别应用运行起始时间为：", global.mobileSpeechStartTime);
+
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "mobile_speech", "main.py");
+
+    let wavFile = path.join(global.context.extensionPath, recorderWavFilePath);  // 保存音频的文件
+    let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
+    let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+
+    let command_str = "python3 " + scriptPath + " " + wavFile + " " + configDir + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let scriptProcess = exec(command_str, {});
+
+    scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        // 发送脉冲编码数据
+        if (data.indexOf("ENCODE RESULT") !== -1) {
+            // 输出是字符串，需要转成数组
+            let ret = data.split("**")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("*************encode ", JSON.parse(ret));
+            console.log("发送脉冲");
+            global.panel.webview.postMessage({ getMobileSpeechAppEncodeRet: JSON.parse(ret) });
+
+        }
+    });
+    scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        let formatted_err = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({ encodeMobileSpeechAppProcessErrLog: formatted_err });
+    });
+    scriptProcess.on("exit", function () {
+        console.log("done!!");
+        let str = "Encode speech data finished, the result is saved in " + outputDir;
+        global.panel.webview.postMessage({ encodeMobileSpeechAppProcessFinish: str });
+    });
+
+}
+
+// 4. 发送数据，芯片识别
+function runMobileSpeechSendInputProcess(global) {
+    console.log("给芯片发送数据，执行移动端语音识别");
+
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "send_input.py");
+    let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
+    let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+
+    let command_str = "python3 " + scriptPath + " " + configDir + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let chipCalculateProcess = exec(command_str, {});
+
+    chipCalculateProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        if (data.indexOf("get slave ip port failed") != -1) {
+            global.panel.webview.postMessage({ mobileSpeechGetIPAndPortFailed: data });
+        }
+        // 解析识别结果的输出
+        if (data.indexOf("OUTPUT SPIKES RESULT") !== -1) {
+            let ret = data.split("**")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("*************output ", JSON.parse(ret));
+            console.log("发送输出脉冲");
+            global.panel.webview.postMessage({ getMobileSpeechOutputSpikesRet: JSON.parse(ret) });
+        }
+        if (data.indexOf("NUMBERRECOGNITION RESULT") !== -1) {
+            let numRet = data.split("$$")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("发送识别结果：", numRet);
+            global.panel.webview.postMessage({ getMobileSpeechRegRet: numRet });
+        }
+    });
+    chipCalculateProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        let formatted_err = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({ runMobileSpeechSendInputProcessErrorLog: formatted_err });
+
+    });
+    chipCalculateProcess.on("exit", function () {
+        console.log("chip calculate finished!!");
+        global.panel.webview.postMessage({ runMobileSpeechSendInputProcessFinish: "done" });
+
+        // 获取应用运行的结束时间
+        let endTime = new Date();//获取当前时间 
+        global["mobileSpeechEndTime"] = endTime;
+        console.log("应用运行结束时间为：", global.mobileSpeechEndTime);
+        global["mobileSpeechTotalRuntime"] = getAppRuntime(global.mobileSpeechStartTime, global.mobileSpeechEndTime);
+        console.log("应用运行耗时为：", global.mobileSpeechTotalRuntime);
+        global.panel.webview.postMessage({ mobileSpeechRecognitionProcessTime: global.mobileSpeechTotalRuntime });
+
+        // 可以执行下一个图像识别
+        clearGlobalRecorderCache();
+
+
+
+    });
 }
 

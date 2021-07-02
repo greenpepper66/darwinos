@@ -48,7 +48,7 @@ window.addEventListener('message', event => {
 
 
     // 任务删除结果
-    if(message.deleteImgAppTaskRet != undefined) {
+    if (message.deleteImgAppTaskRet != undefined) {
         console.log('---------------------------message：delete task ', message.deleteImgAppTaskRet);
         // 表格中删除一行数据
         deleteRowByID(message.deleteImgAppTaskRet);
@@ -60,9 +60,9 @@ window.addEventListener('message', event => {
 function deleteRowByID(id) {
     let tab = document.getElementById('imgAppTasksTable');
     let trs = tab.getElementsByTagName('tr');
-    for (let i = 0; i <trs.length; i++) {
+    for (let i = 0; i < trs.length; i++) {
         console.log("行号：", trs[i].rowIndex);
-        if(trs[i].cells[1].innerHTML == id) {
+        if (trs[i].cells[1].innerHTML == id) {
             console.log("列一内容：", trs[i].cells[1].innerHTML);
             tab.deleteRow(trs[i].rowIndex);
         }
@@ -84,23 +84,23 @@ new Vue({
 
     },
     methods: {
-        gotoImgAppTaskPage(imgAppID) {
-            console.log("run app: ", imgAppID);
+        gotoImgAppTaskPage(imgAppID, appType) {
+            console.log("run app: ", imgAppID, appType);
             // 给插件发送消息 跳转到任务页面
             vscode.postMessage({
                 command: 'gotoImgAppTaskPage',
-                text: imgAppID,
+                text: [imgAppID, appType],
             });
         },
 
-        deleteImgAppTask(appID) {
-            console.log("delete task: ", appID);
+        deleteImgAppTask(appID, appType) {
+            console.log("delete task: ", appID, appType);
             // 给插件发送消息 删除一条应用
             vscode.postMessage({
                 command: 'deleteImgAppTask',
-                text: appID,
+                text: [appID, appType],
             });
         }
-       
+
     }
 });

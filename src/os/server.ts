@@ -7,6 +7,7 @@ var express = require('express'); //express框架模块
 var ip = require('ip');
 var multiparty = require('multiparty');
 
+
 import { ResProvider } from "../DataProvider/ResProvider";
 import { ModelProvider, Model } from "../DataProvider/ModelProvider";
 import { uploadModelPageProvideByPort, modelHomePageProvideByPort, nodePageProvideByPort, chipPageProvideByPort } from "../PageProvider";
@@ -31,7 +32,7 @@ export module handWriterData {
 
 // 移动端录音数据
 export module recorderAudioData {
-	export let currentAudioBs64Data = "";
+	// export let currentAudioBs64Data = "";
 	export let recorderCouldReceiveNextAudioFlag = true;
 	export let recorderAudioShowedFlag = true;
 }
@@ -298,7 +299,7 @@ export function startRecorderHttpsServer(context) {
 						}
 					});
 					recorderAudioData.recorderAudioShowedFlag = false;
-					recorderAudioData.currentAudioBs64Data = obj.blob;
+					// recorderAudioData.currentAudioBs64Data = obj.blob;
 					res.send("success");
 				} else {
 					res.send("refuse");
@@ -306,6 +307,9 @@ export function startRecorderHttpsServer(context) {
 			});
 		}
 	});
+
+
+
 
 
 	https.createServer({

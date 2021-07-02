@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ImgAppJsonData } from '../DataProvider/ImgAppJsonDataProvider';
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
+const speechAppsConfigFile = "src/static/cache/speechAppsConfig.json";
 
 export class TaskProvider implements vscode.TreeDataProvider<Task> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Task | undefined | void> = new vscode.EventEmitter<Task | undefined | void>();
@@ -60,35 +61,45 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 	public getTasksList() {
 		this.tasks = [];
 		console.log("task list searching ...", __filename);
-		let resourcePath = path.join(__filename, "..", "..", "..", imgAppsConfigFile);
-		let data = fs.readFileSync(resourcePath, 'utf-8');
-		let stringContent = data.toString();//将二进制的数据转换为字符串
-		let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
 
-		for (var i = 0; i < jsonContent.data.length; i++) {
-			if (jsonContent.data[i].status == 1) {  // 状态为1的表示一条任务
-				var taskID = jsonContent.data[i].id;
-				var name = jsonContent.data[i].name;
-				var modelID = jsonContent.data[i].modeFileID;
-				var nodeID = jsonContent.data[i].modelFileNodeID;
-				var nodeIP = jsonContent.data[i].modelFileNodeIP;
+		let appFiles = [imgAppsConfigFile, speechAppsConfigFile];
+		let appTypes = [0, 2];
+		for (let j = 0; j < appFiles.length; j++) {
+			
+			let resourcePath = path.join(__filename, "..", "..", "..", appFiles[j]);
+			let data = fs.readFileSync(resourcePath, 'utf-8');
+			let stringContent = data.toString();//将二进制的数据转换为字符串
+			let jsonContent: ImgAppJsonData = JSON.parse(stringContent);//将字符串转换为json对象
 
-				var task = new Task(
-					name,
-					vscode.TreeItemCollapsibleState.None,
-					taskID,
-					modelID,
-					nodeID,
-					nodeIP,
-					{
-						command: 'extension.gotoImgAppTaskPage',
-						title: '',
-						arguments: [name, taskID, "图像识别"]
-					}
-				);
-				this.tasks.push(task);
+			for (let i = 0; i < jsonContent.data.length; i++) {
+				if (jsonContent.data[i].status == 1) {  // 状态为1的表示一条任务
+					var taskID = jsonContent.data[i].id;
+					var name = jsonContent.data[i].name;
+					var modelID = jsonContent.data[i].modeFileID;
+					var nodeID = jsonContent.data[i].modelFileNodeID;
+					var nodeIP = jsonContent.data[i].modelFileNodeIP;
+
+					var task = new Task(
+						name,
+						vscode.TreeItemCollapsibleState.None,
+						taskID,
+						modelID,
+						nodeID,
+						nodeIP,
+						{
+							command: 'extension.gotoImgAppTaskPage',
+							title: '',
+							arguments: [name, taskID, appTypes[j]]
+						}
+					);
+					this.tasks.push(task);
+				}
 			}
 		}
+
+
+
+
 	}
 }
 

@@ -103,7 +103,14 @@
                                 <td>{{ index + 1 }}</td>
                                 <td>{{ item.id }}</td>
                                 <td>{{ item.name }}</td>
-                                <td>数字图像识别</td>
+
+                                <template v-if="item.appType == 0">
+                                    <td>数字图像识别</td>
+                                </template>
+                                <template v-else-if="item.appType == 2">
+                                    <td>语音识别</td>
+                                </template>
+
                                 <td>{{ item.modeFileID }}</td>
                                 <template v-if="item.encodeMethodID == 0">
                                     <td>频率编码</td>
@@ -114,9 +121,9 @@
                                 <td>{{ item.createTime }}</td>
                                 <td>
                                     <button type="button" class="imgAppTasks_detail_btn"
-                                        @click="gotoImgAppTaskPage(item.id)">详情</button>
+                                        @click="gotoImgAppTaskPage(item.id, item.appType)">详情</button>
                                     <button type="button" class="imgAppTasks_delete_btn"
-                                        @click="deleteImgAppTask(item.id)">删除</button>
+                                        @click="deleteImgAppTask(item.id, item.appType)">删除</button>
                                 </td>
                             </tr>
                         </template>

@@ -71,12 +71,14 @@
                     <div class="row" style="margin: auto;">
 
                         <div class="col-md-2">
-                            <div class="userMnistOneApp_handWriter_title">手写板输入</div>
+                            <div class="userMnistOneApp_handWriter_title">音频输入</div>
                             <div class="userMnistOneApp_handWriter_inputImg">
-
-                                <div id="userSpeechOneApp_recorder_audioData" class="userMnistOneApp_waveform"></div>
-                                <a href="javascript:" id="btnPlay" role="button" >播放</a>
-                                <a href="javascript:" id="btnPause" role="button">暂停</a>
+                                <div id="userSpeechApp_inputAudio" style="display: none;">
+                                    <canvas id='canvas' width="150" height="150"></canvas>
+                                    <br>
+                                    <button type="button" class="userSpeechOneApp_playAudio_btn"
+                                        onclick=startPlayAudio()>播放音频</button>
+                                </div>
 
                             </div>
                         </div>
@@ -86,7 +88,7 @@
                         </div> -->
 
                         <div class="col-md-4">
-                            <div class="userMnistOneApp_handWriter_title">图像脉冲编码</div>
+                            <div class="userMnistOneApp_handWriter_title">音频脉冲编码</div>
                             <div class="userMnistOneApp_handWriter_spikesEchart" id="mobileAudio_spikes_charts">
 
                             </div>
@@ -109,7 +111,7 @@
                             <div class="userMnistOneApp_handWriter_outputEchart" id="mobileAudio_output_charts">
 
                             </div>
-                            <div id="userSpeechOneApp_handWriter_outputEchartLoading"
+                            <div id="userSpeechOneApp_recorder_outputEchartLoading"
                                 class="userMnistOneApp_handWriter_outputEchart" style="display: none;">
                                 <img src="../images/loading.gif" class="userMnistOneApp_loading_img">
                                 <div>
@@ -121,10 +123,15 @@
 
                         <div class="col-md-2">
                             <div class="userMnistOneApp_handWriter_title">芯片识别结果</div>
+
+
                             <div class="userMnistOneApp_handWriter_outputRet" id="mobileAudio_output_num">
-                                <div class="userMnistOneApp_handWriter_outputNum"
-                                    id="userSpeechOneApp_recorder_outputNum"></div>
+                                <div class="userMnistOneApp_handWriter_outputNum" id="userSpeechOneApp_recorder_outputResult">
+                                </div>
                             </div>
+
+
+
                             <div id="userSpeechOneApp_recorder_outputNumLoading"
                                 class="userMnistOneApp_handWriter_outputRet" style="display: none;">
                                 <img src="../images/loading.gif" class="userMnistOneApp_loading_img">
@@ -152,8 +159,8 @@
                             <tr>
                                 <td>应用名称</td>
                                 <td>{{userAppInfo.name}}</td>
-                                <td>音频大小</td>
-                                <td>0</td>
+                                <td>音频个数</td>
+                                <td>1</td>
                             </tr>
                             <tr>
                                 <td>应用ID</td>
@@ -207,10 +214,6 @@
     <script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
     <script src="../lib/echarts.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../lib/wavesurfer/wavesurfer.min.js"></script>
-    <script src="../lib/wavesurfer/wavesurfer.timeline.js"></script>
-    <script src="../lib/wavesurfer/wavesurfer.cursor.js"></script>
-    <script src="../lib/wavesurfer/wavesurfer.spectrogram.js"></script>
     <script src="../js/useSpeechOneApp.js"></script>
     <script>Vue.config.ProductionTip = false</script>
 </body>

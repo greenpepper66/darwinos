@@ -15,9 +15,14 @@ import requests
 import socket
 import json
 
+################################################################################################################
+## 发送脉冲给芯片 —— 手写板数字图像识别应用、移动端音频识别应用
+################################################################################################################
+
+
 configDir = sys.argv[1]        # 用户指定的配置文件所在目录
 inputDir = sys.argv[2]         # input.txt row.txt数据所在目录
-print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "start hand-writer send input data.")
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "start send input data.")
 
 
 CLIENT_IP = '192.168.1.254'
@@ -140,7 +145,7 @@ if isExists1 and isExists2:
 
     Number = str(max_index)
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] get Number ", Number)
-    print("HANDWRITERRECOGNITION RESULT: $$", Number, "$$", flush=True)
+    print("NUMBERRECOGNITION RESULT: $$", Number, "$$", flush=True)
 
     clear_start(conn1, 1)
 
@@ -149,5 +154,5 @@ if isExists1 and isExists2:
     # os.remove(os.path.join(inputDir, "input.txt"))
 
 
-print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] HANDWRITERRECOGNITION FINISHED!", flush=True)
+print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "[I] NUMBERRECOGNITION FINISHED!", flush=True)
 
