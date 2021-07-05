@@ -945,7 +945,7 @@ table.userMnistOneApp_imgSrc_table {
   margin-bottom: 20px;
   font-size: 16px;
   color: #333333;
-  width: 80%;
+  width: 100%;
 }
 
 table.userMnistOneApp_imgSrc_table tr {
@@ -1578,4 +1578,8 @@ table.fatigueDrivingApp_page_table tr td:nth-child(6) {
   padding-top: 2px;
   border-style: none;
   margin-top: 50px;
+}
+.userSpeechOneApp_mobileServer_txt {
+  word-wrap:break-word;
+  white-space: pre-line;
 }

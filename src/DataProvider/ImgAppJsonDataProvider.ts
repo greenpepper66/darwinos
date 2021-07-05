@@ -2,10 +2,11 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// 根据函数参数类型处理对应的json文件：0-手写体图像识别, 1-疲劳检测, 2-语音识别
+// 根据函数参数类型处理对应的json文件：0-手写体图像识别, 1-疲劳检测, 2-语音识别，3-年龄检测
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
 const fatigueDrivingAppsConfigFile = "src/static/cache/fatigueDrivingAppsConfig.json";
 const speechAppsConfigFile = "src/static/cache/speechAppsConfig.json";
+const ageJudgeAppsConfigFile = "src/static/cache/ageJudgeAppsConfig.json";
 
 /**
  * ******************************************************************************************************
@@ -66,6 +67,8 @@ export function writeJson(context, imgAppConfig) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
     } else if (imgAppConfig.appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    } else if (imgAppConfig.appType == 3) {
+        var resourcePath = path.join(context.extensionPath, ageJudgeAppsConfigFile);
     }
 
     //现将json文件读出来
@@ -134,6 +137,8 @@ export function deleteJson(context, id, appType) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
     } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    } else if (appType == 3) {
+        var resourcePath = path.join(context.extensionPath, ageJudgeAppsConfigFile);
     }
 
     try {
@@ -172,6 +177,8 @@ export function searchAllJson(context, appType) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
     } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    } else if (appType == 3) {
+        var resourcePath = path.join(context.extensionPath, ageJudgeAppsConfigFile);
     }
 
     let data = fs.readFileSync(resourcePath, 'utf-8');
@@ -196,6 +203,8 @@ export function searchImgAppByID(context, id, appType) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
     } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    } else if (appType == 3) {
+        var resourcePath = path.join(context.extensionPath, ageJudgeAppsConfigFile);
     }
 
     let data = fs.readFileSync(resourcePath, 'utf-8');
@@ -220,6 +229,8 @@ export function searchImgAppByName(context, name, appType) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
     } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    } else if (appType == 3) {
+        var resourcePath = path.join(context.extensionPath, ageJudgeAppsConfigFile);
     }
 
     let data = fs.readFileSync(resourcePath, 'utf-8');
@@ -243,6 +254,8 @@ export function updateImgAppStatusToTask(context, id, appType) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
     } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    } else if (appType == 3) {
+        var resourcePath = path.join(context.extensionPath, ageJudgeAppsConfigFile);
     }
 
     try {
@@ -282,6 +295,8 @@ export function checkImgAppExist(context, message, appType) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
     } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    } else if (appType == 3) {
+        var resourcePath = path.join(context.extensionPath, ageJudgeAppsConfigFile);
     }
 
     try {
@@ -321,7 +336,7 @@ export function checkImgAppExist(context, message, appType) {
 export function searchAllImgAppTasks(context) {
     console.log("json searching all task...");
 
-    let appFiles = [imgAppsConfigFile, speechAppsConfigFile];
+    let appFiles = [imgAppsConfigFile, speechAppsConfigFile, ageJudgeAppsConfigFile];
     let allImgTasks = [];
 
     for (let j = 0; j < appFiles.length; j++) {
@@ -351,6 +366,8 @@ export function updateImgAppStatusToApp(context, id, appType) {
         var resourcePath = path.join(context.extensionPath, fatigueDrivingAppsConfigFile);
     } else if (appType == 2) {
         var resourcePath = path.join(context.extensionPath, speechAppsConfigFile);
+    } else if (appType == 3) {
+        var resourcePath = path.join(context.extensionPath, ageJudgeAppsConfigFile);
     }
 
     try {

@@ -14,50 +14,50 @@ export class UserProvider implements vscode.TreeDataProvider<UserAppKind> {
 
     constructor(private workspaceRoot: string) {
         this.userAppKinds = [];
-		var imgApp = new UserAppKind(
-			"数字图像识别",
-			UserProvider.getIconUriForLabel("数字图像识别.png"),
-			vscode.TreeItemCollapsibleState.None,
-			{
-				command: 'extension.gotoOneKindUserAppPage',
-				title: '',
-				arguments: ["imgApp", 1]
-			}
-		);
-		this.userAppKinds.push(imgApp);
-		var voiceApp = new UserAppKind(
-			"语音识别",
-			UserProvider.getIconUriForLabel("语音识别.png"),
-			vscode.TreeItemCollapsibleState.None,
-			{
-				command: 'extension.gotoOneKindUserAppPage',
-				title: '',
-				arguments: ["speechApp", 2]
-			}
-		);
-		this.userAppKinds.push(voiceApp);
-		var brainApp = new UserAppKind(
-			"脑电模拟",
-			UserProvider.getIconUriForLabel("脑电模拟.png"),
-			vscode.TreeItemCollapsibleState.None,
-			{
-				command: '',
-				title: '',
-				arguments: []
-			}
-		);
-		this.userAppKinds.push(brainApp);
-		var otherApp = new UserAppKind(
-			"疲劳检测",
-			UserProvider.getIconUriForLabel("其它应用.png"),
-			vscode.TreeItemCollapsibleState.None,
-			{
-				command: 'extension.gotoOneKindUserAppPage',
-				title: '',
-				arguments: ["videoApp", 4]
-			}
-		);
-		this.userAppKinds.push(otherApp);
+        var imgApp = new UserAppKind(
+            "数字图像识别",
+            UserProvider.getIconUriForLabel("数字图像识别.png"),
+            vscode.TreeItemCollapsibleState.None,
+            {
+                command: 'extension.gotoOneKindUserAppPage',
+                title: '',
+                arguments: ["imgApp", 1]
+            }
+        );
+        this.userAppKinds.push(imgApp);
+        var voiceApp = new UserAppKind(
+            "语音识别",
+            UserProvider.getIconUriForLabel("语音识别.png"),
+            vscode.TreeItemCollapsibleState.None,
+            {
+                command: 'extension.gotoOneKindUserAppPage',
+                title: '',
+                arguments: ["speechApp", 2]
+            }
+        );
+        this.userAppKinds.push(voiceApp);
+        var brainApp = new UserAppKind(
+            "年龄检测",
+            UserProvider.getIconUriForLabel("脑电模拟.png"),
+            vscode.TreeItemCollapsibleState.None,
+            {
+                command: 'extension.gotoOneKindUserAppPage',
+                title: '',
+                arguments: ["ageJudgeApp", 3]
+            }
+        );
+        this.userAppKinds.push(brainApp);
+        var otherApp = new UserAppKind(
+            "疲劳检测",
+            UserProvider.getIconUriForLabel("其它应用.png"),
+            vscode.TreeItemCollapsibleState.None,
+            {
+                command: 'extension.gotoOneKindUserAppPage',
+                title: '',
+                arguments: ["videoApp", 4]
+            }
+        );
+        this.userAppKinds.push(otherApp);
     }
 
     refresh(): void {
@@ -113,16 +113,16 @@ export class UserProvider implements vscode.TreeDataProvider<UserAppKind> {
 
 
 export class UserAppKind extends vscode.TreeItem {
-	constructor(
-		public readonly label: string,
-		public readonly iconPath: vscode.Uri,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command
-	) {
-		super(label, collapsibleState);
-	}
+    constructor(
+        public readonly label: string,
+        public readonly iconPath: vscode.Uri,
+        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly command?: vscode.Command
+    ) {
+        super(label, collapsibleState);
+    }
 
-	contextValue = 'user-view Application Kind';
+    contextValue = 'user-view Application Kind';
 }
 
 export class UserAppItem extends vscode.TreeItem {

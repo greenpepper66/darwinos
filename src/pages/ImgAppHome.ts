@@ -29,6 +29,11 @@ const speechAppHomeHtmlFilePath = "src/static/views/speechAppHome.html";
 const newSpeechAppHtmlFilePath = "src/static/views/newSpeechApp.html";
 const speechAppInfoHtmlFilePath = "src/static/views/speechAppInfo.html";
 
+// 年龄检测应用
+const ageJudgeAppHomeHtmlFilePath = "src/static/views/ageJudgeAppHome.html";
+const newAgeJudgeAppHtmlFilePath = "src/static/views/newAgeJudgeApp.html";
+const ageJudgeAppInfoHtmlFilePath = "src/static/views/ageJudgeAppInfo.html";
+
 // const log_output_channel = vscode.window.createOutputChannel("darwinos output");
 // log_output_channel.show();
 
@@ -76,7 +81,7 @@ function getImgFileNum(path: string) {
 }
 
 // 3. 保存应用配置到json文件中
-// 参数appType： 应用类型： 0-手写体图像识别, 1-疲劳检测, 2-语音识别
+// 参数appType： 应用类型： 0-手写体图像识别, 1-疲劳检测, 2-语音识别, 3-年龄检测
 // message.text: [appName, modelFileID, encodeMethodID, encodeConfDir, outputDir]
 function writeImgAppInfoToJson(global, message, appType) {
     if (message.text.length != 5 || message.text[0] == "" || message.text[1] == "" || message.text[2] == ""
@@ -922,8 +927,6 @@ const newSpeechAppMessageHandler = {
         console.log(message);
         openSpeechAppHomePage(global.context);
     },
-
-
 };
 
 
@@ -1021,3 +1024,236 @@ export function openSpeechAppInfoPage(context, appID) {
         );
     }
 }
+
+
+
+
+
+
+
+
+
+/**
+ * ******************************************************************************************************
+ * 年龄检测应用
+ * ******************************************************************************************************
+ */
+// 1. 年龄检测应用列表首页交互
+const ageJudgeAppMessageHandler = {
+    // 1.1 打开新建年龄检测应用页面
+    gotoNewAgeJudgeAppPage(global, message) {
+        console.log(message);
+        openNewAgeJudgeAppPage(global.context);
+    },
+
+    // 1.2 查询所有应用列表
+    getAgeJudgeAppsConfigList(global, message) {
+        console.log(message);
+        let allApps = searchAllJson(global.context, 3);
+        global.panel.webview.postMessage({ cmd: 'getAgeJudgeAppsConfigListRet', cbid: message.cbid, data: allApps });
+    },
+
+    // 2.3 删除应用
+    deleteAgeJudgeAppConfig(global, message) {
+        console.log(message);
+        let delRet = deleteJson(global.context, message.text, 3);
+        console.log("deleteAgeJudgeAppConfig ret: ", delRet);
+        global.panel.webview.postMessage({ deleteAgeJudgeAppConfigRet: message.text });
+    },
+
+    // 2.4 查询应用  显示详情页
+    gotoAgeJudgeAppInfoPage(global, message) {
+        console.log(message);
+        openAgeJudgeAppInfoPage(global.context, message.text);
+    },
+
+};
+
+// 2. 打开年龄检测应用首页, 最近应用列表页面
+export function openAgeJudgeAppHomePage(context) {
+    console.log("IDE openAgeJudgeAppHomePage!", IDEPanels.ageJudgeAppListPanel);
+    if (IDEPanels.ageJudgeAppListPanel) {
+        console.log("打开年龄检测应用列表页面：", IDEPanels.ageJudgeAppListPanel.visible);
+        IDEPanels.ageJudgeAppListPanel.reveal();
+    } else {
+        console.log("新建年龄检测应用列表页面");
+        IDEPanels.ageJudgeAppListPanel = vscode.window.createWebviewPanel(
+            'ageJudgeAppListPage',
+            "年龄检测",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+
+        let panel = IDEPanels.ageJudgeAppListPanel;
+        let global = { panel, context };
+
+        IDEPanels.ageJudgeAppListPanel.webview.html = getAppsHomeHtml(context, ageJudgeAppHomeHtmlFilePath);
+        IDEPanels.ageJudgeAppListPanel.webview.onDidReceiveMessage(message => {
+            if (ageJudgeAppMessageHandler[message.command]) {
+                ageJudgeAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openAgeJudgeAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.ageJudgeAppListPanel.onDidDispose(
+            () => {
+                IDEPanels.ageJudgeAppListPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+// 3. 新建年龄检测应用页面交互
+const newAgeJudgeAppMessageHandler = {
+    // 3.1 获取模型文件
+    getAgeJudgeModelFileList(global, message) {
+        console.log(message);
+        console.log("models list:", allData.deployedModelList);
+        global.panel.webview.postMessage({ getAgeJudgeModelFileListRet: allData.deployedModelList });
+    },
+
+    // 3.2 选择编码所需的各个配置文件 - 打包成一个了
+    selectAgeJudgeEncodeConfFile(global, message) {
+        console.log(message);
+        const options: vscode.OpenDialogOptions = {
+            openLabel: "选择文件",
+            // canSelectFolders: true,
+        };
+        vscode.window.showOpenDialog(options).then(fileUri => {
+            console.log("选择配置文件为", fileUri);
+            global.panel.webview.postMessage({ selectAgeJudgeEncodeConfFileRet: fileUri[0].fsPath });
+        });
+    },
+
+    //3.3 选择编码过程中输出文件所在的文件夹
+    selectAgeJudgeOutputDir(global, message) {
+        console.log(message);
+        const options: vscode.OpenDialogOptions = {
+            openLabel: "选择目录",
+            canSelectFolders: true,
+        };
+        vscode.window.showOpenDialog(options).then(fileUri => {
+            console.log("选择目录为", fileUri);
+            global.panel.webview.postMessage({ selectAgeJudgeOutputDirRet: fileUri[0].fsPath });
+        });
+    },
+
+    // 3.4 保存应用配置 - 新建应用页面的“保存应用”按钮触发
+    saveAgeJudgeAppConfig(global, message) {
+        console.log(message);
+        let saveRet = writeImgAppInfoToJson(global, message, 3);
+        console.log("saveAgeJudgeAppConfig save result： ", saveRet);
+        global.panel.webview.postMessage({ saveAgeJudgeAppConfig: saveRet });
+    },
+
+    // 1.5 应用保存成功后，弹出框显示“保存成功！”, 页面跳转到应用列表页面
+    newAgeJudgeAppSaveSuccGotoListPage(global, message) {
+        console.log(message);
+        openAgeJudgeAppHomePage(global.context);
+    },
+
+};
+
+// 4. 打开新建年龄检测应用页面
+export function openNewAgeJudgeAppPage(context) {
+    console.log("IDE openNewAgeJudgeAppPage!", IDEPanels.newAgeJudgeAppPanel);
+    if (IDEPanels.newAgeJudgeAppPanel) {
+        console.log("打开新建年龄检测应用页面：", IDEPanels.newAgeJudgeAppPanel.visible);
+        IDEPanels.newAgeJudgeAppPanel.reveal();
+    } else {
+        console.log("新建 新建年龄检测应用页面");
+
+        IDEPanels.newAgeJudgeAppPanel = vscode.window.createWebviewPanel(
+            'newAgeJudgeAppPage',
+            "新建年龄检测应用",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        let panel = IDEPanels.newAgeJudgeAppPanel;
+        let global = { panel, context };
+        IDEPanels.newAgeJudgeAppPanel.webview.html = getAppsHomeHtml(context, newAgeJudgeAppHtmlFilePath);
+
+        IDEPanels.newAgeJudgeAppPanel.webview.onDidReceiveMessage(message => {
+            if (newAgeJudgeAppMessageHandler[message.command]) {
+                newAgeJudgeAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openNewAgeJudgeAppPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.newAgeJudgeAppPanel.onDidDispose(
+            () => {
+                IDEPanels.newAgeJudgeAppPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+// 5. 应用详情页面交互
+const ageJudgeAppInfoMessageHandler = {
+    getAgeJudgeAppInfos(global, message) {
+        console.log(message);
+        let infos = searchImgAppByID(global.context, global.appID, 3);
+        global.panel.webview.postMessage({ cmd: 'getAgeJudgeAppInfosRet', cbid: message.cbid, data: infos });
+    },
+};
+
+// 6. 打开应用详情页面
+export function openAgeJudgeAppInfoPage(context, appID) {
+    console.log("IDE openAgeJudgeAppInfoPage!", IDEPanels.ageJudgeAppInfoPagePanelsMap);
+    if (IDEPanels.ageJudgeAppInfoPagePanelsMap.has(appID)) {
+        console.log("打开年龄检测应用详情页面：", IDEPanels.ageJudgeAppInfoPagePanelsMap.get(appID).visible);
+        IDEPanels.ageJudgeAppInfoPagePanelsMap.get(appID).reveal();
+    } else {
+        console.log("新建年龄检测应用详情页面");
+        let panel = vscode.window.createWebviewPanel(
+            'ageJudgeAppInfoPage',
+            "应用详情",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        panel.webview.html = getAppsHomeHtml(context, ageJudgeAppInfoHtmlFilePath);
+
+        // 保存应用ID
+        let global = { panel, context, appID };
+        IDEPanels.ageJudgeAppInfoPagePanelsMap.set(appID, panel);
+
+        panel.webview.onDidReceiveMessage(message => {
+            if (ageJudgeAppInfoMessageHandler[message.command]) {
+                ageJudgeAppInfoMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openAgeJudgeAppInfoPage 2!", global.panel);
+
+        // 面板被关闭后重置
+        panel.onDidDispose(
+            () => {
+                panel = undefined;
+                IDEPanels.ageJudgeAppInfoPagePanelsMap.delete(appID);
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+

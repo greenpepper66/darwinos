@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>语音识别应用</title>
+    <title>年龄检测应用</title>
     <style>
         .clearfix:before,
         .clearfix:after {
@@ -28,28 +28,28 @@
 </head>
 
 <body>
-    <div id="userSpeechOneApp" class="userMnistOneApp_page">
+    <div id="userAgeJudgeOneApp" class="userMnistOneApp_page">
         <div class="clearfix thewrap userMnistOneApp_top">
             <table class="userMnistOneApp_imgSrc_table">
                 <tr>
-                    <td>请选择音频输入源：</td>
+                    <td>请选择照片输入源：</td>
 
                     <td>
                         <div>
-                            <select class="form-control userMnistOneApp_select_imgSrc" id="userSpeechOneApp_select_src"
-                                onchange="selectAudioSrcKind()">
-                                <option value="mobileAudio">移动端录音</option>
+                            <select class="form-control userMnistOneApp_select_imgSrc" id="userAgeJudgeOneApp_select_src"
+                                onchange="selectPhotoSrcKind()">
+                                <option value="mobileAudio">移动端拍照</option>
                                 <!-- <option value="localAudio">本地音频</option> -->
                                 <!-- <option value="networkImg">以太网</option> -->
                             </select>
                         </div>
                     </td>
 
-                    <td id="userSpeechOneApp_mobileServer_addr" class="userMnistOneApp_handWriter_desc">
+                    <td id="userAgeJudgeOneApp_mobileServer_addr" class="userMnistOneApp_handWriter_desc">
                         <div class="userSpeechOneApp_mobileServer_txt">
                             请在手机浏览器中打开 <span
-                                class="userMnistOneApp_handWriter_url">{{recorderServerURL}}</span>,进行录音并发送。
-                            <span>提示：录音内容为英文0-9,如果页面访问有问题,请尝试其他浏览器或下载最新版的Chrome浏览器。</span>
+                                class="userMnistOneApp_handWriter_url">{{ageJudgeServerURL}}</span>,进行拍照并发送。
+                            <span>提示：如果页面访问有问题,请尝试其他浏览器或下载最新版的Chrome浏览器。</span>
                         </div>
                     </td>
                 </tr>
@@ -58,43 +58,33 @@
 
 
 
-        <!-- 手机录音输入，语音识别流程展示 -->
-        <div id="userSpeechOneApp_mobile_mainPage">
+        <!-- 手机拍照输入，年龄检测流程展示 -->
+        <div id="userAgeJudgeOneApp_mobile_mainPage">
             <div class="clearfix thewrap userMnistOneApp_handWriter_middle">
                 <div class="row">
-                    <div class="userMnistOneApp_title">移动端语音识别</div>
+                    <div class="userMnistOneApp_title">年龄检测应用</div>
                 </div>
 
                 <div>
                     <div class="row" style="margin: auto;">
 
                         <div class="col-md-2">
-                            <div class="userMnistOneApp_handWriter_title">音频输入</div>
+                            <div class="userMnistOneApp_handWriter_title">手机拍照</div>
                             <div class="userMnistOneApp_handWriter_inputImg">
-                                <div id="userSpeechApp_inputAudio" style="display: none;">
-                                    <canvas id='canvas' width="150" height="150"></canvas>
-                                    <br>
-                                    <button type="button" class="userSpeechOneApp_playAudio_btn"
-                                        onclick=startPlayAudio()>播放音频</button>
-                                </div>
-
+                                <img id="userAgeJudgeOneApp_photo_imgData" src="">
                             </div>
                         </div>
 
-                        <!-- <div class="col-md-1">
-                            <img class="userMnistOneApp_handWriter_arrow" src="../images/arrow.png" />
-                        </div> -->
-
                         <div class="col-md-4">
-                            <div class="userMnistOneApp_handWriter_title">音频脉冲编码</div>
-                            <div class="userMnistOneApp_handWriter_spikesEchart" id="mobileAudio_spikes_charts">
+                            <div class="userMnistOneApp_handWriter_title">照片脉冲编码</div>
+                            <div class="userMnistOneApp_handWriter_spikesEchart" id="mobileAgeJudge_spikes_charts">
 
                             </div>
-                            <div id="userSpeechOneApp_recorder_encodeEchartLoading" style="display: none;"
+                            <div id="userAgeJudgeOneApp_photo_encodeEchartLoading" style="display: none;"
                                 class="userMnistOneApp_handWriter_spikesEchart">
                                 <img src="../images/loading.gif" class="userMnistOneApp_loading_img">
                                 <div>
-                                    <span id="mobileAudio_encode_processBar">0</span>
+                                    <span id="mobileAgeJudge_encode_processBar">0</span>
                                     <span>%</span>
                                 </div>
                             </div>
@@ -106,14 +96,14 @@
 
                         <div class="col-md-4">
                             <div class="userMnistOneApp_handWriter_title">输出层脉冲</div>
-                            <div class="userMnistOneApp_handWriter_outputEchart" id="mobileAudio_output_charts">
+                            <div class="userMnistOneApp_handWriter_outputEchart" id="mobileAgeJudge_output_charts">
 
                             </div>
-                            <div id="userSpeechOneApp_recorder_outputEchartLoading"
+                            <div id="userAgeJudgeOneApp_photo_outputEchartLoading"
                                 class="userMnistOneApp_handWriter_outputEchart" style="display: none;">
                                 <img src="../images/loading.gif" class="userMnistOneApp_loading_img">
                                 <div>
-                                    <span id="mobileAudio_output_processBar">0</span>
+                                    <span id="mobileAgeJudge_output_processBar">0</span>
                                     <span>%</span>
                                 </div>
                             </div>
@@ -123,15 +113,15 @@
                             <div class="userMnistOneApp_handWriter_title">芯片识别结果</div>
 
 
-                            <div class="userMnistOneApp_handWriter_outputRet" id="mobileAudio_output_num">
+                            <div class="userMnistOneApp_handWriter_outputRet" id="mobileAgeJudge_output_num">
                                 <div class="userMnistOneApp_handWriter_outputNum"
-                                    id="userSpeechOneApp_recorder_outputResult">
+                                    id="userAgeJudgeOneApp_photo_outputResult">
                                 </div>
                             </div>
 
 
 
-                            <div id="userSpeechOneApp_recorder_outputNumLoading"
+                            <div id="userAgeJudgeOneApp_photo_outputNumLoading"
                                 class="userMnistOneApp_handWriter_outputRet" style="display: none;">
                                 <img src="../images/loading.gif" class="userMnistOneApp_loading_img">
                                 <div>
@@ -158,27 +148,27 @@
                             <tr>
                                 <td>应用名称</td>
                                 <td>{{userAppInfo.name}}</td>
-                                <td>音频个数</td>
+                                <td>照片个数</td>
                                 <td>1</td>
                             </tr>
                             <tr>
                                 <td>应用ID</td>
                                 <td>{{userAppInfo.id}}</td>
-                                <td>语音识别耗时</td>
-                                <td id="userSpeechOneApp_recorder_runtime"></td>
+                                <td>年龄检测耗时</td>
+                                <td id="userAgeJudgeOneApp_photo_runtime"></td>
                             </tr>
                             <tr>
                                 <td>应用详情</td>
                                 <td>
                                     <button type="button" class="userMnistOneApp_detail_btn"
-                                        @click="userAppGotoSpeechAppInfoPage(userAppInfo.id)">应用详情</button>
+                                        @click="userAppGotoAgeJudgeAppInfoPage(userAppInfo.id)">应用详情</button>
                                 </td>
 
 
                                 <td>任务详情</td>
                                 <td>
                                     <button type="button" class="userMnistOneApp_detail_btn"
-                                        @click="userAppGotoSpeechAppTaskPage(userAppInfo.id)">任务详情</button>
+                                        @click="userAppGotoAgeJudgeAppTaskPage(userAppInfo.id)">任务详情</button>
                                 </td>
 
                             </tr>
@@ -196,8 +186,8 @@
 
 
         <div>
-            <div id="userSpeechOneApp_alert_result" class="userMnistOneApp_alert-box">
-                <p align="center" class="userMnistOneApp_alert-txt" id="userSpeechOneApp_alertContent"></p>
+            <div id="userAgeJudgeOneApp_alert_result" class="userMnistOneApp_alert-box">
+                <p align="center" class="userMnistOneApp_alert-txt" id="userAgeJudgeOneApp_alertContent"></p>
                 <button class="userMnistOneApp_alert-btn" onclick="closeUserOneAppAlertBox()">关闭</button>
             </div>
         </div>
@@ -213,7 +203,7 @@
     <script src="../lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
     <script src="../lib/echarts.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="../lib/vue.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../js/useSpeechOneApp.js"></script>
+    <script src="../js/useAgeJudgeOneApp.js"></script>
     <script>Vue.config.ProductionTip = false</script>
 </body>
 

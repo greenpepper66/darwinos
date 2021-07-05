@@ -4,6 +4,7 @@ import * as path from 'path';
 import { ImgAppJsonData } from '../DataProvider/ImgAppJsonDataProvider';
 const imgAppsConfigFile = "src/static/cache/imgAppsConfig.json";
 const speechAppsConfigFile = "src/static/cache/speechAppsConfig.json";
+const ageJudgeAppsConfigFile = "src/static/cache/ageJudgeAppsConfig.json";
 
 export class TaskProvider implements vscode.TreeDataProvider<Task> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Task | undefined | void> = new vscode.EventEmitter<Task | undefined | void>();
@@ -62,10 +63,10 @@ export class TaskProvider implements vscode.TreeDataProvider<Task> {
 		this.tasks = [];
 		console.log("task list searching ...", __filename);
 
-		let appFiles = [imgAppsConfigFile, speechAppsConfigFile];
-		let appTypes = [0, 2];
+		let appFiles = [imgAppsConfigFile, speechAppsConfigFile, ageJudgeAppsConfigFile];
+		let appTypes = [0, 2, 3];
 		for (let j = 0; j < appFiles.length; j++) {
-			
+
 			let resourcePath = path.join(__filename, "..", "..", "..", appFiles[j]);
 			let data = fs.readFileSync(resourcePath, 'utf-8');
 			let stringContent = data.toString();//将二进制的数据转换为字符串

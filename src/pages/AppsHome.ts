@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { openImgAppHomePage, openFatigueDrivingAppHomePage, openSpeechAppHomePage } from "./ImgAppHome";
+import { openImgAppHomePage, openFatigueDrivingAppHomePage, openSpeechAppHomePage, openAgeJudgeAppHomePage } from "./ImgAppHome";
 import { IDEPanels } from "../extension";
 
 
@@ -94,6 +94,8 @@ export function openCertainAppHomePage(context, num) {
         openImgAppHomePage(context);
     } else if (num == 2) {
         openSpeechAppHomePage(context); // 语音识别
+    } else if (num == 3) {
+        openAgeJudgeAppHomePage(context); // 年龄检测
     } else if (num == 4) {
         openFatigueDrivingAppHomePage(context);  // 疲劳检测
     } else {

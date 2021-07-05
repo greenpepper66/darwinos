@@ -53,6 +53,10 @@ export module IDEPanels {
 	export let speechAppListPanel: vscode.WebviewPanel | undefined = undefined;
 	export let newSpeechAppPanel: vscode.WebviewPanel | undefined = undefined;  
 	export let speechAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	// 年龄检测
+	export let ageJudgeAppListPanel: vscode.WebviewPanel | undefined = undefined;
+	export let newAgeJudgeAppPanel: vscode.WebviewPanel | undefined = undefined;  
+	export let ageJudgeAppInfoPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
 
 	// 用户视图
 	export let userHomePanel: vscode.WebviewPanel | undefined = undefined;
@@ -66,6 +70,9 @@ export module IDEPanels {
 	// 语音识别
 	export let userSpeechAppSquarePanel: vscode.WebviewPanel | undefined = undefined;
 	export let userSpeechAppRunPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
+	// 年龄检测
+	export let userAgeJudgeAppSquarePanel: vscode.WebviewPanel | undefined = undefined;
+	export let userAgeJudgeAppRunPagePanelsMap: Map<number, vscode.WebviewPanel> | undefined = new Map();  // key值为应用的id
 
 	// 任务视图
 	export let taskHomeImgAppListPanel: vscode.WebviewPanel | undefined = undefined;

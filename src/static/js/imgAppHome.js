@@ -40,7 +40,7 @@ window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
 
-    // 获取模型文件列表
+    // 获取应用文件列表
     if (message.cmd == 'appsConfigListRet') {
         this.appsConfigList = message.data;
         console.log(message.data);

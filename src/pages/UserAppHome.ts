@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { ChildProcess, exec, spawn } from "child_process";
 import { searchAllJson, updateImgAppInfo, searchImgAppByID, updateImgAppStatusToTask } from '../DataProvider/ImgAppJsonDataProvider';
-import { openImgAppInfoPage, openImgAppRunTaskPage, openSpeechAppInfoPage } from './ImgAppHome';
+import { openImgAppInfoPage, openImgAppRunTaskPage, openSpeechAppInfoPage, openAgeJudgeAppInfoPage } from './ImgAppHome';
 import { IDEPanels } from "../extension";
 import { handWriterData, recorderAudioData } from '../os/server';
 import { getOnlyHandWriterData, updataHandWriterAppID } from "../DataProvider/HandWriterImgJsonDataProvider";
@@ -26,6 +26,9 @@ const handWriterServerURL = "http://" + ip.address() + ":5003"
 const recorderHttpsServerURL = "https://" + ip.address() + ":5004"
 // 录音文件地址
 const recorderWavFilePath = "src/static/cache/audio.wav";
+// 手机拍照年龄检测照片地址
+const mobilePhotoFilePath = "src/static/cache/ageJudge.png";
+
 
 
 // html文件路径
@@ -41,6 +44,8 @@ const userFatigueDrivingAppHomeHtmlPath = "src/static/views/userFatigueDrivingAp
 const userSpeechAppHomeHtmlFilePath = "src/static/views/userSpeechAppHome.html";
 const userOneSpeechAppHtmlFilePath = "src/static/views/userSpeechOneApp.html";
 
+const userAgeJudgeAppHomeHtmlFilePath = "src/static/views/userAgeJudgeAppHome.html";
+const userOneAgeJudgeAppHtmlFilePath = "src/static/views/userAgeJudgeOneApp.html";
 
 
 /********************************************************************************************
@@ -124,6 +129,8 @@ export function openOneKindUserAppPage(context, num) {
         openMnistUserAppHomePage(context);
     } else if (num == 2) {
         openUserSpeechAppHomePage(context);
+    } else if (num == 3) {
+        openUserAgeJudgeAppHomePage(context);
     } else if (num == 4) {
         openFatigueDrivingAppHomePage(context);
     }
@@ -1276,11 +1283,11 @@ function finishDrivingProcess() {
 
 
 
-
-
-/********************************************************************************************
+/**
+ * ******************************************************************************************************
  * 语音识别应用开发
- ********************************************************************************************/
+ * ******************************************************************************************************
+ */
 // 1. 首页信息交互， 语音识别用户应用首页-九宫格页面
 const userSpeechHomeMessageHandler = {
     // 查询所有图像识别应用列表
@@ -1355,7 +1362,7 @@ const oneUserSpeechAppMessageHandler = {
         global.panel.webview.postMessage({ cmd: 'getRecorderHttpsServerURLRet', cbid: message.cbid, data: recorderHttpsServerURL });
     },
 
-    // 解包配置文件, 用户页面上一选择“手写板输入源”就执行解包
+    // 解包配置文件, 用户页面上一收到server地址就执行解包
     unpackSpeechRegConfig(global, message) {
         console.log(message);
         unpackSpeechRegConfigProcess(global);
@@ -1543,7 +1550,7 @@ function unpackSpeechRegConfigProcess(global) {
     scriptProcess.on("exit", function () {
         console.log("done!!");
         let unpackPath = path.join(outputDir, "unpack_target");
-        let str = "Unpack hand-writer config files finished, the result is saved in " + unpackPath;
+        let str = "Unpack speech reg config files finished, the result is saved in " + unpackPath;
         global.panel.webview.postMessage({ unpackSpeechRegConfigProcessFinish: str });
     });
 }
@@ -1654,4 +1661,367 @@ function runMobileSpeechSendInputProcess(global) {
 
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * ******************************************************************************************************
+ * 年龄检测应用开发
+ * ******************************************************************************************************
+ */
+// 1. 首页信息交互， 年龄检测用户应用首页-九宫格页面
+const userAgeJudgeHomeMessageHandler = {
+    // 查询所有图像识别应用列表
+    getUserAgeJudgeAppsList(global, message) {
+        console.log(message);
+        let allImgTasks = searchAllJson(global.context, 3);
+        global.panel.webview.postMessage({ cmd: 'getUserAgeJudgeAppsListRet', cbid: message.cbid, data: allImgTasks });
+    },
+
+    // 单击九宫格的按钮进入应用运行页面
+    gotoOneUserAgeJudgeAppPage(global, message) {
+        console.log(message);
+        openOneUserAgeJudgeAppPageByID(global.context, message.text);
+    },
+};
+
+// 2. 打开年龄检测应用首页 - 九宫格页面
+export function openUserAgeJudgeAppHomePage(context) {
+    console.log("IDE openUserAgeJudgeAppHomePage!", IDEPanels.userAgeJudgeAppSquarePanel);
+    if (IDEPanels.userAgeJudgeAppSquarePanel) {
+        console.log("打开用户视图年龄检测九宫格首页：", IDEPanels.userAgeJudgeAppSquarePanel.visible);
+        IDEPanels.userAgeJudgeAppSquarePanel.reveal();
+    } else {
+        console.log("新建用户视图年龄检测九宫格首页");
+
+        IDEPanels.userAgeJudgeAppSquarePanel = vscode.window.createWebviewPanel(
+            'userAgeJudgeAppHomePage',
+            "年龄检测",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+            }
+        );
+        IDEPanels.userAgeJudgeAppSquarePanel.webview.html = getHtmlContent(context, userAgeJudgeAppHomeHtmlFilePath);
+
+        let panel = IDEPanels.userAgeJudgeAppSquarePanel;
+        let global = { panel, context };
+
+        IDEPanels.userAgeJudgeAppSquarePanel.webview.onDidReceiveMessage(message => {
+            if (userAgeJudgeHomeMessageHandler[message.command]) {
+                userAgeJudgeHomeMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openUserAgeJudgeAppHomePage 2!", global.panel);
+
+        // 面板被关闭后重置
+        IDEPanels.userAgeJudgeAppSquarePanel.onDidDispose(
+            () => {
+                IDEPanels.userAgeJudgeAppSquarePanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+// 3. 单个年龄检测页面信息交互
+const oneUserAgeJudgeAppMessageHandler = {
+    // 返回单个应用信息
+    getOneUserAgeJudgeAppInfo(global, message) {
+        console.log(message);
+        global.panel.webview.postMessage({ cmd: 'getOneUserAgeJudgeAppInfoRet', cbid: message.cbid, data: global.appInfo });
+    },
+
+    // 获取手机拍照url
+    getAgeJudgeHttpsServerURL(global, message) {
+        console.log(message);
+        global.panel.webview.postMessage({ cmd: 'getAgeJudgeHttpsServerURLRet', cbid: message.cbid, data: "test" });
+    },
+
+    // 解包配置文件, 用户页面收到server地址就执行解包
+    unpackAgeJudgeConfig(global, message) {
+        console.log(message);
+        unpackAgeJudgeConfigProcess(global);
+    },
+
+    // 显示手机上传的照片
+    startGetPhotoFromMobile(global, message) {
+        console.log(message);
+        // 先清除缓存
+        clearGlobalMobilePhotoCache();
+        // 循环
+        getPhotoFromMobileLoop(global);
+        // 成为一条任务
+        updateImgAppStatusToTask(global.context, global.appInfo.id, 3);
+    },
+
+    // 照片编码
+    ageJudgeAppStartEncode(global, message) {
+        console.log(message);
+        encodeMobileAgeJudgeAppProcess(global);
+    },
+
+    // 照片年龄芯片识别
+    startMobileAgeJudgeRecognitionProcess(global, message) {
+        console.log(message);
+        runMobileAgeJudgeSendInputProcess(global);
+    },
+
+    // 查询应用  显示详情页
+    userAppGotoAgeJudgeAppInfoPage(global, message) {
+        console.log(message);
+        openAgeJudgeAppInfoPage(global.context, message.text);
+    },
+
+    // 跳转到任务详情页面
+    userAppGotoAgeJudgeAppTaskPage(global, message) {
+        console.log(message);
+        openImgAppRunTaskPage(global.context, message.text, 3);
+    },
+
+
+
+
+};
+
+// 4. 单击用户年龄检测应用首页九宫格中的按钮，进入单个应用页面，执行年龄检测
+export function openOneUserAgeJudgeAppPageByID(context, id) {
+    console.log("IDE openOneUserAgeJudgeAppPageByID!", IDEPanels.userAgeJudgeAppRunPagePanelsMap);
+    if (IDEPanels.userAgeJudgeAppRunPagePanelsMap.has(id)) {
+        console.log("打开用户视图年龄检测应用运行页面：", IDEPanels.userAgeJudgeAppRunPagePanelsMap.get(id).visible);
+        IDEPanels.userAgeJudgeAppRunPagePanelsMap.get(id).reveal();
+    } else {
+        console.log("新建用户年龄检测识别应用运行页面");
+
+        let panel = vscode.window.createWebviewPanel(
+            'userAgeJudgeAppRunPage',
+            "用户应用",
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+            }
+        );
+        panel.webview.html = getHtmlContent(context, userOneAgeJudgeAppHtmlFilePath);
+
+        var appInfo = searchImgAppByID(context, id, 3);
+        if (appInfo == "none") {
+            console.error("can not found the app: ", id);
+        }
+
+        let postMobilePhotoTimer = undefined; // 接收手机人脸照片的计时器
+
+        let global = { panel, context, appInfo, postMobilePhotoTimer };
+        IDEPanels.userAgeJudgeAppRunPagePanelsMap.set(id, panel);
+
+        panel.webview.onDidReceiveMessage(message => {
+            if (oneUserAgeJudgeAppMessageHandler[message.command]) {
+                oneUserAgeJudgeAppMessageHandler[message.command](global, message);
+            } else {
+                vscode.window.showInformationMessage(`未找到名为 ${message.command} 回调方法!`);
+            }
+        }, undefined, context.subscriptions);
+
+        console.log("IDE openOneUserAgeJudgeAppPageByID 2!", global.panel);
+
+        panel.onDidChangeViewState(
+            () => {
+                console.log("年龄检测切换页面了！");
+            }
+        );
+
+        // 面板被关闭后重置
+        panel.onDidDispose(
+            () => {
+                panel = undefined;
+                IDEPanels.userAgeJudgeAppRunPagePanelsMap.delete(id);
+                if (global.postMobilePhotoTimer != undefined) {
+                    clearInterval(global.postMobilePhotoTimer);
+                    global.postMobilePhotoTimer = undefined;
+                    console.log("mobile photo timer killed！");
+                }
+                clearGlobalMobilePhotoCache();
+            },
+            null,
+            context.subscriptions
+        );
+    }
+}
+
+
+/* ******************************************************************************************************
+* 年龄检测 —— 移动端拍照 执行识别操作的函数
+* ******************************************************************************************************/
+// 0. 清除年龄检测缓存
+function clearGlobalMobilePhotoCache() {
+
+    // 清空缓存文件：
+}
+
+// 1. 传递照片 - todo
+function getPhotoFromMobileLoop(global) {
+    const photoFile = path.join(global.context.extensionPath, 'src/static/cache/ageJudge.png');
+
+    let bData = fs.readFileSync(photoFile);
+    let base64Str = bData.toString('base64');
+    let datauri = 'data:image/png;base64,' + base64Str;
+
+    global.panel.webview.postMessage({ getPhotoFromMobileRet: datauri });
+}
+
+// 2. 解包配置文件
+function unpackAgeJudgeConfigProcess(global) {
+    console.log("start unpack config files for age judge app: ", global.appInfo.name);
+
+    // 脚本位置
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "pack_bin_files.py");
+
+    let configFile = global.appInfo.encodeConfigFile;      // 配置文件
+    let outputDir = global.appInfo.outputDir;            // 输出路径,脚本里会新建一个文件夹unpack_target
+
+    let command_str = "python3 " + scriptPath + " " + configFile + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let scriptProcess = exec(command_str, {});
+
+    scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+    });
+
+    scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        let formatted_err = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({ unpackAgeJudgeConfigProcessErrorLog: formatted_err });
+    });
+
+    scriptProcess.on("exit", function () {
+        console.log("done!!");
+        let unpackPath = path.join(outputDir, "unpack_target");
+        let str = "Unpack age judge config files finished, the result is saved in " + unpackPath;
+        global.panel.webview.postMessage({ unpackAgeJudgeConfigProcessFinish: str });
+    });
+}
+
+// 3. 音频编码
+function encodeMobileAgeJudgeAppProcess(global) {
+    console.log("start encode for age judge app: ", global.appInfo);
+
+    // // 防止识别中提交新的录音，造成音频和输出不一样
+    // recorderAudioData.recorderCouldReceiveNextAudioFlag = false;
+
+    // 获取应用运行的起始时间
+    let startTime = new Date();//获取当前时间 
+    global["mobileAgeJudgeStartTime"] = startTime;
+    console.log("年龄检测应用运行起始时间为：", global.mobileAgeJudgeStartTime);
+
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "age_judge", "main.py");
+
+    let photoFile = path.join(global.context.extensionPath, mobilePhotoFilePath);  // 保存音频的文件
+    let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
+    let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+
+    let command_str = "python3 " + scriptPath + " " + photoFile + " " + configDir + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let scriptProcess = exec(command_str, {});
+
+    scriptProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        // 发送脉冲编码数据
+        if (data.indexOf("ENCODE RESULT") !== -1) {
+            // 输出是字符串，需要转成数组
+            let ret = data.split("**")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("*************encode ", JSON.parse(ret));
+            console.log("发送脉冲");
+            global.panel.webview.postMessage({ getMobileAgeJudgeAppEncodeRet: JSON.parse(ret) });
+
+        }
+    });
+    scriptProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        let formatted_err = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({ encodeMobileAgeJudgeAppProcessErrLog: formatted_err });
+    });
+    scriptProcess.on("exit", function () {
+        console.log("done!!");
+        let str = "Encode speech data finished, the result is saved in " + outputDir;
+        global.panel.webview.postMessage({ encodeMobileAgeJudgeAppProcessFinish: str });
+    });
+
+}
+
+// 4. 发送数据，芯片识别
+function runMobileAgeJudgeSendInputProcess(global) {
+    console.log("给芯片发送数据，执行年龄检测识别");
+
+    let scriptPath = path.join(global.context.extensionPath, "src", "static", "python", "send_input.py");
+    let outputDir = global.appInfo.outputDir;            // 编码文件保存目录, 只有一个input.txt和一个row.txt，直接放在应用的output目录下
+    let configDir = path.join(outputDir, "unpack_target");  // 配置文件目录，上一步解包后保存路径，要保证有br2.pkl文件
+
+    let command_str = "python3 " + scriptPath + " " + configDir + " " + outputDir;
+    console.log("执行命令为", command_str);
+    let chipCalculateProcess = exec(command_str, {});
+
+    chipCalculateProcess.stdout?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        if (data.indexOf("get slave ip port failed") != -1) {
+            global.panel.webview.postMessage({ mobileAgeJudgeGetIPAndPortFailed: data });
+        }
+        // 解析识别结果的输出
+        if (data.indexOf("OUTPUT SPIKES RESULT") !== -1) {
+            let ret = data.split("**")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("*************output ", JSON.parse(ret));
+            console.log("发送输出脉冲");
+            global.panel.webview.postMessage({ getMobileAgeJudgeOutputSpikesRet: JSON.parse(ret) });
+        }
+        if (data.indexOf("NUMBERRECOGNITION RESULT") !== -1) {
+            let numRet = data.split("$$")[1].replace(/(^\s*)|(\s*$)/g, "");
+            console.log("发送识别结果：", numRet);
+            global.panel.webview.postMessage({ getMobileAgeJudgeRegRet: numRet });
+        }
+    });
+    chipCalculateProcess.stderr?.on("data", function (data) {
+        log_output_channel.append(data);
+        console.log(data);
+        let formatted_err = data.split("\r\n").join("<br/>");
+        global.panel.webview.postMessage({ runMobileAgeJudgeSendInputProcessErrorLog: formatted_err });
+
+    });
+    chipCalculateProcess.on("exit", function () {
+        console.log("chip calculate finished!!");
+        global.panel.webview.postMessage({ runMobileSpeechSendInputProcessFinish: "done" });
+
+        // 获取应用运行的结束时间
+        let endTime = new Date();//获取当前时间 
+        global["mobileAgeJudgeEndTime"] = endTime;
+        console.log("应用运行结束时间为：", global.mobileAgeJudgeEndTime);
+        global["mobileAgeJudgeTotalRuntime"] = getAppRuntime(global.mobileAgeJudgeStartTime, global.mobileAgeJudgeEndTime);
+        console.log("应用运行耗时为：", global.mobileAgeJudgeTotalRuntime);
+        global.panel.webview.postMessage({ mobileAgeJudgeRecognitionProcessTime: global.mobileAgeJudgeTotalRuntime });
+
+        // 可以执行下一个图像识别
+        clearGlobalRecorderCache();
+
+
+
+    });
+}
+
 

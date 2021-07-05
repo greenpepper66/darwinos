@@ -52,13 +52,13 @@ export class AppsProvider implements vscode.TreeDataProvider<AppKind> {
 		);
 		this.appKinds.push(voiceApp);
 		var brainApp = new AppKind(
-			"脑电模拟",
+			"年龄检测",
 			AppsProvider.getIconUriForLabel("脑电模拟.png"),
 			vscode.TreeItemCollapsibleState.None,
 			{
-				command: '',
+				command: 'extension.gotoAppPage',
 				title: '',
-				arguments: []
+				arguments: ["ageJudgeApp", 3]
 			}
 		);
 		this.appKinds.push(brainApp);

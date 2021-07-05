@@ -20,32 +20,31 @@ function callbacks(data, cb) {
 }
 
 
-
 window.addEventListener('message', event => {
     const message = event.data;
     console.log("html get message:", message);
 
-    // 获取引应用文件列表
-    if (message.cmd == 'getSpeechAppsConfigListRet') {
+    // 获取模型文件列表
+    if (message.cmd == 'getAgeJudgeAppsConfigListRet') {
         this.appsConfigList = message.data;
         console.log(message.data);
         (callbacks[message.cbid] || function () { })(message.data);
         delete callbacks[message.cbid];
-        console.log('---------------------------message：get speech apps list', this.appsConfigList.length);
+        console.log('---------------------------message：get age judge apps list', this.appsConfigList.length);
     }
 
     // 应用删除结果
-    if (message.deleteSpeechAppConfigRet != undefined) {
-        console.log('---------------------------message：delete app ', message.deleteSpeechAppConfigRet);
+    if (message.deleteAgeJudgeAppConfigRet != undefined) {
+        console.log('---------------------------message：delete app ', message.deleteAgeJudgeAppConfigRet);
         // 表格中删除一行数据
-        deleteRowByID(message.deleteSpeechAppConfigRet);
+        deleteRowByID(message.deleteAgeJudgeAppConfigRet);
     }
 
 });
 
 // 根据id匹配结果，删除一行记录
 function deleteRowByID(id) {
-    let tab = document.getElementById('speechAppsTable');
+    let tab = document.getElementById('ageJudgeAppsTable');
     let trs = tab.getElementsByTagName('tr');
     for (let i = 0; i < trs.length; i++) {
         console.log("行号：", trs[i].rowIndex);
@@ -56,8 +55,11 @@ function deleteRowByID(id) {
     }
 }
 
+
+
+
 new Vue({
-    el: '#speechAppHome',
+    el: '#ageJudgeAppHome',
     data: {
         appsConfigList: [], // 全部应用
         appsShowedList: [],  // 根据搜索条件匹配的应用
@@ -68,7 +70,7 @@ new Vue({
     },
 
     mounted() {
-        callbacks('getSpeechAppsConfigList', appsConfigList => {
+        callbacks('getAgeJudgeAppsConfigList', appsConfigList => {
             this.appsConfigList = appsConfigList;
             this.appsShowedList = appsConfigList;
         });
@@ -77,34 +79,34 @@ new Vue({
 
     },
     methods: {
-        gotoNewSpeechAppPage() {
+        gotoNewAgeJudgeAppPage() {
             vscode.postMessage({
-                command: 'gotoNewSpeechAppPage',
-                text: '进入新建语音应用页面'
+                command: 'gotoNewAgeJudgeAppPage',
+                text: '进入新建年龄检测应用页面'
             });
         },
 
         // 删除一个应用
-        deleteSpeechAppConfig(appID) {
+        deleteAgeJudgeAppConfig(appID) {
             console.log("delete speech app: ", appID);
             vscode.postMessage({
-                command: 'deleteSpeechAppConfig',
+                command: 'deleteAgeJudgeAppConfig',
                 text: appID,
             });
 
         },
 
-        gotoSpeechAppInfoPage(imgAppID) {
+        gotoAgeJudgeAppInfoPage(imgAppID) {
             console.log("search app: ", imgAppID);
             // 给插件发送消息 跳转到详情页
             vscode.postMessage({
-                command: 'gotoSpeechAppInfoPage',
+                command: 'gotoAgeJudgeAppInfoPage',
                 text: imgAppID,
             });
         },
 
         /* 搜索框实现 */
-        searchSpeechApp() {
+        searchAgeJudgeApp() {
             // 获取用户输入的模型名称
             let searchNameVal = document.getElementById("searchByAppName").value;
             let searchModelVal = document.getElementById("searchByModelID").value;   // 按类别分类暂时没有实现
