@@ -1,93 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title></title>
-    <script src="../lib/jquery-1.10.2.js"></script>
-    <script src="../lib/wavesurfer/wavesurfer.min.js"></script>
-    <script src="../lib/wavesurfer/wavesurfer.timeline.js"></script>
-    <script src="../lib/wavesurfer/wavesurfer.cursor.js"></script>
-    <script src="../lib/wavesurfer/wavesurfer.spectrogram.js"></script>
-
-    <style>
-        .waveform {
-            max-width: 800px;
-            height: 150px;
-            margin: auto;
-        }
-    </style>
-
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传图片</title>
 </head>
-
 <body>
-    <div id="waveform" class="waveform"></div>
-    <a href="javascript:" id="btnPlay" role="button">播放</a>
-    <a href="javascript:" id="btnPause" role="button">暂停</a>
-
-    <div>
-        <input type="file" id="fileinput" />
-    </div>
-    <script>
-        var wavesurfer = WaveSurfer.create({
-            container: '#waveform'
-        });
-
-        $("#fileinput").on("change", function () {
-            var file = this.files[0];
-            console.log(file);
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function (evt) {
-                    // var blob = new window.Blob([new Uint8Array(evt.target.result)]);
-                    
-                    
-                    console.log("blob", blob);
-                    wavesurfer.loadBlob(blob);
-                };
-                reader.onerror = function (evt) {
-                    console.error("An error ocurred reading the file: ", evt);
-                };
-                reader.readAsArrayBuffer(file);
-            }
-
-            // wavesurfer.load(require("../cache/audio.wav"));
-
-        });
-
-        // wavesurfer.load('./zxx-comic-01.mp3');
-        // 播放和暂停
-        btnPlay.addEventListener('click', function () {
-            wavesurfer.play();
-        });
-        btnPause.addEventListener('click', function () {
-            wavesurfer.pause();
-        });
-
-
-
-
-        function base64ToBlob(base64, fileType) {
-            let typeHeader = 'data:application/' + fileType + ';base64,'; // 定义base64 头部文件类型
-            let audioSrc = typeHeader + base64; // 拼接最终的base64
-            let arr = audioSrc.split(',');
-            let array = arr[0].match(/:(.*?);/);
-            let mime = (array && array.length > 1 ? array[1] : type) || type;
-            // 去掉url的头，并转化为byte
-            let bytes = window.atob(arr[1]);
-            // 处理异常,将ascii码小于0的转换为大于0
-            let ab = new ArrayBuffer(bytes.length);
-            // 生成视图（直接针对内存）：8位无符号整数，长度1个字节
-            let ia = new Uint8Array(ab);
-            for (let i = 0; i < bytes.length; i++) {
-                ia[i] = bytes.charCodeAt(i);
-            }
-            console.log("base64转为blob");
-            return new Blob([ab], {
-                type: mime
-            });
-        }
-    </script>
+<form id="filename" name="theForm" action="" method="POST">
+    <input type="file" name="phone" accept="image/*" capture="camera"/>
+</form>
+<button onclick="postData()">Submit</button>
 </body>
+<script src='https://cdn.bootcdn.net/ajax/libs/jquery/3.5.0/jquery.min.js'></script>
+<script>
 
+
+    function postData() {
+        var formData = new FormData();
+        formData.append("file", document.getElementById('filename')[0].files[0]);
+        $.ajax({
+            url: 'http://172.20.10.2:8081/upload',
+            type: 'post',
+            data: formData,
+            contentType: false,
+            processData: false,
+            headers: {
+                "accept": 'application/json',
+                "Conten-Type": 'multipart/form-data',
+            },
+            success: function (res) {
+                console.log(res.data)
+            }
+        });
+    }
+</script>
 </html>

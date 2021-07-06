@@ -1583,3 +1583,11 @@ table.fatigueDrivingApp_page_table tr td:nth-child(6) {
   word-wrap:break-word;
   white-space: pre-line;
 }
+/****************************************************************************
+  **** 11. 年龄检测页面
+  ****************************************************************************/
+
+.userAgeJudgeOneApp_outputNum {
+  font-size: 30px;
+  margin-top: 70px;
+}

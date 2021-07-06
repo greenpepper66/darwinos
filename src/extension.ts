@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { EmptyDataProvider, EmptyData } from "./DataProvider/EmptyDataProvider";
 import { changeIndexHtmlCss, uploadModelPageProvideByPort, modelHomePageProvideByPort, resourceHomePageProvideByPort, nodePageProvideByPort, chipPageProvideByPort } from "./PageProvider";
-import { startHttpServer, startHandWriterServer, startRecorderHttpsServer } from './os/server';
+import { startHttpServer, startRecorderHttpsServer } from './os/server';
 import { AppsHomePageProvide, openCertainAppHomePage } from "./pages/AppsHome";
 import { openImgAppRunTaskPage, openImgAppTasksPage } from "./pages/ImgAppHome";
 import { OpenLoginPage } from "./pages/UserLogin";
@@ -137,11 +137,8 @@ export function activate(context: vscode.ExtensionContext) {
 	terminal1.sendText("cd " + resourcePath);
 	terminal1.sendText("serve -s dist -l 5001");
 
-	// 启动手写板网页服务
-	startHandWriterServer(context);
-	// 启动语音网页https服务
+	// 启动手机端网页https服务
 	startRecorderHttpsServer(context);
-	
 
 	// 自动弹出登录页面导航栏
 	openLoginTreeView(context);

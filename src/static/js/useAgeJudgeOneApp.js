@@ -135,7 +135,7 @@ window.addEventListener('message', event => {
         console.log(message.data);
         (callbacks[message.cbid] || function () { })(message.data);
         delete callbacks[message.cbid];
-        console.log('---------------------------message：get recorder url', this.ageJudgeServerURL);
+        console.log('---------------------------message：get age-judge url', this.ageJudgeServerURL);
 
         // 开始接收人脸照片
         startGetPhotoFromMobile();
@@ -261,15 +261,29 @@ window.addEventListener('message', event => {
         // 显示识别结果
         console.log("为啥没了啊！！", document.getElementById("userAgeJudgeOneApp_photo_outputResult"))
 
+         // 显示年龄段
+         var age = "0";
+         if (message.getMobileAgeJudgeRegRet == 0) {
+             age = "0-20";
+         } else if (message.getMobileAgeJudgeRegRet == 1) {
+             age = "21-32";
+         } else if (message.getMobileAgeJudgeRegRet == 2) {
+             age = "33-48";
+         } else if (message.getMobileAgeJudgeRegRet == 3) {
+             age = "49-59";
+         } else if (message.getMobileAgeJudgeRegRet == 4) {
+             age = "60-100";
+         }
+
         if (document.getElementById("userAgeJudgeOneApp_photo_outputResult") == null) {
             let div_tag = document.createElement('div');
-            div_tag.className = "userMnistOneApp_handWriter_outputNum";
+            div_tag.className = "userAgeJudgeOneApp_outputNum";
             div_tag.id = "userAgeJudgeOneApp_photo_outputResult";
-            div_tag.innerHTML = message.getMobileAgeJudgeRegRet;
+            div_tag.innerHTML = age + "岁";
             console.log("*********************create div !!!!!!!!!!!!!!!!!");
             document.getElementById("mobileAgeJudge_output_num").appendChild(div_tag);
         } else {
-            document.getElementById("userAgeJudgeOneApp_photo_outputResult").innerHTML = message.getMobileAgeJudgeRegRet;
+            document.getElementById("userAgeJudgeOneApp_photo_outputResult").innerHTML = age + "岁";
         }
     }
 
@@ -327,7 +341,7 @@ function display_ageJudgeEncode_scatterChart(datas, eleID) {
         yAxis: {
             type: 'value',
             min: 0,
-            max: 800,  
+            max: 800,   // 28*28
             scale: true,
             name: "Neuron",
             nameTextStyle: {

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传图片</title>
+
+    <style>
+        .app_btn {
+            background-image: linear-gradient(180deg, #aed77c 0%, #8fb740 100%);
+            border-radius: 5px;
+            height: 30px;
+            width: 30%;
+            padding-top: 2px;
+            text-align: center;
+            border-style: none;
+            font-size: 16px;
+        }
+
+        .app_img {
+            width: 80%;
+            min-height: 300px;
+            margin: auto;
+            margin-left: 20px;
+        }
+
+        #cameraCapture {
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="button" value="点击拍照" class="app_btn" onclick="getPhoto()"  style="cursor:pointer"/>
+    <br />
+
+
+    <form id="filename" name="theForm" action="" method="POST" style="display: none;">
+        <input type="file" name="phone" accept="image/*" capture="camera" id="cameraCapture" />
+    </form>
+
+    <br />
+    <img src="" class="app_img" alt="展示区..." title="preview-img" id="imgShow" />
+    <br />
+    <br />
+
+    <input type="button" value="提交" class="app_btn" onclick="postData()" />
+</body>
+<script src='./jquery.js'></script>
+<script>
+
+    function getPhoto() {
+        document.getElementById("cameraCapture").click();
+    }
+
+
+    var fileInput = document.getElementById("cameraCapture"),
+        previewImg = document.getElementById("imgShow");
+    fileInput.addEventListener('change', function () {
+        var file = this.files[0];
+        var reader = new FileReader();
+        // 监听reader对象的的onload事件，当图片加载完成时，把base64编码賦值给预览图片
+        reader.addEventListener("load", function () {
+            previewImg.src = reader.result;
+        }, false);
+        // 调用reader.readAsDataURL()方法，把图片转成base64
+        reader.readAsDataURL(file);
+    }, false);
+
+    function postData() {
+        var formData = new FormData();
+        formData.append('fname', 'ageJudge.png');
+        formData.append("file", document.getElementById('filename')[0].files[0]);
+        $.ajax({
+            url: '/upload_photo',
+            type: 'post',
+            data: formData,
+            contentType: false,
+            processData: false,
+            headers: {
+                "accept": 'application/json',
+                "Conten-Type": 'multipart/form-data',
+            },
+            success: function (data) {
+                if (data == "refuse") {
+                    alert("年龄检测中，请稍后！");
+                }
+            },
+            error: function (data, status, e) {
+                alert("error: ", data);
+            }
+        });
+    }
+</script>
+
+</html>

@@ -93,6 +93,8 @@ def real_time_snn_detect():
     for i in range(len(br2_input_spike_monitor.spike_trains().items())):
         input_spike_seqs.append([i, [int(tm/brian2.ms) for tm in list(br2_input_spike_monitor.spike_trains()[i])]])
     print("out spikes={}, pred label={}".format(out_spikes, np.argmax(out_spikes)))
+
+    print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", input_spike_seqs)
     
         # 数据重排，写入缓存文件，用于显示脉冲图
     spike_tuples = []

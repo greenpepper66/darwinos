@@ -5,7 +5,7 @@ import { ChildProcess, exec, spawn } from "child_process";
 import { searchAllJson, updateImgAppInfo, searchImgAppByID, updateImgAppStatusToTask } from '../DataProvider/ImgAppJsonDataProvider';
 import { openImgAppInfoPage, openImgAppRunTaskPage, openSpeechAppInfoPage, openAgeJudgeAppInfoPage } from './ImgAppHome';
 import { IDEPanels } from "../extension";
-import { handWriterData, recorderAudioData } from '../os/server';
+import { handWriterData, recorderAudioData, mobileAgeJudgeData } from '../os/server';
 import { getOnlyHandWriterData, updataHandWriterAppID } from "../DataProvider/HandWriterImgJsonDataProvider";
 
 const decode = require('audio-decode');
@@ -21,9 +21,8 @@ log_output_channel.show();
 // 手写板图像保存位置
 const handWriterImgSaveFilePath = "src/static/cache/handWriterImgBase64Data.txt";
 // 手写板页面访问地址
-const handWriterServerURL = "http://" + ip.address() + ":5003"
+const MobileAppServerHomeURL = "https://" + ip.address() + ":5003"
 // 页面录音器访问地址
-const recorderHttpsServerURL = "https://" + ip.address() + ":5004"
 // 录音文件地址
 const recorderWavFilePath = "src/static/cache/audio.wav";
 // 手机拍照年龄检测照片地址
@@ -368,7 +367,7 @@ const oneUserAppMessageHandler = {
     // 获取手写板url
     getHandWriterServerURL(global, message) {
         console.log(message);
-        global.panel.webview.postMessage({ cmd: 'getHandWriterServerURLRet', cbid: message.cbid, data: handWriterServerURL });
+        global.panel.webview.postMessage({ cmd: 'getHandWriterServerURLRet', cbid: message.cbid, data: MobileAppServerHomeURL });
         // 该应用成为一条任务
 
     },
@@ -1359,7 +1358,7 @@ const oneUserSpeechAppMessageHandler = {
     // 获取录音url
     getRecorderHttpsServerURL(global, message) {
         console.log(message);
-        global.panel.webview.postMessage({ cmd: 'getRecorderHttpsServerURLRet', cbid: message.cbid, data: recorderHttpsServerURL });
+        global.panel.webview.postMessage({ cmd: 'getRecorderHttpsServerURLRet', cbid: message.cbid, data: MobileAppServerHomeURL });
     },
 
     // 解包配置文件, 用户页面上一收到server地址就执行解包
@@ -1749,7 +1748,7 @@ const oneUserAgeJudgeAppMessageHandler = {
     // 获取手机拍照url
     getAgeJudgeHttpsServerURL(global, message) {
         console.log(message);
-        global.panel.webview.postMessage({ cmd: 'getAgeJudgeHttpsServerURLRet', cbid: message.cbid, data: "test" });
+        global.panel.webview.postMessage({ cmd: 'getAgeJudgeHttpsServerURLRet', cbid: message.cbid, data: MobileAppServerHomeURL });
     },
 
     // 解包配置文件, 用户页面收到server地址就执行解包
@@ -1868,7 +1867,7 @@ export function openOneUserAgeJudgeAppPageByID(context, id) {
 * ******************************************************************************************************/
 // 0. 清除年龄检测缓存
 function clearGlobalMobilePhotoCache() {
-
+    mobileAgeJudgeData.mobileCouldReceiveNextPhotoFlag = true;
     // 清空缓存文件：
 }
 
@@ -1876,11 +1875,19 @@ function clearGlobalMobilePhotoCache() {
 function getPhotoFromMobileLoop(global) {
     const photoFile = path.join(global.context.extensionPath, 'src/static/cache/ageJudge.png');
 
-    let bData = fs.readFileSync(photoFile);
-    let base64Str = bData.toString('base64');
-    let datauri = 'data:image/png;base64,' + base64Str;
+    let postMobilePhotoTimer = setInterval(function encodeAndSendData() {
+        // 显示原始photo信息
+        if (mobileAgeJudgeData.mobilePhotoShowedFlag == false && global.panel.visible == true) {
+            let bData = fs.readFileSync(photoFile);
+            let base64Str = bData.toString('base64');
+            let datauri = 'data:image/png;base64,' + base64Str;
 
-    global.panel.webview.postMessage({ getPhotoFromMobileRet: datauri });
+            global.panel.webview.postMessage({ getPhotoFromMobileRet: datauri });
+
+            mobileAgeJudgeData.mobilePhotoShowedFlag = true; // 其他app页面不能再显示
+        }
+    }, 500);
+    global["postMobilePhotoTimer"] = postMobilePhotoTimer;
 }
 
 // 2. 解包配置文件
@@ -1921,8 +1928,8 @@ function unpackAgeJudgeConfigProcess(global) {
 function encodeMobileAgeJudgeAppProcess(global) {
     console.log("start encode for age judge app: ", global.appInfo);
 
-    // // 防止识别中提交新的录音，造成音频和输出不一样
-    // recorderAudioData.recorderCouldReceiveNextAudioFlag = false;
+    // 防止手机提交新的照片，造成图像和输出不一样
+    mobileAgeJudgeData.mobileCouldReceiveNextPhotoFlag = false;
 
     // 获取应用运行的起始时间
     let startTime = new Date();//获取当前时间 
@@ -2017,7 +2024,7 @@ function runMobileAgeJudgeSendInputProcess(global) {
         global.panel.webview.postMessage({ mobileAgeJudgeRecognitionProcessTime: global.mobileAgeJudgeTotalRuntime });
 
         // 可以执行下一个图像识别
-        clearGlobalRecorderCache();
+        clearGlobalMobilePhotoCache();
 
 
 

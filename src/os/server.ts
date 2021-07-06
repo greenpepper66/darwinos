@@ -37,6 +37,12 @@ export module recorderAudioData {
 	export let recorderAudioShowedFlag = true;
 }
 
+// 年龄检测，手机拍照数据
+export module mobileAgeJudgeData {
+	export let mobileCouldReceiveNextPhotoFlag = true;
+	export let mobilePhotoShowedFlag = true;
+}
+
 
 
 /**
@@ -177,22 +183,50 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 
 
 
-/**
- * 本地http server
- * 功能1：客户端手写板应用server
- * @param context 
- */
-export function startHandWriterServer(context) {
+// /**
+//  * 本地http server
+//  * 功能1：客户端手写板应用server
+//  * @param context 
+//  */
+// export function startHandWriterServer(context) {
 
+// 	// 获取本机ip
+// 	const hostName = handWriterData.localIP;
+// 	console.log("本机ip地址为：", hostName);
+// 	const port = 5004; //端口
+// 	const app = express();
+
+	
+// 	app.listen(port, hostName, function () {
+// 		console.log(`类脑应用服务器运行在http://${hostName}:${port}`);
+// 	});
+// }
+
+
+
+// 语音识别应用 本地https server
+export function startRecorderHttpsServer(context) {
 	// 获取本机ip
 	const hostName = handWriterData.localIP;
 	console.log("本机ip地址为：", hostName);
 	const port = 5003; //端口
 	const app = express();
 
+	const WAVFile = path.join(context.extensionPath, 'src/static/cache/audio.wav');
+	const testPath = path.join(context.extensionPath, 'src/static/cache');
+
+	// ssl证书文件
+	const sslKeyFile = path.join(context.extensionPath, 'src/resources/certs/server.key');
+	const sslCertFile = path.join(context.extensionPath, 'src/resources/certs/server.cert');
+
+
+	// 入口
+	app.use('/', express.static(path.join(context.extensionPath, 'src/resources/app'))); //指定静态文件目录
+
+
 	// 1. 手写板应用接口
 	// 1.1 提供手写板访问页面：pc端和手机端都可访问，用于输入手写数字
-	app.use('/', express.static(path.join(context.extensionPath, 'src/resources/hand-writer'))); //指定静态文件目录
+	app.use('/hand_writer', express.static(path.join(context.extensionPath, 'src/resources/hand-writer'))); //指定静态文件目录
 
 	// app.get('/handwriter', function (req, res) {
 	// 	res.sendfile(path.join(context.extensionPath, 'src/resources/hand-writer') + '/index.html')
@@ -220,96 +254,99 @@ export function startHandWriterServer(context) {
 		});
 	});
 
+	// 2. 年龄检测应用接口，获取摄像机拍照图像
+	app.use('/age_judge', express.static(path.join(context.extensionPath, 'src/resources/age-judge')));
 
-	app.listen(port, hostName, function () {
-		console.log(`类脑应用服务器运行在http://${hostName}:${port}`);
-	});
-}
+	app.post('/upload_photo', function (req, res) {
+		console.log(req, "body")
 
-
-
-// 语音识别应用 本地https server
-export function startRecorderHttpsServer(context) {
-	// 获取本机ip
-	const hostName = handWriterData.localIP;
-	console.log("本机ip地址为：", hostName);
-	const port = 5004; //端口
-	const app = express();
-
-	const WAVFile = path.join(context.extensionPath, 'src/static/cache/audio.wav');
-	const testPath = path.join(context.extensionPath, 'src/static/cache');
-
-	// ssl证书文件
-	const sslKeyFile = path.join(context.extensionPath, 'src/resources/certs/server.key');
-	const sslCertFile = path.join(context.extensionPath, 'src/resources/certs/server.cert');
-
-	app.use('/', express.static(path.join(context.extensionPath, 'src/resources/recorder'))); //指定静态文件目录
-
-	app.post('/post_audio', function (req, res) {
-		console.log(new Date().getTime(), "收到音频");
-		if (recorderAudioData.recorderCouldReceiveNextAudioFlag === true) {
-			// 	// 接收FormData
-			// 	//生成multiparty对象，并配置上传目标路径
-			// 	var form = new multiparty.Form({ uploadDir: testPath });
-			// 	form.parse(req, function (err, fields, files) {
-			// 		console.log(fields, files, ' fields2');
-			// 		if (err) {
-			// 			console.log("保存失败", err);
-			// 		} else {
-			// 			// 重命名
-			// 			var inputFile = files.data[0];
-			// 			var uploadedPath = inputFile.path;
-			// 			var dstPath = WAVFile;
-			// 			//重命名为真实文件名
-			// 			fs.rename(uploadedPath, dstPath, function (err) {
-			// 				if (err) {
-			// 					console.log('rename error: ' + err);
-			// 				} else {
-			// 					files.data[0].path = dstPath;
-			// 					console.log('rename ok',files.data[0]);
-			// 				}
-			// 			});
-			// 			console.log("保存成功", files);
-			// 		}
-			// 	});
-			// 	recorderAudioData.recorderAudioShowedFlag = false;
-			// 	res.send("success");
-			// } else {
-			// 	res.send("refuse");
-			// }
-
-
-
-			var currentData = ""
-			req.on("data", function (data) {
-				currentData += data;
-			});
-			req.on("end", function (data) {
-				console.log(new Date().getTime(), "收到音频");
-				if (recorderAudioData.recorderCouldReceiveNextAudioFlag == true) {
-					// 接收blob经过base64编码后的音频
-					let obj = JSON.parse(currentData);
-					let buf = new Buffer(obj.blob, 'base64'); // decode
-					// 保存音频
-					fs.writeFile(WAVFile, buf, function (err) {
-						if (err) {
-							console.log("err", err);
-						} else {
-							console.log("保存成功");
-						}
-					});
-					recorderAudioData.recorderAudioShowedFlag = false;
-					// recorderAudioData.currentAudioBs64Data = obj.blob;
-					res.send("success");
+		if (mobileAgeJudgeData.mobileCouldReceiveNextPhotoFlag === true) {
+			//生成multiparty对象，并配置上传目标路径
+			const testPath = path.join(context.extensionPath, 'src/static/cache/'); // 最后必须有/
+			var form = new multiparty.Form({ uploadDir: testPath });
+			form.parse(req, function (err, fields, files) {
+				console.log(fields, files, ' fields2')
+				var fileOne = files.file[0]
+				if (err) {
+					res.send("error: ", err);
 				} else {
-					res.send("refuse");
+					//同步重命名文件名
+					fs.renameSync(fileOne.path, form.uploadDir + fields.fname[0]);
+					console.log("photo 重命名成功！");
+					mobileAgeJudgeData.mobilePhotoShowedFlag = false;
+					res.json({ imgSrc: files.image[0].path })
 				}
 			});
+		} else {
+			res.send("refuse");
 		}
 	});
 
 
+	// 3. 手机录音应用
+	app.use('/recorder', express.static(path.join(context.extensionPath, 'src/resources/recorder'))); //指定静态文件目录
+	app.post('/post_audio', function (req, res) {
+		console.log(new Date().getTime(), "收到音频");
 
+		// 	// 接收FormData
+		// 	//生成multiparty对象，并配置上传目标路径
+		// 	var form = new multiparty.Form({ uploadDir: testPath });
+		// 	form.parse(req, function (err, fields, files) {
+		// 		console.log(fields, files, ' fields2');
+		// 		if (err) {
+		// 			console.log("保存失败", err);
+		// 		} else {
+		// 			// 重命名
+		// 			var inputFile = files.data[0];
+		// 			var uploadedPath = inputFile.path;
+		// 			var dstPath = WAVFile;
+		// 			//重命名为真实文件名
+		// 			fs.rename(uploadedPath, dstPath, function (err) {
+		// 				if (err) {
+		// 					console.log('rename error: ' + err);
+		// 				} else {
+		// 					files.data[0].path = dstPath;
+		// 					console.log('rename ok',files.data[0]);
+		// 				}
+		// 			});
+		// 			console.log("保存成功", files);
+		// 		}
+		// 	});
+		// 	recorderAudioData.recorderAudioShowedFlag = false;
+		// 	res.send("success");
+		// } else {
+		// 	res.send("refuse");
+		// }
+
+
+
+		var currentData = ""
+		req.on("data", function (data) {
+			currentData += data;
+		});
+		req.on("end", function (data) {
+			console.log(new Date().getTime(), "收到音频");
+			if (recorderAudioData.recorderCouldReceiveNextAudioFlag == true) {
+				// 接收blob经过base64编码后的音频
+				let obj = JSON.parse(currentData);
+				let buf = new Buffer(obj.blob, 'base64'); // decode
+				// 保存音频
+				fs.writeFile(WAVFile, buf, function (err) {
+					if (err) {
+						console.log("err", err);
+					} else {
+						console.log("保存成功");
+					}
+				});
+				recorderAudioData.recorderAudioShowedFlag = false;
+				// recorderAudioData.currentAudioBs64Data = obj.blob;
+				res.send("success");
+			} else {
+				res.send("refuse");
+			}
+		});
+
+	});
 
 
 	https.createServer({
@@ -317,7 +354,7 @@ export function startRecorderHttpsServer(context) {
 		cert: fs.readFileSync(sslCertFile)
 	}, app)
 		.listen(port, function () {
-			console.log(`Recorder app running on https://${hostName}:${port}/`)
+			console.log(`类脑手机端应用 running on https://${hostName}:${port}/`)
 		})
 
 }
