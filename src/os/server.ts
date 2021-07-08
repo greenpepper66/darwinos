@@ -183,28 +183,7 @@ export function startHttpServer(ResDataProvider: ResProvider, ModelDataProvider:
 
 
 
-// /**
-//  * 本地http server
-//  * 功能1：客户端手写板应用server
-//  * @param context 
-//  */
-// export function startHandWriterServer(context) {
-
-// 	// 获取本机ip
-// 	const hostName = handWriterData.localIP;
-// 	console.log("本机ip地址为：", hostName);
-// 	const port = 5004; //端口
-// 	const app = express();
-
-	
-// 	app.listen(port, hostName, function () {
-// 		console.log(`类脑应用服务器运行在http://${hostName}:${port}`);
-// 	});
-// }
-
-
-
-// 语音识别应用 本地https server
+// 移动端数据输入 本地https server
 export function startRecorderHttpsServer(context) {
 	// 获取本机ip
 	const hostName = handWriterData.localIP;

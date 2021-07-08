@@ -59,8 +59,10 @@ def real_time_snn_detect():
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), "Finish initialize snn.")
     with open(LAYER_WIDTH_FILE_PATH, "rb") as f:
         layerWidth = pickle.load(f)
+        print("layerWidth", layerWidth)
     with open(NODE_LIST_FILE_PATH, "rb") as f:
         nodeList = pickle.load(f)
+        print("nodeList", nodeList)
     with open(INPUT_LAYER1_FILE_PATH, "rb") as f:
         in_layer1 = pickle.load(f)
 
@@ -94,7 +96,7 @@ def real_time_snn_detect():
         input_spike_seqs.append([i, [int(tm/brian2.ms) for tm in list(br2_input_spike_monitor.spike_trains()[i])]])
     print("out spikes={}, pred label={}".format(out_spikes, np.argmax(out_spikes)))
 
-    print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", input_spike_seqs)
+    
     
         # 数据重排，写入缓存文件，用于显示脉冲图
     spike_tuples = []

@@ -114,7 +114,7 @@ if isExists1 and isExists2:
     idx = 0
     pr = []
     result = []
-    spike = [0] * 10
+    spike = [0] * 1000
     while pos < len(input_list):
         rank = int(row_list[idx].strip(), 16)
         idx += 1
@@ -127,10 +127,12 @@ if isExists1 and isExists2:
         if len(result) > 8:
             fmt = 'Q' * int(len(result)/8)    # Q: unsigned long long
             result = struct.unpack(fmt,result)
+            print("result: ", result)
             for i in range(0, len(result), 2):
+                print("test index: ", int(result[i + 1] % (1 << 32) // (1 << 16)))
                 spike[int(result[i + 1] % (1 << 32) // (1 << 16))] += 1
         pos = rank
-
+        print("spike:", spike)
 
     spike_str = str(spike)
     max_index = spike.index(max(spike))  

@@ -94,8 +94,10 @@ def real_time_snn_detect():
 
     with open(LAYER_WIDTH_FILE_PATH, "rb") as f:
         layerWidth = pickle.load(f)
+        print("layerWidth", layerWidth)
     with open(NODE_LIST_FILE_PATH, "rb") as f:
         nodeList = pickle.load(f)
+        print("nodeList", nodeList)
     with open(INPUT_LAYER1_FILE_PATH, "rb") as f:
         in_layer1 = pickle.load(f)
 
